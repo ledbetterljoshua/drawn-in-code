@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Drawn in Code</title>
+<meta name="description" content="Illustrations Claude makes out of plain JavaScript and a canvas. No image models, no image files, and most of it moves when you touch it.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  /* A night gallery: ink-dark walls so each drawing reads like a lit window. One column of type on
+     the left, the plates in a loose grid; the newest hangs largest. */
+  :root {
+    --wall: #17121b;        /* the gallery wall */
+    --wall-lift: #211a27;   /* plate mats, hover */
+    --ink: #f4ebdf;         /* type */
+    --ink-dim: #b3a6a9;     /* captions */
+    --ink-faint: #7d6f78;   /* meta, rules */
+    --lamp: #f3b86a;        /* the one warm accent: links, focus */
+    --display: "Young Serif", "Iowan Old Style", Georgia, serif;
+    --body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box }
+  html { background: var(--wall) }
+  body {
+    margin: 0; background: var(--wall); color: var(--ink); font: 400 17px/1.6 var(--body);
+    padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px));
+    padding-block: clamp(40px, 7vw, 96px) 64px;
+  }
+  .wrap { max-width: 1240px; margin: 0 auto; display: grid; gap: clamp(40px, 6vw, 72px) }
+  header { display: grid; gap: 18px; max-width: 40rem }
+  h1 { font: 400 clamp(44px, 7.5vw, 88px)/0.98 var(--display); letter-spacing: -0.01em; margin: 0; text-wrap: balance }
+  header p { margin: 0; color: var(--ink-dim); font-size: 18px; text-wrap: pretty }
+  .links { display: flex; flex-wrap: wrap; gap: 6px 22px; font: 500 13px/1.4 var(--mono); letter-spacing: 0.02em }
+  a { color: var(--lamp); text-decoration: none }
+  a:hover { text-decoration: underline; text-underline-offset: 3px }
+  a:focus-visible { outline: 2px solid var(--lamp); outline-offset: 4px; border-radius: 4px }
+
+  .plates { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr)); gap: clamp(28px, 4vw, 48px) clamp(20px, 3vw, 36px) }
+  .plate { display: grid; gap: 14px; color: inherit; min-width: 0 }
+  .plate:hover { text-decoration: none }
+  .plates .plate:first-child:not(:only-child) { grid-column: 1 / -1 }
+  .frame { aspect-ratio: 3 / 2; max-width: 100%; background: var(--wall-lift); border-radius: 6px; overflow: hidden;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.05) inset, 0 24px 60px -30px rgba(243,184,106,0.25) }
+  .frame img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s cubic-bezier(.2,.7,.2,1) }
+  .plate:hover .frame img, .plate:focus-visible .frame img { transform: scale(1.025) }
+  .caption { display: grid; gap: 4px; min-width: 0 }
+  .caption h2 { font: 400 26px/1.15 var(--display); margin: 0 }
+  .caption p { margin: 0; color: var(--ink-dim) }
+  .meta { font: 400 12.5px/1.5 var(--mono); color: var(--ink-faint); font-variant-numeric: tabular-nums; letter-spacing: 0.01em }
+
+  footer { border-top: 1px solid rgba(244,235,223,0.1); padding-top: 22px; color: var(--ink-faint); font-size: 14px; max-width: 40rem }
+  footer p { margin: 0 }
+  .empty { color: var(--ink-dim) }
+  @media (prefers-reduced-motion: reduce) { .frame img { transition: none } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Drawn in Code</h1>
+    <p>Illustrations Claude makes out of plain JavaScript and a canvas. There are no image models and no image files: every cloud, roof tile and frog is code. Most of it moves when you touch it.</p>
+    <nav class="links" aria-label="About this project">
+      <a href="https://github.com/ledbetterljoshua/drawn-in-code">source on GitHub</a>
+      <a href="https://github.com/ledbetterljoshua/drawn-in-code/blob/main/.claude/skills/drawing-in-code/SKILL.md">how they're made</a>
+    </nav>
+  </header>
+
+  <main class="plates" id="plates" aria-live="polite">
+    <p class="empty">Hanging the drawings…</p>
+  </main>
+
+  <footer>
+    <p>Each drawing is a single page you can open on its own. Hover or tap anything; on a phone, a tap holds for a moment.</p>
+  </footer>
+</div>
+<script>
+  const fmtDate = (d) => new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  fetch('scenes.json').then((r) => r.json()).then((scenes) => {
+    const box = document.getElementById('plates');
+    box.textContent = '';
+    if (!scenes.length) { box.appendChild(el('p', 'empty', 'Nothing hung yet.')); return; }
+    for (const s of scenes) {
+      const a = el('a', 'plate'); a.href = `scenes/${s.slug}/`;
+      const frame = el('div', 'frame');
+      const img = el('img'); img.src = `thumbs/${s.slug}.jpg`; img.alt = s.title; img.loading = 'lazy';
+      frame.appendChild(img);
+      const cap = el('div', 'caption');
+      cap.appendChild(el('h2', null, s.title));
+      if (s.blurb) cap.appendChild(el('p', null, s.blurb));
+      const bits = [`${s.lines.toLocaleString()} lines of JavaScript`, s.by, s.made && fmtDate(s.made)].filter(Boolean);
+      cap.appendChild(el('div', 'meta', bits.join(' · ')));
+      a.append(frame, cap);
+      box.appendChild(a);
+    }
+  }).catch(() => { document.getElementById('plates').textContent = 'The gallery list did not load. Try a refresh.'; });
+</script>
+</body>
+</html>
