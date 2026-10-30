@@ -61,7 +61,7 @@ layer({
     for (const f of flowers) streak(f.X, f.Z, f.h, 2.5);
     streak(HIVE[0], HIVE[2], 40, 14); streak(-150, 168, 78, 6); streak(HB[0], HB[2], 62, 4);
     const [bX, bZ] = CF.cottage.at(-84, 76); streak(bX, bZ, 30, 18);
-    streak(-104, 150, 30, 12, 0.6); streak(-52, 196, 22, 16, 0.6);
+    streak(-104, 150, 30, 12, 0.6);
     for (let a = 1.75; a <= 2.75; a += 0.07) { const [X, Z] = CF.rim(a); streak(X * 0.93, Z * 0.93, 18, 2.2, 0.5); }
     // the trunk's shadow, a long thin streak back to the left
     const [tx, ty] = pr(TREE.X, 0, TREE.Z), [sx2, sz2] = CF.shadowOf(TREE.X, 130, TREE.Z), [ex, ey] = pr(sx2, 0, sz2);
@@ -111,12 +111,15 @@ function drawTree(g) {
     cl.push([cx + Math.cos(a) * 150 * d, cy + Math.sin(a) * 105 * d, 30 + R() * 22]);
   }
   cl.push([cx, cy - 10, 44], [cx + 40, cy - 50, 40], [cx - 50, cy - 30, 40], [cx + 10, cy - 80, 36], [cx - 80, cy + 30, 34]);
-  const dark = (x, y) => clamp(((cx - x) / 160 + (y - cy) / 110) * 0.45 + 0.1, 0, 0.9);
+  const dark = (x, y) => clamp(((cx - x) / 150) * 0.55 + ((y - cy) / 110) * 0.35 + 0.12, 0, 0.92);
   // back clumps first, darker, so the canopy has depth
   CF.leafy(g, cl.map(([x, y, r_]) => [x - 8, y - 12, r_ * 0.95]), M.leaf, { seed: 3, dark: (x, y) => clamp(dark(x, y) + 0.35, 0, 0.95), lw: 2.2 });
   CF.leafy(g, cl, M.leafWarm, { seed: 7, dark, lw: 2.4 });
   // gaps of sky between the clumps aren't there; but light between: a few bright leaves
 
+  // the low sun catching the right edge of the crown
+  g.save(); const U = new Path2D(); for (const [x, y, r_] of cl) CF.scallop(x, y, r_, 1, U); g.clip(U);
+  g.lineWidth = 9; g.strokeStyle = grad(g, cx + 40, 0, cx + 170, 0, ['rgba(255,214,140,0)', 'rgba(255,214,140,0.55)']); g.stroke(U); g.restore();
   // ripe peaches, mostly on the sunny side
   peaches.length = 0;
   for (let i = 0; i < 24; i++) {
@@ -201,7 +204,7 @@ layer({
     g.lineWidth = 1.3; g.strokeStyle = '#6e4c46';
     for (const k of [-3, 0, 3]) { g.beginPath(); g.moveTo(ax, ay); g.lineTo(e1[0], e1[1] + k); g.moveTo(bx, by); g.lineTo(e2[0], e2[1] + k); g.stroke(); }
     const breathe = Math.sin(t * 1.6) * 0.6;
-    frog(g, mx + 10, my - 12 + breathe, 0.62, { sleep: ham.wake < 0.5, open: ham.wake, smile: 1.4 + L.hover * 2, rot: -0.2 + ham.a * 0.3, c: CF.FROG_TINTS.moss });
+    frog(g, mx + 10, my - 12 + breathe, 0.72, { sleep: ham.wake < 0.5, open: ham.wake, smile: 1.4 + L.hover * 2, rot: -0.2 + ham.a * 0.3, c: CF.FROG_TINTS.moss });
     const cA = [mx * 2 - (e1[0] + e2[0]) / 2, (my - 14) * 2 - (e1[1] + e2[1]) / 2], cB = [mx * 2 - (e1[0] + e2[0]) / 2, (my + 8) * 2 - (e1[1] + e2[1]) / 2];
     const fabric = new Path2D(); fabric.moveTo(...e1); fabric.quadraticCurveTo(...cA, ...e2); fabric.quadraticCurveTo(...cB, ...e1); fabric.closePath();
     ink(g, fabric, '#f3d27e', 2, '#5a3a30');
@@ -218,7 +221,7 @@ layer({
 });
 
 // ------------------------------------------------------------------ the vegetable garden
-const BEDS = [{ X: -252, Z: 160, w: 120, d: 34, crop: 'cabbage' }, { X: -246, Z: 205, w: 110, d: 30, crop: 'carrot' }, { X: -128, Z: 214, w: 70, d: 28, crop: 'pumpkin' }];
+const BEDS = [{ X: -252, Z: 170, w: 120, d: 34, crop: 'cabbage' }, { X: -150, Z: 214, w: 70, d: 28, crop: 'pumpkin' }];
 const gard = { water: 0, perk: 0, blink: D.blinker(), can: 0 };
 function bedBox(g, B) {
   const x0 = B.X - B.w / 2, x1 = B.X + B.w / 2, z0 = B.Z - B.d / 2, z1 = B.Z + B.d / 2, h = 8;
@@ -245,14 +248,6 @@ layer({
       ink(g, ell(x + (r() - 0.5) * 6, y, 4, 2.4, undefined, r() * 3), r() < 0.5 ? tone(M.leaf, 0.5) : tone(M.leaf, 0.75), 0.8, M.leaf.line);
       if (r() < 0.25) ink(g, circ(x + 3, y + 2, 2), '#e0503f', 0.7, '#5a2030');
     }
-    // the wheelbarrow, left with a pumpkin in it
-    const [wx, wy] = pr(-52, 0, 196);
-    CF.contact(g, wx, wy + 2, 26, 6, 0.45);
-    ink(g, poly([[wx - 22, wy - 18], [wx + 14, wy - 20], [wx + 10, wy - 6], [wx - 18, wy - 4]]), grad(g, wx - 22, 0, wx + 14, 0, ['#5a6a8a', '#8aa0b8', '#c8d8e0']), 1.6);
-    tube(g, seg(wx - 18, wy - 10, wx - 36, wy - 14), tone(M.timber, 0.6), 2.4, 1); tube(g, seg(wx - 14, wy - 6, wx - 32, wy - 9), tone(M.timber, 0.4), 2.4, 1);
-    ink(g, circ(wx + 12, wy - 4, 6), '#4a4050', 1.4); ink(g, circ(wx + 12, wy - 4, 2), '#a0a0b0', 0.8);
-    tube(g, seg(wx - 12, wy - 4, wx - 14, wy + 2), '#5a4a5a', 1.6, 0.8);
-    lumps(g, [[wx - 6, wy - 22, 8], [wx + 2, wy - 22, 8]], { line: '#6a2a20', lw: 1.2, shade: '#c9562f', base: '#ef8a3c', lit: '#f9c070' });
   },
 });
 layer({
@@ -275,14 +270,14 @@ layer({
           ink(g, circ(x, y - 5 - perk * 2, 4.6), radial(g, x + 1.5, y - 7 - perk * 2, 0.5, 5, ['#e4f2b8', '#9fd08c', '#6faa76']), 1, '#24392c');
         }
         else if (B.crop === 'carrot') { for (const dx of [-3, 0, 3]) { g.lineWidth = 1.4; g.strokeStyle = '#5f9e52'; g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + dx, y - 6, x + dx * 1.6 + sw, y - 11 - perk * 3); g.stroke(); } ink(g, ell(x, y + 0.5, 2.4, 1.4), '#ef8a3c', 0.8, '#6a2a20'); }
-        else if (i < 4) { const p = ell(x, y - 5, 9, 6.5); ink(g, p, grad(g, x - 9, 0, x + 9, 0, ['#c9562f', '#ef8a3c', '#f9c070']), 1.4, '#6a2a20'); g.lineWidth = 0.9; g.strokeStyle = 'rgba(106,42,32,0.5)'; for (const dx of [-4, 0, 4]) { g.beginPath(); g.ellipse(x + dx, y - 5, 3, 6.5, 0, -Math.PI / 2, Math.PI / 2, dx < 0); g.stroke(); } tube(g, quad(x, y - 11, x + 2, y - 15, x + 5, y - 15), '#5f7a3a', 1.8, 0.8); }
+        else if (i < 4) { const p = ell(x, y - 4, 6.5, 4.8); ink(g, p, grad(g, x - 9, 0, x + 9, 0, ['#c9562f', '#ef8a3c', '#f9c070']), 1.4, '#6a2a20'); g.lineWidth = 0.9; g.strokeStyle = 'rgba(106,42,32,0.5)'; for (const dx of [-4, 0, 4]) { g.beginPath(); g.ellipse(x + dx, y - 5, 3, 6.5, 0, -Math.PI / 2, Math.PI / 2, dx < 0); g.stroke(); } tube(g, quad(x, y - 11, x + 2, y - 15, x + 5, y - 15), '#5f7a3a', 1.8, 0.8); }
       }
     }
     // the gardener, in her sun hat, watering can in hand
     const [gx, gy] = pr(-104, 0, 150);
     CF.contact(g, gx, gy, 16, 4, 0.5);
     const w = gard.water;
-    frog(g, gx, gy, 0.7, { c: CF.FROG_TINTS.gold, open: gard.blink(t), look: CF.lookAt(gx, gy, [-0.9 + w * 0.2, 0.5 + w * 0.3]).map((v, i) => (i ? v : -v)), smile: 2.2 + w, flip: true, rot: -w * 0.08,
+    frog(g, gx, gy, 0.8, { wide: 1.18, tall: 0.94, c: CF.FROG_TINTS.gold, open: gard.blink(t), look: CF.lookAt(gx, gy, [-0.9 + w * 0.2, 0.5 + w * 0.3]).map((v, i) => (i ? v : -v)), smile: 2.2 + w, flip: true, rot: -w * 0.08,
       arms: [[-16 - w * 2, -16 + w * 6], [12, -10]],
       hat: (g, lw) => { ink(g, D.ell(0, -31, 22, 5), '#f0d68a', lw); ink(g, D.ell(0, -36, 11, 7), '#f0d68a', lw); g.lineWidth = 2.2; g.strokeStyle = '#7fb8b0'; g.beginPath(); g.ellipse(0, -33, 10.6, 2.6, 0, 0, Math.PI); g.stroke(); ink(g, circ(8, -35, 2.4), '#f3a0b0', 0.8); } });
     const [sx, sy] = pr(...canSpout());

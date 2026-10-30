@@ -50,15 +50,15 @@ layer({
 });
 
 // ------------------------------------------------------------------ near clouds, drifting past below
-const front = [{ x: 1180, y: 1185, w: 380, h: 120, seed: 41, sp: 2 }, { x: 420, y: 1225, w: 480, h: 140, seed: 42, sp: 1.4 }, { x: 1640, y: 1240, w: 400, h: 120, seed: 43, sp: 1.8 }, { x: 820, y: 1290, w: 440, h: 130, seed: 44, sp: 1.2 }, { x: -60, y: 1270, w: 420, h: 130, seed: 45, sp: 1.6 }];
-const FRONT = { union: true, line: 'rgba(160,108,140,0.45)', lw: 1.6, shade: '#e3c0d0', base: '#fbe3da', lit: '#fff4ea' };
+const front = [{ x: 1010, y: 1118, w: 760, h: 170, seed: 41, sp: 1.2 }, { x: 330, y: 1200, w: 560, h: 150, seed: 42, sp: 1.4 }, { x: 1640, y: 1190, w: 520, h: 150, seed: 43, sp: 1.8 }, { x: 760, y: 1290, w: 620, h: 160, seed: 44, sp: 1.1 }, { x: -120, y: 1290, w: 520, h: 150, seed: 45, sp: 1.6 }];
+const FRONT = { union: true, line: 'rgba(140,84,120,0.6)', lw: 1.9, shade: '#c891b4', base: '#f9d2c6', lit: '#fff1de' };
 onLayout(() => { for (const c of front) { c.cs = CF.cumulusCircles(c.seed, c.w, c.h); c.sp_ = sprite(-c.w * 0.6 - 10, -c.h * 1.25, c.w * 1.2 + 20, c.h * 1.8, (g) => lumps(g, c.cs, FRONT)); c.billow = 0; } });
 layer({
   id: 'front-clouds', z: 45,
   hit(x, y) { for (const c of front) if (((x - c.cx) / (c.w * 0.5)) ** 2 + ((y - c.y + c.h * 0.45) / (c.h * 0.6)) ** 2 < 1) return (this.which = c), true; return false; },
   update(dt, t, L) {
     for (const c of front) {
-      c.cx = c.x + Math.sin(t * 0.05 * c.sp + c.seed) * 60;
+      c.cx = c.x + Math.sin(t * 0.05 * c.sp + c.seed) * 40;
       const on = L.hovered && L.which === c;
       c.billow = ease(c.billow, on ? 1 : 0, on ? 3 : 1.2, dt);
     }
@@ -129,5 +129,5 @@ layer({
   },
 });
 
-Drawn.start({ W: 1600, H: 1100 });
+Drawn.start({ W: 1600, H: 1100, slack: 0.72 });
 })();

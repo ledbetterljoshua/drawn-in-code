@@ -247,11 +247,11 @@ layer({
     const [mx, my] = pr(...millerPos());
     CF.contact(g, mx, my, 14, 3.5, 0.45);
     const o = mill.oil, w = mill.wipe;
-    frog(g, mx, my, 0.64, { c: CF.FROG_TINTS.olive, open: mill.blink(t), look: CF.lookAt(mx, my, [clamp((P.x - mx) / 200, -1, 1) * (1 - o) + o * 0.6, -0.6 * (1 - o) - o * 0.6]), smile: 2 + o,
+    frog(g, mx, my, 0.76, { c: CF.FROG_TINTS.olive, open: mill.blink(t), look: CF.lookAt(mx, my, [clamp((P.x - mx) / 200, -1, 1) * (1 - o) + o * 0.6, -0.6 * (1 - o) - o * 0.6]), smile: 2 + o,
       arms: w > 0.3 ? [[-6, -36, -12, -12], [20, -22 - o * 8]] : [[20, -22 - o * 10], [-14, -6]],
       hat: (g, lw) => { ink(g, poly([[-14, -34], [14, -34], [10, -40], [-10, -40]]), '#f3e4c8', lw); g.fillStyle = 'rgba(255,255,255,0.6)'; g.fill(circ(-4, -37, 1.5)); } });
     // the oil can, raised toward the shaft when you hover
-    const cx = mx + 14 * 0.64 + 6, cy = my - (22 + o * 10) * 0.64 - 2;
+    const cx = mx + 14 * 0.76 + 6, cy = my - (22 + o * 10) * 0.76 - 2;
     g.save(); g.translate(cx, cy); g.rotate(-0.5 - o * 0.5);
     ink(g, poly([[-4, -4], [4, -4], [5, 4], [-5, 4]]), '#a0a8b8', 1.1);
     tube(g, seg(4, -2, 13, -8), '#a0a8b8', 1.4, 0.8);

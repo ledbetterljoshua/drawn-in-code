@@ -13,7 +13,7 @@ const { clamp, lerp } = D;
 const CF = (window.CF = { D });
 
 // ------------------------------------------------------------------ camera
-const CAM = (CF.CAM = { cx: 840, cy: 630, S: 0.31, C: 0.951, HZ: 312 });
+const CAM = (CF.CAM = { cx: 900, cy: 606, S: 0.31, C: 0.951, HZ: 312 });
 CF.pr = (X, Y = 0, Z = 0) => [CAM.cx + X, CAM.cy + Z * CAM.S - Y * CAM.C];
 const vec = (v) => [v[0], v[2] * CAM.S - v[1] * CAM.C];
 CF.plane = (o, u, v) => {
@@ -46,7 +46,7 @@ CF.lit = (n) => { n = norm(n); return clamp(0.1 + 0.9 * Math.max(0, CF.dot(n, LI
 // where a point at height Y casts its shadow on the ground (plan): back and to the left
 CF.SH = [-1.2, -0.26];
 CF.shadowOf = (X, Y, Z) => [X + CF.SH[0] * Y, Z + CF.SH[1] * Y];
-CF.SHADOW = '#8d86c9'; // multiplied over whatever it falls on: a cool violet shade, never grey
+CF.SHADOW = '#7d72c2'; // multiplied over whatever it falls on: a cool violet shade, never grey
 CF.casters = []; // functions returning 3D points whose shadows the ground layer draws
 
 // ------------------------------------------------------------------ colour
@@ -187,7 +187,7 @@ CF.frog = function frog(g, x, y, s = 1, o = {}) {
   g.save();
   g.translate(x, y);
   if (o.rot) g.rotate(o.rot);
-  g.scale(s * (o.flip ? -1 : 1), s * (o.squash || 1));
+  g.scale(s * (o.flip ? -1 : 1) * (o.wide || 1), s * (o.squash || 1) * (o.tall || 1));
   const lw = 1.9 / s;
   if (o.armsBack) for (const a of o.armsBack) frogArm(g, a, c, lw);
   const parts = [D.ell(0, -13, 21, 14), D.ell(-10, -26.5, 8.5, 8), D.ell(10, -26.5, 8.5, 8)];

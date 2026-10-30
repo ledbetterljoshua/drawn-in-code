@@ -103,7 +103,7 @@ function drawRock(g, rock, o = {}) {
       const pth = new Path2D(); pth.moveTo(x, y);
       const len = 3 + ((r() * 4) | 0);
       for (let k = 0; k < len; k++) { x += (r() - 0.5) * 9 * rock.scale; y += (6 + r() * 8) * rock.scale; pth.lineTo(x, y); }
-      g.lineWidth = 1.4 * Math.max(0.6, rock.scale); g.strokeStyle = rgba(mat.line, 0.5); g.stroke(pth);
+      g.lineWidth = 1.2 * Math.max(0.6, rock.scale); g.strokeStyle = rgba(mat.line, 0.38); g.stroke(pth);
     }
     // chips and pits
     for (let k = 0; k < 5; k++) {
@@ -117,13 +117,13 @@ function drawRock(g, rock, o = {}) {
       g.beginPath(); g.moveTo(lerp(p0[0], p1[0], 0.06), lerp(p0[1], p1[1], 0.06) + 1.5); g.lineTo(lerp(p0[0], p1[0], 0.94), lerp(p0[1], p1[1], 0.94) + 1.5); g.stroke();
     }
     // the facet's edges, thin
-    g.lineWidth = 1.2 * Math.max(0.7, rock.scale); g.strokeStyle = rgba(mat.line, 0.55); g.stroke(c.path);
+    g.lineWidth = 1 * Math.max(0.7, rock.scale); g.strokeStyle = rgba(mat.line, 0.26); g.stroke(c.path);
   }
   // each band's lower lip, a little heavier: it reads as the overhang's edge
   for (const c of vis) {
     if (c.b === 0) continue;
     const [p0, p1] = c.s;
-    g.lineWidth = 1.8 * Math.max(0.7, rock.scale); g.strokeStyle = rgba(mat.line, 0.7);
+    g.lineWidth = 2 * Math.max(0.7, rock.scale); g.strokeStyle = rgba(mat.line, 0.62);
     g.beginPath(); g.moveTo(...p0); g.lineTo(...p1); g.stroke();
   }
   // mossy ledges where a band juts out
@@ -209,7 +209,7 @@ layer({
     // the cloud floor bounces a pink light up into the underside, strongest at the shaded left
     g.save(); g.globalCompositeOperation = 'screen';
     const [tipx, tipy] = pr(40, -450, 30);
-    g.fillStyle = radial(g, tipx - 160, tipy + 40, 0, 330, [[0, 'rgba(214,130,150,0.38)'], [1, 'rgba(214,130,150,0)']]);
+    g.fillStyle = radial(g, tipx - 160, tipy + 40, 0, 330, [[0, 'rgba(214,130,150,0.16)'], [1, 'rgba(214,130,150,0)']]);
     g.fillRect(tipx - 520, tipy - 420, 900, 520);
     g.restore();
     g.restore();
@@ -218,7 +218,7 @@ layer({
     const sil = new Path2D(); for (const c of ISLE.cells) if (c.facing > -0.05) sil.addPath(c.path);
     g.clip(sil);
     g.save(); g.globalCompositeOperation = 'multiply';
-    g.fillStyle = grad(g, CF.CAM.cx - 420, 0, CF.CAM.cx + 420, 0, ['rgba(90,80,160,0.55)', 'rgba(160,140,200,0.2)', 'rgba(255,255,255,0)']); g.fillRect(CF.CAM.cx - 430, 630, 870, 460);
+    g.fillStyle = grad(g, CF.CAM.cx - 420, 0, CF.CAM.cx + 420, 0, ['rgba(70,56,140,0.72)', 'rgba(140,120,190,0.3)', 'rgba(255,255,255,0)']); g.fillRect(CF.CAM.cx - 430, 630, 870, 460);
     g.fillStyle = grad(g, 0, 660, 0, 1090, ['rgba(255,255,255,0)', 'rgba(120,90,150,0.3)']); g.fillRect(CF.CAM.cx - 430, 630, 870, 460);
     g.restore();
     g.lineWidth = 10; g.strokeStyle = grad(g, CF.CAM.cx + 140, 0, CF.CAM.cx + 440, 0, ['rgba(255,214,150,0)', 'rgba(255,214,150,0.6)']);
@@ -407,6 +407,8 @@ layer({
   draw(g, t) {
     for (const c of crystals) {
       const [x, y] = pr(c.X, c.Y, c.Z), s = c.s;
+      g.fillStyle = 'rgba(30,18,40,0.75)'; g.fill(poly([[x - 18 * s, y + 1], [x - 6 * s, y - 5 * s], [x + 4 * s, y - 2 * s], [x + 18 * s, y + 2], [x + 6 * s, y + 5 * s], [x - 8 * s, y + 4 * s]]));
+      CF.glow(g, x, y + 4, 40 * s, '#78c8e8', 0.18);
       const glint = Math.max(0, Math.sin(t * 0.7 + c.ph)) ** 12 + c.tw;
       CF.glow(g, x, y - 10 * s, 28 * s, '#a8e8ff', 0.16 + glint * 0.4);
       const prisms = [[-6, 16, 5, -0.35], [3, 24, 6, 0.08], [10, 13, 4.5, 0.45], [-13, 10, 4, -0.7], [15, 8, 3.5, 0.8]].slice(0, c.n);
@@ -554,11 +556,14 @@ layer({
     for (const s of stones) {
       const { x, y, r } = s, rot = s.ox * 0.004;
       g.save(); g.translate(x, y); g.rotate(rot);
-      const body = poly([[-r, -r * 0.15], [-r * 0.5, -r * 0.45], [r * 0.55, -r * 0.42], [r, -r * 0.05], [r * 0.45, r * 0.6], [r * 0.05, r * 0.95], [-r * 0.45, r * 0.55]]);
-      ink(g, body, tone(M.rock, 0.3), 1.8, M.rock.line);
-      ink(g, poly([[r * 0.05, -r * 0.2], [r * 0.55, -r * 0.42], [r, -r * 0.05], [r * 0.45, r * 0.6], [r * 0.05, r * 0.95]]), tone(M.rock, 0.8), 1.2, M.rock.line);
-      ink(g, poly([[-r * 0.45, r * 0.55], [r * 0.05, r * 0.95], [r * 0.05, -r * 0.2], [-r, -r * 0.15]]), mix(tone(M.rock, 0.15), M.rock.bounce, 0.3), 1.2, M.rock.line);
-      ink(g, ell(0, -r * 0.34, r * 0.86, r * 0.2), tone(M.grass, 0.6), 1.3, M.grass.line);
+      // each chunk its own shape: a seeded outline, a lit right face and a shaded left one
+      const rr = rng(s.s * 31), n = 6, outl = [];
+      for (let k = 0; k < n; k++) { const a = Math.PI + (k / (n - 1)) * Math.PI, d = 0.8 + rr() * 0.35; outl.push([Math.cos(a) * r * d, Math.sin(a) * r * 0.3 * d]); }
+      const tip = [r * (rr() - 0.5) * 0.8, r * (0.8 + rr() * 0.9)];
+      const body = poly(outl.concat([[r * 0.7, r * 0.3], tip, [-r * 0.6, r * 0.4]]));
+      ink(g, body, tone(M.rock, 0.25), 1.8, M.rock.line);
+      ink(g, poly([[outl[3][0], 0], ...outl.slice(3), [r * 0.7, r * 0.3], tip]), tone(M.rock, 0.82), 1.1, M.rock.line);
+      ink(g, ell(0, -r * 0.12, r * 0.9, r * 0.26), tone(M.grass, 0.6), 1.3, M.grass.line);
       if (s.s === 1) { const sw = Math.sin(t * 1.2) * 3; tube(g, D.quad(r * 0.1, r * 0.9, r * 0.3 + sw, r * 1.6, -r * 0.1 + sw * 1.5, r * 2.3), '#7d5a4e', 1.6, 1); }
       g.restore();
     }
@@ -566,7 +571,7 @@ layer({
 });
 
 // ------------------------------------------------------------------ the little rock, its bridge, its fisher
-const SAT = { X: -610, Y: -30, Z: 40, rx: 66, rz: 48 };
+const SAT = { X: -566, Y: -30, Z: 40, rx: 62, rz: 46 };
 const satRim = (a) => { const k = 1 + 0.08 * noise(a * 3 + 40); return [SAT.rx * Math.cos(a) * k, SAT.rz * Math.sin(a) * k]; };
 const SATR = makeRock({ rim: satRim, bands: [{ y: -8, k: 0.985 }, { y: -34, k: 0.86 }, { y: -66, k: 0.6 }, { y: -96, k: 0.3 }, { y: -118, k: 0 }], tip: [-6, 10], seed: 9, ox: SAT.X, oy: SAT.Y, oz: SAT.Z, scale: 1 });
 layer({
@@ -616,6 +621,7 @@ layer({
     const [x, y] = pr(SAT.X + 40, SAT.Y, SAT.Z - 4);
     CF.contact(g, x, y, 10, 3, 0.45);
     tube(g, D.seg(x, y, x, y - 34), tone(M.timber, 0.55), 3.4, 1.4);
+    g.save(); g.translate(x, y); g.scale(0.72, 0.72); g.translate(-x, -y);
     const bx = x - 13, by = y - 34;
     const side = poly([[bx + 26, by - 13], [bx + 32, by - 16], [bx + 32, by - 2], [bx + 26, by + 1]]);
     ink(g, side, '#8f3a36', 1.6);
@@ -627,11 +633,12 @@ layer({
     tube(g, D.seg(0, 0, 0, -14), '#f2c14e', 1.8, 1.1);
     ink(g, poly([[0, -14], [9, -11], [0, -8]]), '#f2c14e', 1.2);
     g.restore();
+    g.restore();
   },
 });
 
 const bridge = { b: 0, bv: 0, lan: [0, 0], lanv: [0, 0] };
-const BA = [-404, 0, 22], BB = [-548, -30, 46], W2 = 11;
+const BA = [-404, 0, 22], BB = [-508, -30, 46], W2 = 11;
 const bridgeAt = (u, side, h = 0) => {
   const sag = 16 + bridge.b, X = lerp(BA[0], BB[0], u), Y = lerp(BA[1], BB[1], u) - sag * 4 * u * (1 - u) + h, Z = lerp(BA[2], BB[2], u) + side * W2;
   return pr(X, Y, Z);
@@ -724,7 +731,7 @@ layer({
     if (c > 0.85 && Math.random() < 0.04) spawn({ kind: 'spark', x: bx + (Math.random() - 0.5) * 20, y: fall + 10, vy: -20, life: 0.8 });
     const rod = D.quad(fx_ - 12, fy - 14, fx_ - 30, fy - 30 - c * 10, tip[0], tip[1]);
     tube(g, rod, '#b07a4c', 2.2, 1.2);
-    frog(g, fx_, fy - 2, 0.85, { open: fisher.blink(t), look: [-0.8, 0.6 - c], smile: 2 + c * 3, c: CF.FROG_TINTS.olive,
+    frog(g, fx_, fy - 2, 0.85, { wide: 1.08, open: fisher.blink(t), look: [-0.8, 0.6 - c], smile: 2 + c * 3, c: CF.FROG_TINTS.olive,
       arms: [[-17, -12 - c * 6, -12, -11]],
       hat: (g, lw) => { ink(g, D.ell(0, -32, 17, 4.5), '#e8c56a', lw); ink(g, D.ell(0, -36, 9, 6), '#e8c56a', lw); g.lineWidth = 2.4; g.strokeStyle = '#c9503f'; g.beginPath(); g.ellipse(0, -33.5, 8.6, 2.2, 0, 0, Math.PI); g.stroke(); } });
     // a bucket beside the fisher, with one already in it

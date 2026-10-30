@@ -41,8 +41,8 @@ layer({
         if (rs() < 0.08) { g.strokeStyle = `rgba(255,250,235,${a * 0.6})`; g.lineWidth = 0.8; g.beginPath(); g.moveTo(x - 4, y); g.lineTo(x + 4, y); g.moveTo(x, y - 4); g.lineTo(x, y + 4); g.stroke(); }
       }
       // and an island floating far above, seen from underneath, its waterfall a thread
-      farIsle(g, 1290, -300, 190, 0.18, 9);
-      farIsle(g, 420, -640, 90, 0.4, 13);
+      farIsle(g, 330, -250, 150, 0.18, 9);
+      farIsle(g, 1270, -540, 80, 0.4, 13);
     }
     // long thin streaks of high cloud, lit underneath by the low sun
     const r = rng(8);
@@ -78,7 +78,7 @@ function cloudRow(g, d, seed, v) {
   for (let x = x0; x < x1; ) {
     const len = r * (5 + R() * 14), gap = r * (R() < 0.35 ? 1.5 + R() * 3 : 0.2);
     const cs = [], n = Math.max(3, Math.round(len / (r * 0.9)));
-    const tall = 0.6 + R() * 0.9;
+    const tall = 0.4 + R() ** 1.5 * 1.6;
     for (let i = 0; i < n; i++) {
       const u = i / (n - 1), env = Math.sin(Math.PI * (0.08 + u * 0.84)) ** 0.7;
       const rr = r * (0.45 + 0.75 * env * tall) * (0.85 + R() * 0.3);
@@ -89,7 +89,7 @@ function cloudRow(g, d, seed, v) {
     for (let xx = x; xx < x + len; xx += r * 0.9) cs.push([xx, y + r * 0.7, r * 0.95]);
     const w = warmAt(x + len / 2);
     lumps(g, cs, {
-      union: true, lw: 1.3, line: r > 22 ? rgba('#9a6a8c', 0.3 * (1 - far)) : null,
+      union: true, lw: 1.2, line: r > 22 && r < 48 ? rgba('#9a6a8c', 0.22 * (1 - far)) : null,
       shade: mix(mix('#b9a0cc', '#d2a6bc', w), '#e4c6d0', far),
       base: mix(mix('#f1d8da', '#fbd8c4', w), '#f3d8d0', far * 0.6),
       lit: mix(mix('#fff2e8', '#fff0cc', w), '#fbe6d8', far * 0.6),
@@ -145,8 +145,8 @@ function farIsle(g, x, y, w, haze, seed) {
   for (let i = 0; i < 4; i++) { g.fillRect(x - w / 2, y + w * (0.12 + i * 0.13), w, w * 0.025); }
   g.restore(); g.globalAlpha = 1;
   // its waterfall, a thread of light
-  g.strokeStyle = rgba('#fff6ea', 0.7 - haze * 0.3); g.lineWidth = Math.max(1, w * 0.02);
-  g.beginPath(); g.moveTo(x + w * 0.33, y + w * 0.04); g.quadraticCurveTo(x + w * 0.4, y + w * 0.5, x + w * 0.38, y + w * 1.6); g.stroke();
+  g.strokeStyle = grad(g, 0, y, 0, y + w * 1.1, [rgba('#fff6ea', 0.7 - haze * 0.3), rgba('#fff6ea', 0)]); g.lineWidth = Math.max(1, w * 0.02);
+  g.beginPath(); g.moveTo(x + w * 0.33, y + w * 0.04); g.quadraticCurveTo(x + w * 0.4, y + w * 0.5, x + w * 0.38, y + w * 1.1); g.stroke();
   const grassC = mix('#6f9a6a', '#bccab0', haze), treeC = mix('#4f7a62', '#a9bba8', haze);
   if (above) {
     g.fillStyle = grassC; g.fill(ell(x, y, w / 2, w * 0.035));
@@ -179,7 +179,6 @@ layer({
       at(9, () => mountain(g, [[1260, 380], [1380, 310], [1430, 324], [1530, 270], [1640, 332], [1760, 306], [1900, 382]], 0.55)),
       at(20, () => mountain(g, [[300, 335], [370, 304], [420, 312], [480, 292], [560, 338]], 0.85)),
       at(7, () => farIsle(g, 1450, 410, 120, 0.45, 3)),
-      at(12, () => farIsle(g, 470, 240, 70, 0.6, 5)),
       at(5, () => farIsle(g, -60, 190, 130, 0.35, 7)),
       at(3.2, () => bank(g, 100, rowY(3.2) + 10, 760, 210, 31, 0.1)),
       at(2.4, () => bank(g, 1640, rowY(2.4) + 10, 820, 260, 33, 1)),
@@ -222,11 +221,13 @@ function cumulusCircles(seed, w, h) {
 }
 CF.cumulusCircles = cumulusCircles;
 const clouds = [
-  { x: 1320, y: 110, w: 420, h: 120, seed: 3, sp: 3.2 },
-  { x: 610, y: 50, w: 240, h: 70, seed: 9, sp: 4.5 },
+  { x: 1320, y: 110, w: 460, h: 130, seed: 3, sp: 3.2 },
+  { x: 1520, y: 150, w: 200, h: 60, seed: 4, sp: 3.2 },
+  { x: 640, y: 40, w: 170, h: 50, seed: 9, sp: 4.5 },
   { x: -40, y: 130, w: 300, h: 85, seed: 21, sp: 5 },
-  { x: 900, y: -260, w: 380, h: 110, seed: 14, sp: 2.6 },
-  { x: 200, y: -520, w: 460, h: 130, seed: 17, sp: 2.2 },
+  { x: 940, y: -250, w: 520, h: 150, seed: 14, sp: 2.6 },
+  { x: 260, y: -480, w: 260, h: 74, seed: 17, sp: 2.2 },
+  { x: 1180, y: -700, w: 140, h: 40, seed: 19, sp: 2.2 },
 ];
 onLayout(() => {
   for (const c of clouds) {
@@ -236,8 +237,8 @@ onLayout(() => {
       // a base of small lumps, so the underside is nearly flat but never ruled
       const r = rng(c.seed * 5), cs = c.cs.slice();
       for (let x = -c.w * 0.46; x < c.w * 0.46; x += c.h * 0.2) cs.push([x, -c.h * 0.1 + (r() - 0.5) * c.h * 0.05, c.h * (0.13 + r() * 0.06)]);
-      const warm = clamp((c.x + 200) / 1600, 0, 1);
-      lumps(g, cs, { union: true, line: rgba('#8f7cae', 0.22), lw: 1.1, shade: mix('#aaa2d2', '#cfa6c0', warm), base: mix('#ece4f2', '#fbe2d8', warm), lit: mix('#fffaf4', '#fff0d2', warm) }, c.h * 0.02);
+      const warm = clamp((c.x + 200) / 1600, 0, 1), dusk = clamp(-c.y / 500, 0, 1);
+      lumps(g, cs, { union: true, line: rgba('#8f7cae', 0.22), lw: 1.1, shade: mix(mix('#aaa2d2', '#cfa6c0', warm), '#6a6aa8', dusk * 0.6), base: mix(mix('#ece4f2', '#fbe2d8', warm), '#b8b0d8', dusk * 0.5), lit: mix(mix('#fffaf4', '#fff0d2', warm), '#ffd6b0', dusk * 0.5) }, c.h * 0.02);
       g.save(); g.globalCompositeOperation = 'source-atop';
       // the underside, in its own shade; the sun-side tops catching warm
       g.fillStyle = grad(g, 0, -c.h * 0.7, 0, 0, [[0, 'rgba(150,130,190,0)'], [1, 'rgba(150,130,190,0.5)']]);
@@ -302,7 +303,7 @@ layer({
 });
 
 // ------------------------------------------------------------------ the balloon, tied to the tree
-const balloon = (CF.balloon = { x: 250, y: 112, rise: 0, flame: 0, tie: CF.pr(-392, 190, -70), blink: D.blinker(), sway: 0, sv: 0 });
+const balloon = (CF.balloon = { x: 400, y: 120, rise: 0, flame: 0, tie: CF.pr(-392, 190, -70), blink: D.blinker(), sway: 0, sv: 0 });
 layer({
   id: 'balloon', z: 8,
   hit: (x, y) => Math.hypot(x - balloon.cx, y - balloon.cy) < 84 || (Math.abs(x - balloon.cx) < 30 && y > balloon.cy + 72 && y < balloon.cy + 140),
@@ -317,7 +318,7 @@ layer({
     balloon.cy = balloon.y + Math.sin(t * 0.8) * 6 - balloon.rise * 24;
   },
   draw(g, t, L) {
-    const cx = balloon.cx, cy = balloon.cy, r = 74, tilt = balloon.sway * 0.8;
+    const cx = balloon.cx, cy = balloon.cy, r = 88, tilt = balloon.sway * 0.8;
     const bx = cx + Math.sin(tilt) * 132, by = cy + 132, [tx, ty] = balloon.tie;
     const sag = 50 - balloon.rise * 36;
     g.lineWidth = 1.5; g.strokeStyle = '#6e4c46';
@@ -330,7 +331,7 @@ layer({
     env.bezierCurveTo(r * 0.55, -r * 1.02, r, -r * 0.62, r, -6);
     env.bezierCurveTo(r, r * 0.35, 52, r - 6, 20, r + 12);
     env.closePath();
-    g.lineWidth = 4.4; g.strokeStyle = LINEB; g.stroke(env);
+    g.lineWidth = 3.4; g.strokeStyle = LINEB; g.stroke(env);
     g.save(); g.clip(env);
     // gores: they curve round the envelope, so draw them as narrowing ellipses
     const gores = ['#f3e4c4', '#d9654f', '#f3e4c4', '#3f8d93', '#f3e4c4', '#d9654f', '#f3e4c4'];
@@ -361,7 +362,7 @@ layer({
       g.fillStyle = `rgba(255,240,170,${f})`; g.fill(ell(0, r + 24 - fl * 0.3 * f, 3, 6 * f + 1));
     }
     const [lookX, lookY] = CF.lookAt(cx, cy + 110, [clamp((P.x - cx) / 300, -1, 1), clamp((P.y - cy - 110) / 300, -1, 1)], 300);
-    frog(g, 2, r + 56, 0.66, { c: CF.FROG_TINTS.gold, open: balloon.blink(t), look: [lookX, lookY], smile: 2 + L.hover * 2.5,
+    frog(g, 2, r + 56, 0.78, { c: CF.FROG_TINTS.gold, open: balloon.blink(t), look: [lookX, lookY], smile: 2 + L.hover * 2.5,
       arms: L.hover > 0.3 ? [[18, -22 - Math.sin(t * 12) * 6 * L.hover]] : null,
       hat: (g, lw) => { ink(g, poly([[-14, -33], [14, -33], [10, -38], [-10, -38]]), '#7a4a3a', lw); ink(g, D.ell(0, -38, 10, 5), '#8f5a44', lw); } });
     const bk = poly([[-19, r + 38], [19, r + 38], [16, r + 62], [-16, r + 62]]);
@@ -379,7 +380,7 @@ const LINEB = '#3a2232';
 
 // ------------------------------------------------------------------ a school of sky-fish in the cloud tops
 // far below the island, only on a tall screen: they porpoise in and out of the cloud, and scatter
-const school = { x: 700, fish: Array.from({ length: 9 }, (_, i) => ({ dx: (i % 3) * 34 + (i * 13) % 20, dy: Math.floor(i / 3) * 22, ph: i * 0.8, ox: 0, oy: 0, vx: 0, vy: 0 })) };
+const school = { x: 700, fish: Array.from({ length: 14 }, (_, i) => ({ dx: i * 22 + (i % 2) * 8, dy: (i % 3) * 10, ph: i * 0.8, ox: 0, oy: 0, vx: 0, vy: 0 })) };
 layer({
   id: 'school', z: 3,
   hit: (x, y) => st.view.y1 > 1500 && Math.abs(y - 1560) < 120 && Math.abs(x - school.cx) < 120,
@@ -404,6 +405,7 @@ layer({
       g.restore();
       // the cloud closes over them as they dive
       if (dive < 0.2) { g.fillStyle = `rgba(250,226,220,${clamp(0.4 - dive, 0, 0.7)})`; g.fill(ell(x, y + 6, 14, 5)); }
+      if (Math.abs(arc) < 0.12) { g.strokeStyle = 'rgba(255,255,255,0.7)'; g.lineWidth = 1.2; g.beginPath(); g.ellipse(x, y + 8, 12, 3, 0, Math.PI, TAU); g.stroke(); }
     }
   },
 });

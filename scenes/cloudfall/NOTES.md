@@ -135,3 +135,37 @@ by distance, small-object shadows.
    ferns grow from the cracks on the wet side.
 4. The hedgehog's door had no way in or out. A rope ladder now hangs to it from the turf above.
 5. One of the new high islands was cut by the phone's left edge; moved.
+
+## Round 8 (second fresh-eyes critic)
+The critic's ten, condensed: (1) the near cloud floor still looks generated: one bump, one
+lavender outline, wallpaper; (2) bullseye composition, the tip jammed on the bottom edge, the
+phone crop dead weight, tangents (a far islet kissing the crown, an islet's waterfall landing
+on a cloud like a pole); (3) no value structure: the rock's left flank the same value and hue as
+the lavender clouds behind it; noon-lit clouds under the phone's stars; (4) the rock still
+reads as crazy paving: every facet edge as heavy as the silhouette, crystals pasted on, the
+little chunks one stamp; (5) "the tree and turret are lit from the left" (checked in close-up:
+they aren't; both are lit from the right, so no change); (6) "the mill is a flat elevation"
+(it isn't: its sails sweep an ellipse in their own plane; no change); (7) scale drift: frogs
+of different sizes, pumpkins bigger than the gardener, a head-sized mailbox, a toy balloon;
+(8) the front-left strip is an inventory of equal-weight props; (9) one line weight
+everywhere; (10) the frogs' gags are scattered, and the sky-fish school reads as a bug.
+
+Fixed:
+- A warm, crisp foreground bank of cloud now crosses in front of the tip and the waterfall's
+  end, with more saturated shade than anything behind it; the near rows of the floor lost their
+  outlines and their heads vary far more in height.
+- Island moved further right and up, so it sits off centre and the bank crops it, not the
+  frame; `slack` 0.72 so the phone shows the island 20% larger; balloon larger (it's tethered
+  to the tree, so it's near) and clear of the crown; the islet that kissed the crown is gone;
+  the high islets moved clear of the phone's edges, their waterfalls fade out.
+- Value: the rock's core shade on the left is deeper and the pink bounce cut by half, so the
+  silhouette holds against the clouds. High clouds on the phone take the dusk: cooler,
+  darker undersides, warm tops.
+- Rock facet edges at half the weight of before, band lips kept heavier: big planes first, then
+  courses. Crystals sit in a dark fissure and throw a cold light on the rock round them. Each
+  chunk under the island is its own shape.
+- One frog height as the unit (0.72 to 0.85); pumpkins shrunk, mailbox shrunk; roof tile lines
+  thinned; the wheelbarrow and the carrot bed cut so the garden is one cluster.
+- A static story at the focal point: the cottage door now rests ajar, lamplight on the step,
+  tea steaming on the bench outside.
+- The sky-fish school is a clear stream of fourteen with splash rings where they surface.
