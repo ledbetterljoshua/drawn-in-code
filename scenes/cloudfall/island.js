@@ -225,7 +225,7 @@ layer({
     // aerial haze: the belly goes back toward the colour of the cloud below as it descends, so
     // the rock is darkest just under the lip and the eye stays up on the top
     const [, yLip] = pr(0, -20, RZ), [, yTip] = pr(40, -450, 30);
-    g.fillStyle = grad(g, 0, yLip + 60, 0, yTip, [[0, 'rgba(232,196,214,0)'], [0.6, 'rgba(232,196,214,0.22)'], [1, 'rgba(240,206,214,0.5)']]);
+    g.fillStyle = grad(g, 0, yLip + 60, 0, yTip, [[0, 'rgba(232,196,214,0)'], [0.6, 'rgba(232,196,214,0.1)'], [1, 'rgba(240,206,214,0.3)']]);
     g.fillRect(CF.CAM.cx - 440, yLip, 880, yTip - yLip + 40);
     g.save(); g.globalCompositeOperation = 'multiply';
     g.fillStyle = grad(g, CF.CAM.cx - 420, 0, CF.CAM.cx + 420, 0, ['rgba(70,56,140,0.72)', 'rgba(140,120,190,0.3)', 'rgba(255,255,255,0)']); g.fillRect(CF.CAM.cx - 430, 630, 870, 460);
@@ -403,7 +403,7 @@ layer({
 const crystals = [];
 D.onLayout(() => {
   if (crystals.length) return;
-  const pick = [[2, 0.66, 1.25, 5], [2, 0.58, 0.6, 2], [4, 0.45, 0.8, 3]];
+  const pick = [[2, 0.66, 1.25, 5]];
   for (const [b, u, sz, n] of pick) {
     const cs = ISLE.cells.filter((c) => c.b === b && c.facing > 0.3);
     if (!cs.length) continue;

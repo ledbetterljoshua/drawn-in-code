@@ -236,3 +236,21 @@ the big pale lavender bank on the left (it is the side away from the sun and the
 the rest there); more texture on the rock (would put detail back where the eye shouldn't go);
 more sky content on the phone (the stars, islets and varied clouds already carry it). Nothing I
 could name would visibly change the full frame.
+
+## Round 14 (fifth critic, full frame only)
+Five items rated visible. Three of them had come up in every critique so far, so they were
+real, whatever I thought in round 13:
+1. The rock and the lilac cloud shade behind it were too close in value: the underside dissolved.
+   Rock material darker and cooler, the belly haze cut back, and the cool multiply across the far
+   side of the cloud floor halved so the background behind the rock is lighter.
+2. The floor's heads all carried the same lit crescent and shade at every distance. Now both
+   fade into the base colour with distance, so the far floor flattens into haze and only near
+   heads are modelled.
+3. The foreground clouds were flat fills with an outline. They have a shadowed belly and a
+   warm lit top, and lighter ink.
+4. The horizontal wisps across the phone's sky read as rendering artifacts to three critics in a
+   row. Gone. The high islets hazier.
+5. Props were spread evenly over the rock. The two smaller crystal clusters are gone; the rock
+   keeps one group (door, lamp, ladder, ledge) and one crystal cluster, with quiet rock between.
+Not taken: "the waterfall is a straight band with no breakup" (it arcs, tears into ribbons and
+ends in mist; at full frame it reads as a band, which is what a waterfall reads as at that size).

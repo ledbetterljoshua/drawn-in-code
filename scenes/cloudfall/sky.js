@@ -41,16 +41,8 @@ layer({
         if (rs() < 0.08) { g.strokeStyle = `rgba(255,250,235,${a * 0.6})`; g.lineWidth = 0.8; g.beginPath(); g.moveTo(x - 4, y); g.lineTo(x + 4, y); g.moveTo(x, y - 4); g.lineTo(x, y + 4); g.stroke(); }
       }
       // and an island floating far above, seen from underneath, its waterfall a thread
-      farIsle(g, 330, -250, 150, 0.18, 9);
-      farIsle(g, 1270, -540, 80, 0.4, 13);
-    }
-    // long thin streaks of high cloud, lit underneath by the low sun
-    const r = rng(8);
-    for (let i = 0; i < 9; i++) {
-      const y = lerp(v.y0 + 80, HZ - 60, r() ** 0.7), x = v.x0 + r() * (v.x1 - v.x0), len = 120 + r() * 340, th = 2 + r() * 5;
-      const warm = clamp((y - (HZ - 500)) / 500, 0, 1) * clamp((x + 200) / 2000, 0.2, 1);
-      g.fillStyle = rgba(mix('#d9d6f2', '#ffd3b0', warm), 0.32 + r() * 0.3);
-      const bend = (r() - 0.5) * 18, p = new Path2D(); p.moveTo(x - len / 2, y + bend * 0.3); p.bezierCurveTo(x - len * 0.2, y - th * 1.4 + bend, x + len * 0.15, y - th * 0.6 - bend * 0.5, x + len / 2, y - bend * 0.2); p.bezierCurveTo(x + len * 0.2, y + th * 0.2 - bend * 0.4, x - len * 0.25, y + th * 0.5 + bend, x - len / 2, y + bend * 0.3); g.fill(p);
+      farIsle(g, 330, -250, 150, 0.45, 9);
+      farIsle(g, 1270, -540, 80, 0.6, 13);
     }
   },
 });
@@ -87,12 +79,14 @@ function cloudRow(g, d, seed, v) {
     for (let i = 0; i < n * 0.5; i++) { const u = 0.2 + R() * 0.6, env = Math.sin(Math.PI * u); cs.push([x + u * len, y - r * tall * env * (0.9 + R() * 0.4), r * (0.35 + 0.4 * env * tall)]); }
     // a skirt of lumps under the mass so it never shows a flat seam
     for (let xx = x; xx < x + len; xx += r * 0.9) cs.push([xx, y + r * 0.7, r * 0.95]);
-    const w = warmAt(x + len / 2);
+    // with distance the heads lose their lit crescents and their shade: they flatten into haze
+    const w = warmAt(x + len / 2), k = clamp(far * 1.8, 0, 1);
+    const base = mix(mix('#f1d8da', '#fbd8c4', w), '#f3d8d0', far * 0.6);
     lumps(g, cs, {
       union: true, lw: 1.2, line: null,
-      shade: mix(mix('#b9a0cc', '#d2a6bc', w), '#e4c6d0', far),
-      base: mix(mix('#f1d8da', '#fbd8c4', w), '#f3d8d0', far * 0.6),
-      lit: mix(mix('#fff2e8', '#fff0cc', w), '#fbe6d8', far * 0.6),
+      shade: mix(mix('#b9a0cc', '#d2a6bc', w), base, k * 0.75),
+      base,
+      lit: mix(mix('#fff2e8', '#fff0cc', w), base, k),
     });
     x += len + gap;
   }
@@ -208,7 +202,7 @@ layer({
     g.restore();
     // the cloud floor falls into shadow further from the sun, and toward us
     g.save(); g.globalCompositeOperation = 'multiply';
-    g.fillStyle = grad(g, v.x0, 0, v.x1, 0, ['rgba(150,130,190,0.35)', 'rgba(200,180,210,0.1)', 'rgba(255,255,255,0)']);
+    g.fillStyle = grad(g, v.x0, 0, v.x1, 0, ['rgba(150,130,190,0.15)', 'rgba(200,180,210,0.05)', 'rgba(255,255,255,0)']);
     g.fillRect(v.x0, HZ + 30, v.x1 - v.x0, v.y1 - HZ);
     g.restore();
     // and a haze along the horizon line itself, so the far rows melt into the sky

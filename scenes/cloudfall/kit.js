@@ -59,7 +59,7 @@ CF.tone = (m, b) => (b < 0.5 ? CF.mix(m.shade, m.base, b * 2) : CF.mix(m.base, m
 CF.jit = (c, r, amt) => CF.mix(c, r() < 0.5 ? '#2a1830' : '#fff4dc', r() * amt);
 
 CF.M = {
-  rock: { shade: '#3c305e', base: '#9a6268', lit: '#ffbf7e', line: '#2c1a35', bounce: '#d88a8e' },
+  rock: { shade: '#30264f', base: '#87505e', lit: '#ffb878', line: '#24152c', bounce: '#c9808a' },
   rockFar: { shade: '#8c84ad', base: '#b39cb4', lit: '#e8c0a8', line: '#7a6a90' },
   soil: { shade: '#3b2532', base: '#61403a', lit: '#8d5e44', line: '#2c1a28' },
   grass: { shade: '#477a5a', base: '#7cad57', lit: '#c9df7a', line: '#2b4632' },
