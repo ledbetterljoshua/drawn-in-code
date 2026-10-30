@@ -429,7 +429,9 @@
   layer({
     id: 'lanterns', z: 11.8,
     hit(x, y) {
-      for (let s = 0; s < 2; s++) for (let u = 0.05; u < 1; u += 0.1) { const [px, py] = sag(s, u, st.t); if (Math.hypot(x - px, y - py - 8) < 14) return true; }
+      const [qx, qy] = POD.inv(x, y);
+      if (Math.abs(qx - POD.x) < POD.w * 1.2 && qy > POD.y1 - 16 && qy < POD.base) return false; // the pod's own
+      for (let s = 0; s < 2; s++) for (let u = 0.05; u < 1; u += 0.1) { const [px, py] = sag(s, u, st.t); if (Math.hypot(x - px, y - py - 8) < 12) return true; }
       return false;
     },
     onEnter() { thread.pluck.v += 4; for (const l of thread.lanterns) l.v += (P.vx || 30) * 0.004; },
