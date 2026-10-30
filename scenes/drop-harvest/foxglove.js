@@ -210,14 +210,15 @@
     draw(g, t) {
       const pts = bladePts(t), L = [], R = [];
       for (let i = 0; i < pts.length; i++) {
-        const u = i / (pts.length - 1), w = 15 * (1 - u * 0.92);
+        // tapering, with a pinch where the blade twists to show its paler back
+        const u = i / (pts.length - 1), w = 16 * (1 - u * 0.88) * (0.35 + 0.65 * Math.min(1, Math.abs(u - 0.58) * 6));
         const [ax, ay] = pts[Math.max(0, i - 1)], [bx2, by2] = pts[Math.min(pts.length - 1, i + 1)], l = Math.hypot(bx2 - ax, by2 - ay) || 1;
         const nx = -(by2 - ay) / l, ny = (bx2 - ax) / l;
         L.push([pts[i][0] - nx * w, pts[i][1] - ny * w]); R.push([pts[i][0] + nx * w, pts[i][1] + ny * w]);
       }
       const p = curve([...L, ...R.reverse()]);
       g.lineWidth = 2.6; g.strokeStyle = LINE; g.stroke(p);
-      g.fillStyle = grad(g, BLADE.x - 60, 0, BLADE.x + 20, 0, ['#2e4a30', '#4c6e3a', '#2a4030']); g.fill(p);
+      g.fillStyle = grad(g, pts[0][0], pts[0][1], pts[10][0], pts[10][1], [[0, '#2a4030'], [0.55, '#46663a'], [0.6, '#7a9454'], [1, '#6a8a4a']]); g.fill(p);
       g.save(); g.clip(p);
       g.lineWidth = 1; g.strokeStyle = 'rgba(200,230,150,0.35)';
       for (const off of [-0.4, 0, 0.4]) { g.beginPath(); L.forEach(([x, y], i) => { const [rx2, ry2] = R[R.length - 1 - i]; const k = 0.5 + off; (i ? g.lineTo : g.moveTo).call(g, lerp(x, rx2, k), lerp(y, ry2, k)); }); g.stroke(); }
@@ -293,13 +294,21 @@
       for (let i = 0; i < n; i++) { const a = (i / n) * TAU, L = spokeEnd(geo, i, n); ends.push(L); g.beginPath(); g.moveTo(hx, hy); g.lineTo(hx + Math.cos(a) * L, hy + Math.sin(a) * L); g.stroke(); }
       // the capture spiral: sagging between spokes, heavier where beaded
       g.lineWidth = 0.7; g.strokeStyle = 'rgba(255,230,190,0.5)';
-      for (let ring = 0.2; ring < 0.97; ring += 0.045) {
+      // the capture spiral: sagging between spokes, a few strands broken and hanging loose
+      let ri = 0;
+      for (let ring = 0.2; ring < 0.97; ring += 0.045, ri++) {
         g.beginPath();
+        let pen = false;
         for (let i = 0; i <= n; i++) {
           const k = i % n, a = (k / n) * TAU, L = ends[k] * (ring + (i / n) * 0.045);
           const x = hx + Math.cos(a) * L, y = hy + Math.sin(a) * L + 2 * ring;
-          if (i === 0) g.moveTo(x, y);
-          else { const pa = ((k - 0.5) / n) * TAU, pl = ends[k] * ring * 0.97; g.quadraticCurveTo(hx + Math.cos(pa) * pl, hy + Math.sin(pa) * pl + 4 * ring, x, y); }
+          const broken = Drawn.hash(ri * 31 + k * 7) < 0.07;
+          if (!pen || broken) {
+            if (broken && pen) { g.lineTo(x - Math.cos(a) * 2, y + 9); }
+            g.moveTo(x, y); pen = true; continue;
+          }
+          const pa = ((k - 0.5) / n) * TAU, pl = ends[k] * ring * (0.95 - Drawn.hash(ri + k) * 0.03);
+          g.quadraticCurveTo(hx + Math.cos(pa) * pl, hy + Math.sin(pa) * pl + 5 * ring, x, y);
         }
         g.stroke();
       }

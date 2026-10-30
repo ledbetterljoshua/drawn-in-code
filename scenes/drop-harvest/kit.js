@@ -27,7 +27,7 @@
     moss: { deep: '#1f3326', shade: '#2f4a33', base: '#4f6d3a', lit: '#9db54a', rim: '#e9df7a' },
     soil: { deep: '#1d1320', shade: '#33222f', base: '#4a3140', lit: '#7a4f52', rim: '#d99a6a' },
     leaf: { vein: '#e6efa0', under: '#7c9a55', underShade: '#4d6a42', glow: '#c9e05a', hot: '#eef59a', top: '#2f5a34', topLit: '#5f8f3c' },
-    bug: { base: '#6c6790', shade: '#433f63', deep: '#2c2944', lit: '#9b95bf', rim: '#ffd88e', belly: '#8d84a8' },
+    bug: { base: '#837ca8', shade: '#4e4870', deep: '#2c2944', lit: '#b4aed6', rim: '#ffd88e', belly: '#9d94b8' },
   };
 
   // which side of a thing faces the sun (+1 right, -1 left), and how strongly (0..1)

@@ -48,7 +48,7 @@
     g.fillStyle = 'rgba(10,8,16,0.5)'; g.fill(ell(x, base + 1, 30, 5));
     // the gills: the cap's underside seen from below, fanning from the stalk
     const under = ell(x, top, rx, ry);
-    g.lineWidth = 5; g.strokeStyle = LINE; g.stroke(under);
+    g.lineWidth = 3.4; g.strokeStyle = LINE; g.stroke(under);
     g.fillStyle = '#d9c7a8'; g.fill(under);
     g.save(); g.clip(under);
     g.fillStyle = radial(g, x, top, 0, rx, [[0, 'rgba(70,50,50,0.55)'], [0.5, 'rgba(120,96,80,0.2)'], [1, 'rgba(255,210,150,0.25)']]);
@@ -68,7 +68,7 @@
     cap.bezierCurveTo(x + 22, top - dome, x + rx - 4, top - dome * 0.9, x + rx + 2, top);
     cap.ellipse(x, top, rx + 2, ry * 0.9, 0, 0, Math.PI, false);
     cap.closePath();
-    g.lineWidth = 5.4; g.strokeStyle = LINE; g.stroke(cap);
+    g.lineWidth = 3.8; g.strokeStyle = LINE; g.stroke(cap);
     g.fillStyle = grad(g, x - rx, 0, x + rx, 0, ['#e8d4b0', '#c8ab86', '#8e7262']); g.fill(cap);
     g.save(); g.clip(cap);
     // the dark crown and the shaggy brown scales of a parasol
@@ -89,7 +89,7 @@
 
     // the stalk
     const S = capStalk(g);
-    g.lineWidth = 5; g.strokeStyle = LINE; g.stroke(S);
+    g.lineWidth = 3.4; g.strokeStyle = LINE; g.stroke(S);
     g.fillStyle = grad(g, x - 22, 0, x + 22, 0, ['#e6d8bc', '#bba684', '#7d6a5c']); g.fill(S);
     g.save(); g.clip(S);
     // snakeskin chevrons
@@ -149,7 +149,7 @@
     ink(g, stalk, '#8c8a5a', 2.4);
     DH.rim(g, stalk, x, 2);
     const B = podBody();
-    g.lineWidth = 5; g.strokeStyle = LINE; g.stroke(B);
+    g.lineWidth = 3.4; g.strokeStyle = LINE; g.stroke(B);
     g.fillStyle = grad(g, x - w, 0, x + w, 0, ['#cdb98a', '#a89064', '#6e5e4c']); g.fill(B);
     g.save(); g.clip(B);
     // ribs running up the urn
@@ -170,7 +170,7 @@
     lid.moveTo(x - lw2, y1 + 1);
     for (let i = 0; i < n; i++) { const a = x - lw2 + (i + 0.5) * (lw2 * 2 / n); lid.quadraticCurveTo(a, y1 + 10, x - lw2 + (i + 1) * (lw2 * 2 / n), y1 + 1); }
     lid.lineTo(x + lw2 * 0.86, y1 - 5); lid.quadraticCurveTo(x, y1 - 13, x - lw2 * 0.86, y1 - 5); lid.closePath();
-    g.lineWidth = 4.6; g.strokeStyle = LINE; g.stroke(lid);
+    g.lineWidth = 3.2; g.strokeStyle = LINE; g.stroke(lid);
     g.fillStyle = '#8c744e'; g.fill(lid);
     DH.crescent(g, lid, '#5e4a3a', 0, -4);
     DH.shadeFace(g, lid, x - w * 1.1, x + w * 1.1, 0.5);
@@ -205,7 +205,7 @@
     const nut = new Path2D();
     nut.moveTo(x - R, cy + 4); nut.bezierCurveTo(x - R, cy - R * 1.1, x + R, cy - R * 1.1, x + R, cy + 4);
     nut.bezierCurveTo(x + R, cy + R * 0.9, x - R, cy + R * 0.9, x - R, cy + 4);
-    g.lineWidth = 5; g.strokeStyle = LINE; g.stroke(nut);
+    g.lineWidth = 3.4; g.strokeStyle = LINE; g.stroke(nut);
     g.fillStyle = grad(g, x - R, 0, x + R, 0, ['#c88a4a', '#9a5c32', '#5c3424']); g.fill(nut);
     g.save(); g.clip(nut);
     // stripes running round the shell
@@ -229,7 +229,7 @@
     }
     for (let i = 14; i >= 0; i--) { const u = i / 14, a = Math.PI * (1.08 + u * 0.84); pts.push([x + Math.cos(a) * R * 0.86, cy - 4 + Math.sin(a) * R * 0.86]); }
     const H = curve(pts);
-    g.lineWidth = 4.6; g.strokeStyle = LINE; g.stroke(H);
+    g.lineWidth = 3.2; g.strokeStyle = LINE; g.stroke(H);
     g.fillStyle = '#7c8a44'; g.fill(H);
     DH.crescent(g, H, '#4c5a34', 4, -4);
     DH.shadeFace(g, H, x - R * 1.3, x + R * 1.3, 0.5);
@@ -239,7 +239,7 @@
     for (let i = 0; i < 12; i++) { const a = Math.PI * (1.1 + i / 12 * 0.8); g.beginPath(); g.moveTo(x + Math.cos(a) * R * 0.9, cy - 4 + Math.sin(a) * R * 0.9); g.lineTo(x + Math.cos(a) * R * 1.2, cy - 6 + Math.sin(a) * R * 1.15); g.stroke(); }
     g.restore();
     // a chimney of a hollow grass stem, capped with a bead
-    g.lineWidth = 5; g.strokeStyle = LINE; g.beginPath(); g.moveTo(x + 16, cy - R * 0.9); g.lineTo(x + 19, cy - R * 1.6); g.stroke();
+    g.lineWidth = 3.4; g.strokeStyle = LINE; g.beginPath(); g.moveTo(x + 16, cy - R * 0.9); g.lineTo(x + 19, cy - R * 1.6); g.stroke();
     g.lineWidth = 3; g.strokeStyle = '#b8a060'; g.stroke();
   }
 

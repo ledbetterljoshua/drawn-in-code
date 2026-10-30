@@ -107,3 +107,23 @@ away, fore drops and floats fill the phone's lower water.
 
 Still to do from the critique: (5) hero action and hover payoffs; (7) plane separation by line weight
 and haze; (9) web and blade irregularity.
+
+## Round 5
+
+The story pass. The crane is bigger (jib 112, mast a bent forked twig with a strut and a snapped side
+shoot, the jib cocked up and swinging *over the top* to the heap instead of a goalpost); the sling
+drop is r15 and catches the sun; workers are a lighter lilac with a thicker gold rim so they read
+against the moss. Hovering the leaf now visibly sags it and pours a thick glassy rope onto the heap
+with a churn of spray. House and cup outlines lighter than the foreground's (the island is a plane
+back). The web has broken strands hanging loose; the arching blade tapers and pinches where it twists
+to show its paler back. The stone in the bottom-right (a helmet) became a floating oak leaf, curled at
+the rim, rocking on the rings, beads rolling to its low side and off. The near bank has root and beard
+clusters, creeping moss and two huddles of fairy-bonnet mushrooms. Far clover removed (saucers on
+sticks).
+
+Five worst now:
+1. The upper-left quarter is empty storm; nothing leads the eye there except the web.
+2. Reflections step visibly (strip jaggies) in the bottom right.
+3. The leaf has no undulation along its lower margin — a smooth arc against the sky.
+4. The snail ferry and ladybird are still tiny at full frame.
+5. The island's right end and the Nut House get little light or story.

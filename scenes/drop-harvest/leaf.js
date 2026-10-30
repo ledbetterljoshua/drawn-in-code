@@ -213,7 +213,7 @@
       const [tx, ty] = DH.leafTip();
       const k = state.tipDrop;
       // the hanging drop stretches into a pendant before it falls
-      const r = 2.5 + k * 3.2;
+      const r = 3 + k * 4.2;
       g.lineWidth = 2 + k; g.strokeStyle = 'rgba(230,240,200,0.6)';
       g.beginPath(); g.moveTo(tx, ty - 2); g.lineTo(tx, ty + 2 + k * 6); g.stroke();
       DH.glassDrop(g, tx, ty + 4 + k * 7, r, { sy: 1 + k * 0.25, bright: 0.6 });
@@ -223,12 +223,14 @@
         g.save();
         g.globalAlpha = state.pour * 0.8;
         g.lineCap = 'round';
-        g.lineWidth = 2 + state.pour * 3; g.strokeStyle = 'rgba(200,226,210,0.6)';
+        g.lineWidth = 3 + state.pour * 5; g.strokeStyle = 'rgba(214,232,220,0.75)';
         g.beginPath(); g.moveTo(tx, ty + 4);
         for (let y = ty + 4; y < yb; y += 8) g.lineTo(tx + Math.sin(y * 0.2 - t * 18) * 1.2 * state.pour, y);
         g.stroke();
-        g.lineWidth = 1; g.strokeStyle = 'rgba(255,240,190,0.9)'; g.stroke();
+        g.lineWidth = 1.6; g.strokeStyle = 'rgba(255,244,200,0.95)'; g.stroke();
         g.restore();
+        // where it lands on the heap: a churn of spray
+        if (Math.random() < state.pour) DH.spawn({ kind: 'spray', x: tx + (Math.random() - 0.5) * 6, y: yb, vx: (Math.random() - 0.5) * 160, vy: -60 - Math.random() * 90, r: 1 + Math.random() * 1.2, life: 0.45, g: 900, z: 'mid' });
       }
     },
   });

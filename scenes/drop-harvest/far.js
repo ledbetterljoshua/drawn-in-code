@@ -51,7 +51,7 @@
     // a few broad blades arching over, out of focus and hazed toward the sky
     // [x, height, width, bend]: a hedge of broad far leaves and a couple of tall blades, low on the bank
     // [x, height, width, bend, kind]: far clover on long stalks, and tall blades at the edges
-    const spec = [[-330, 520, 70, 200, 'blade'], [-80, 120, 0, -20, 'clover'], [90, 90, 0, 14, 'clover'], [460, 70, 0, -10, 'clover'], [1880, 110, 0, 20, 'clover']];
+    const spec = [[-330, 520, 70, 200, 'blade'], [-150, 300, 50, 90, 'blade'], [1900, 420, 60, -160, 'blade']];
     for (const [x, h, w, bend, kind] of spec) {
       if (x < v.x0 - 400 || x > v.x1 + 400) continue;
       giants.push({ x, h, w: w || 10, bend, kind, ph: x * 0.01, near: clamp(1 - Math.abs(x - SUN.x) / 900, 0, 1) });

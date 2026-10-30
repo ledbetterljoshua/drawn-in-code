@@ -157,7 +157,7 @@
     const r = rng(12);
     g.fillStyle = 'rgba(10,8,16,0.55)'; g.fill(ell(CX, CB + 2, RX * 0.8, 5));
     const cup = cupPath();
-    g.lineWidth = 5.2; g.strokeStyle = LINE; g.stroke(cup);
+    g.lineWidth = 4; g.strokeStyle = LINE; g.stroke(cup);
     g.fillStyle = grad(g, CX - RX, 0, CX + RX, 0, ['#a2905a', '#76683e', '#4a3e2c']); g.fill(cup);
     g.save(); g.clip(cup);
     // overlapping scales in staggered rows, each with a lit tip on the sun side
@@ -220,17 +220,18 @@
   // A twig mast on the island's shoulder with a jib hinged at its top. The winders turn a
   // windlass at its foot: the sling rises from the jetty to the jib, the jib swings up and over
   // and lowers the drop onto the heap, then swings back and lets the empty sling down for the next.
-  const MAST = { x: 928, y: DH.ridgeY(928) + 2 }, TOP = [950, 556], JIB = 88;
+  const MAST = { x: 926, y: DH.ridgeY(926) + 2 }, TOP = [954, 516], JIB = 112;
   const WIND = { x: 936, y: DH.ridgeY(936) - 12 };
-  const crane = { phase: 'hoist', tt: 0, rope: 200, jib: Math.PI, sw: 0, swv: 0, load: true, roll: 0, crank: 0, heave: 0, blinkA: Drawn.blinker(), blinkB: Drawn.blinker() };
-  const ROPE_DOWN = 214, ROPE_UP = 26;
+  const JIB_REST = Math.PI + 0.3, JIB_OVER = TAU - 0.9;
+  const crane = { phase: 'hoist', tt: 0, rope: 200, jib: JIB_REST, sw: 0, swv: 0, load: true, roll: 0, crank: 0, heave: 0, blinkA: Drawn.blinker(), blinkB: Drawn.blinker() };
+  const ROPE_DOWN = 286, ROPE_UP = 40;
   const jibTip = () => [TOP[0] + Math.cos(crane.jib) * JIB, TOP[1] + Math.sin(crane.jib) * JIB];
   const loadPos = () => { const [tx, ty] = jibTip(); return [tx + Math.sin(crane.sw) * crane.rope, ty + Math.cos(crane.sw) * crane.rope]; };
   layer({
     id: 'crane', z: 13,
     hit(x, y) {
       const [lx, ly] = loadPos();
-      return Math.hypot(x - WIND.x, y - WIND.y) < 44 || Math.hypot(x - lx, y - ly) < 22 || (Math.abs(x - MAST.x - 8) < 14 && y > TOP[1] && y < MAST.y);
+      return Math.hypot(x - WIND.x, y - WIND.y) < 44 || Math.hypot(x - lx, y - ly) < 26 || (Math.abs(x - MAST.x - 16) < 22 && y > TOP[1] && y < MAST.y);
     },
     update(dt, t, L) {
       // hovered, the winders curl up into balls and the sling slips back down a little
@@ -249,11 +250,11 @@
           crane.rope = Math.max(ROPE_UP, crane.rope - dt * (6 + crane.heave * 40));
           if (crane.rope <= ROPE_UP) { crane.phase = 'swing'; crane.tt = 0; }
         } else if (crane.phase === 'swing') {
-          if (swingTo(-0.72) && crane.tt > 1.2) { crane.phase = 'drop'; crane.tt = 0; crane.load = false; DH.cisternPlink(DH.cisternX, 7); }
+          if (swingTo(JIB_OVER) && crane.tt > 1.2) { crane.phase = 'drop'; crane.tt = 0; crane.load = false; DH.cisternPlink(DH.cisternX, 7); }
         } else if (crane.phase === 'drop') {
           if (crane.tt > 0.8) { crane.phase = 'back'; crane.tt = 0; }
         } else if (crane.phase === 'back') {
-          if (swingTo(Math.PI) && crane.tt > 1) { crane.phase = 'lower'; crane.tt = 0; }
+          if (swingTo(JIB_REST) && crane.tt > 1) { crane.phase = 'lower'; crane.tt = 0; }
         } else if (crane.phase === 'lower') {
           crane.crank -= dt * 2;
           crane.rope = Math.min(ROPE_DOWN, crane.rope + dt * 70);
@@ -276,14 +277,18 @@
       };
       g.lineWidth = 1; g.strokeStyle = 'rgba(220,200,150,0.8)';
       g.beginPath(); g.moveTo(TOP[0], TOP[1] + 4); g.lineTo(1000, DH.ridgeY(1000) - 2); g.stroke();
-      twig(MAST.x, MAST.y, TOP[0], TOP[1], 6);
-      twig(MAST.x + 14, MAST.y - 4, TOP[0] + 2, TOP[1] + 40, 3.6);
+      const kx = MAST.x + 20, ky = (MAST.y + TOP[1]) / 2 + 20;
+      twig(MAST.x, MAST.y, kx, ky, 8);
+      twig(kx, ky, TOP[0], TOP[1], 6.5);
+      // a side shoot snapped short, and a strut into the moss
+      twig(kx - 2, ky + 10, kx + 22, ky - 6, 3);
+      twig(MAST.x + 30, DH.ridgeY(MAST.x + 30), kx + 1, ky - 18, 3.2);
       // lashings
       g.lineWidth = 2; g.strokeStyle = '#c8b070';
-      for (const [x, y] of [[TOP[0] - 1, TOP[1] + 6], [TOP[0] + 1, TOP[1] + 42], [MAST.x + 3, MAST.y - 16]]) { g.beginPath(); g.moveTo(x - 4, y - 2); g.lineTo(x + 4, y + 2); g.moveTo(x - 4, y + 1); g.lineTo(x + 4, y + 5); g.stroke(); }
+      for (const [x, y] of [[TOP[0] - 1, TOP[1] + 8], [kx, ky - 16], [MAST.x + 4, MAST.y - 16]]) { g.beginPath(); g.moveTo(x - 4, y - 2); g.lineTo(x + 4, y + 2); g.moveTo(x - 4, y + 1); g.lineTo(x + 4, y + 5); g.stroke(); }
       // the jib
       const [tx, ty] = jibTip();
-      twig(TOP[0], TOP[1], tx, ty, 4.2, '#7a5440');
+      twig(TOP[0], TOP[1], tx, ty, 5.2, '#7a5440');
       ink(g, circ(TOP[0], TOP[1], 4.5), '#a88a5a', 1.6);
       ink(g, circ(tx, ty, 3.2), '#a88a5a', 1.4);
       // the thread: windlass → masthead → jib tip → load
