@@ -88,3 +88,22 @@ Did:
 - Caustics: a warped Voronoi net built once as pixels, finer and flatter with distance.
 - Reef: distant forms fogged harder, no table "mushrooms" in the haze. Eels have burrow mounds.
 - A sea turtle, a fusilier school that scatters from the pointer, two moon jellies.
+
+## Round 4
+Looked at every hover (wheelhouse, pump, galley, nautilus) and the hit map. Measured speed: headless
+software Chromium gave 18 fps at 1440×900 @2x, which sent me hunting; the costs were spread thin
+(shafts, caustics, room light, kelp, the two shell sprites ~5 ms each in software). Real Chrome with
+the GPU holds 60 fps desktop @2x and phone @3x, worst frame 16.8 ms. Kept the cheap wins anyway:
+shafts painted at quarter resolution every third frame, kelp blades without clip/inner strokes, small
+rooms' light baked, the shell's bob translate-only (no per-frame rotation of the big sprites).
+
+Worst five, and what I did:
+1. The body crescent was a big dead cream fan → the sea's caustic net now plays over it (slow, faint),
+   stripes vary in width and spacing, a crust of barnacles along the keel, a cleaner wrasse working
+   the shell (hover: it darts off, then comes back to its job).
+2. The coil centre read as a clock face → septum ink thins and lightens toward the coil, chamber
+   outlines scale with size, so the oldest chambers go quiet.
+3. Every room lit by the same jar → three kinds of light: jelly jars, scallop-shell sconces with a
+   glowing sea-pen, a jelly on a tether drifting in the observatory and the garden.
+4. Caustics on the shell first read as crackle glaze → bigger cells, much fainter, one tall tile (no seam).
+5. Barnacles first came out as upside-down cups mid-shell → plate volcanoes seen from the side, on the keel.

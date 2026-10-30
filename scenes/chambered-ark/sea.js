@@ -155,23 +155,39 @@ layer({
 // ------------------------------------------------------------------ slow light shafts
 const shafts = [];
 { const r = rng(9); for (let i = 0; i < 7; i++) shafts.push({ x: -200 + i * 230 + r() * 120, w: 40 + r() * 90, ph: r() * 10, sp: 0.1 + r() * 0.12, a: 0.05 + r() * 0.05 }); }
+// the shafts are soft, so they're painted small (a quarter of the screen's resolution) and scaled up
+let shaftC = null, shaftG = null;
+const SHQ = 0.25;
 layer({
   id: 'shafts', z: 6,
   draw(g, t) {
-    const S = A.SURF, len = 1700, ang = 0.32; // leaning down to the right, away from the sun
+    const v = st.view, S = A.SURF;
+    const W = Math.ceil((v.x1 - v.x0) * SHQ), H = Math.ceil((v.y1 - S) * SHQ);
+    const fresh = !shaftC || shaftC.width !== W || shaftC.height !== H;
+    if (fresh) { shaftC = document.createElement('canvas'); shaftC.width = W; shaftC.height = H; shaftG = shaftC.getContext('2d'); }
+    // they move slowly: repaint them every third frame
+    if (fresh || (shaftN = (shaftN + 1) % 3) === 0) paintShafts(shaftG, t, v, S, W, H);
     g.save(); g.globalCompositeOperation = 'lighter';
+    g.drawImage(shaftC, v.x0, S, W / SHQ, H / SHQ);
+    g.restore();
+  },
+});
+let shaftN = 0;
+function paintShafts(q, t, v, S, W, H) {
+    const len = 1700, ang = 0.32;
+    q.setTransform(1, 0, 0, 1, 0, 0); q.clearRect(0, 0, W, H);
+    q.setTransform(SHQ, 0, 0, SHQ, -v.x0 * SHQ, -S * SHQ);
+    q.globalCompositeOperation = 'lighter';
     for (const s of shafts) {
       const k = 0.5 + 0.5 * Math.sin(t * s.sp + s.ph), w = s.w * (0.6 + 0.6 * k);
       const x0 = s.x + Math.sin(t * s.sp * 0.7 + s.ph) * 30;
       const dx = Math.sin(ang) * len, dy = Math.cos(ang) * len;
-      const gr = g.createLinearGradient(x0, S, x0 + dx, S + dy);
+      const gr = q.createLinearGradient(x0, S, x0 + dx, S + dy);
       gr.addColorStop(0, `rgba(255,250,220,${s.a * (0.5 + k)})`); gr.addColorStop(0.55, `rgba(220,255,240,${s.a * 0.5})`); gr.addColorStop(1, 'rgba(200,255,240,0)');
-      g.fillStyle = gr;
-      g.fill(poly([[x0, S], [x0 + w, S], [x0 + w * 2.2 + dx, S + dy], [x0 + dx, S + dy]]));
+      q.fillStyle = gr;
+      q.fill(poly([[x0, S], [x0 + w, S], [x0 + w * 2.2 + dx, S + dy], [x0 + dx, S + dy]]));
     }
-    g.restore();
-  },
-});
+}
 
 // ------------------------------------------------------------------ the near sand
 const sandTop = (x) => A.BED + 10 * Math.sin(x * 0.006 + 1) + 6 * noise(x * 0.01);
@@ -235,7 +251,7 @@ onLayout(() => {
     }
   }
   g.putImageData(img, 0, 0);
-  cau = { c };
+  cau = { c }; A.cau = cau;
 });
 layer({
   id: 'caustics', z: 9,
@@ -422,11 +438,9 @@ function drawKelp(g, k, t) {
     }
     const p = curve([...Ls, ...Rs.reverse()]);
     g.fillStyle = k.c.blade; g.fill(p);
-    g.save(); g.clip(p);
-    g.globalAlpha = 0.7; A.stroke(g, Ls, W * 0.45, k.c.bladeSh); A.stroke(g, Rs, W * 0.2, k.c.bladeLt); g.globalAlpha = 1;
-    A.stroke(g, spine, 1, k.c.bladeSh);
-    g.restore();
     g.lineWidth = k.lw; g.strokeStyle = k.c.line; g.stroke(p);
+    // the midrib, lit where the sun comes through the blade
+    A.stroke(g, spine.slice(1, -2), Math.max(1.5, W * 0.16), k.c.bladeLt);
     g.fillStyle = k.c.float; g.fill(ell(x, y, 4.5, 5.5)); g.lineWidth = k.lw * 0.8; g.stroke(ell(x, y, 4.5, 5.5));
   }
 }

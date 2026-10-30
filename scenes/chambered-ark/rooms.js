@@ -108,6 +108,27 @@ K.lampJar = (g, x, y, s, t, k = 0, bright = 0) => {
   g.fillStyle = 'rgba(255,255,255,0.6)'; g.fillRect(x - jw * 0.7, y - jh * 0.7, 1.6 * s, jh * 1.1);
 };
 
+// two other lights the crew make: a scallop-shell sconce with a glowing sea-pen in it, and a jelly
+// on a tether, free to drift
+K.sconce = (g, x, y, s, t, bright = 0) => {
+  g.fillStyle = radial(g, x, y - 4 * s, 0, 34 * s, [[0, `rgba(255,236,170,${0.35 + bright * 0.3})`], [1, 'rgba(255,220,150,0)']]);
+  g.fillRect(x - 34 * s, y - 38 * s, 68 * s, 68 * s);
+  const fl = 1 + 0.08 * Math.sin(t * 6 + x);
+  ink(g, curve([[x - 2 * s, y - 4 * s], [x - 1 * s, y - 14 * s * fl], [x + 1.5 * s, y - 16 * s * fl], [x + 2 * s, y - 4 * s]]), '#fff2c0', 0.8);
+  const S = curve([[x - 9 * s, y - 5 * s], [x, y + 4 * s], [x + 9 * s, y - 5 * s], [x, y - 1 * s]]);
+  ink(g, S, '#f2c3a8', 1.1);
+  g.lineWidth = 0.7; g.strokeStyle = '#c98a70'; for (let i = -2; i <= 2; i++) { g.beginPath(); g.moveTo(x + i * 1.6 * s, y + 3 * s); g.lineTo(x + i * 4 * s, y - 4 * s); g.stroke(); }
+};
+K.tethered = (g, x, y, s, t, k = 0, bright = 0) => {
+  const jx = x + Math.sin(t * 0.7 + k) * 6 * s, jy = y + Math.cos(t * 0.9 + k) * 3 * s, p = Math.sin(t * 2.4 + k);
+  A.line(g, x, y + 30 * s, jx, jy + 2 * s, 0.6, 'rgba(60,40,60,0.6)');
+  g.fillStyle = radial(g, jx, jy, 0, 30 * s, [[0, `rgba(255,240,190,${0.4 + bright * 0.3})`], [1, 'rgba(255,220,150,0)']]);
+  g.fillRect(jx - 30 * s, jy - 30 * s, 60 * s, 60 * s);
+  const B = new Path2D(); B.ellipse(jx, jy, (7 + p) * s, (5 - p * 0.5) * s, 0, Math.PI, 0); B.closePath();
+  g.fillStyle = 'rgba(255, 250, 225, 0.9)'; g.fill(B); g.lineWidth = 0.8; g.strokeStyle = 'rgba(200,150,90,0.9)'; g.stroke(B);
+  for (let i = -2; i <= 2; i++) { g.beginPath(); g.moveTo(jx + i * 2.4 * s, jy); g.quadraticCurveTo(jx + i * 2.6 * s + Math.sin(t * 3 + i) * 2, jy + 6 * s, jx + i * 2 * s, jy + 10 * s); g.stroke(); }
+};
+
 // ------------------------------------------------------------------ rooms
 A.rooms = [];
 A.room = (def) => {
@@ -117,6 +138,16 @@ A.room = (def) => {
     g.save(); g.clip(ch.path);
     if (def.floor != null) { const [x0, x1] = K.deck(g, ch, def.floor, { near: def.near }); R.fx0 = x0; R.fx1 = x1; }
     if (def.furnish) def.furnish(g, R);
+    // small rooms keep their jelly-light baked in (the big ones pool it live over the crew)
+    if (def.glow && ch.size <= 110) {
+      g.globalCompositeOperation = 'lighter';
+      for (const [x, y, rad, a] of def.glow) {
+        const al = a * 0.42 * clamp(ch.size / 200, 0.35, 1), rr = rad * 1.2;
+        g.fillStyle = radial(g, x, y, 0, rr, [[0, `rgba(255, 190, 110, ${al})`], [0.4, `rgba(240, 140, 70, ${al * 0.45})`], [1, 'rgba(200, 100, 60, 0)']]);
+        g.fillRect(x - rr, y - rr, rr * 2, rr * 2);
+      }
+      g.globalCompositeOperation = 'source-over';
+    }
     g.restore();
   }, def.k);
   if (def.floor != null) { const [x0, x1] = A.span(ch.poly, def.floor, def.near); R.fx0 = x0; R.fx1 = x1; R.fy = def.floor; }
@@ -132,7 +163,7 @@ A.room = (def) => {
         g.save(); g.clip(ch.path);
         def.draw(g, t, L, R);
         // the jelly-light pools warm over the room and everyone in it, breathing with the jellies
-        if (def.glow) {
+        if (def.glow && ch.size > 110) {
           const hero = clamp(ch.size / 200, 0.35, 1.15);
           const f = 0.85 + 0.1 * Math.sin(t * 2.3 + def.k) + 0.05 * Math.sin(t * 5.1 + def.k * 3) + L.hover * 0.2 + (A.flare ? A.flare(def.k) * 0.8 : 0);
           g.globalCompositeOperation = 'lighter';
@@ -196,7 +227,7 @@ A.room({
     R.wv += ((L.hovered ? 5 : 0) - R.wv) * dt * 2.2;
     R.wheel += (R.wv + Math.sin(t * 0.4) * 0.15) * dt;
     R.lean = Drawn.ease(R.lean, L.hovered ? 1 : 0, 1.5, dt);
-    A.tiltExtra = R.lean * 0.02;
+    A.tiltExtra = R.lean * 0.02; // the turn swings the ark a little sideways
     if (L.hovered && L.since > 1.1 && !R.tube.live && R.tube.u >= 1 && !R.called) { R.called = true; R.tube.start(); A.mail(0.98, 0.0, () => { A.signal = 1; }); }
     if (!L.hovered) R.called = false;
   },
@@ -361,7 +392,7 @@ A.room({
     if (R.ws > 2 && Math.random() < dt * R.ws * 0.8) A.spawn({ kind: 'bubble', x: 968 + Math.random() * 4, y: 326, vx: 0, vy: -6, size: 1.2, life: 0.8 });
   },
   draw(g, t, L, R) {
-    K.lampJar(g, 1040, 196, 0.85, t, 2, L.hover + A.flare(R.k));
+    K.sconce(g, 1040, 200, 0.9, t, L.hover + A.flare(R.k));
     // the treadwheel
     const wx = 1000, wy = 262, wr = 38;
     g.save(); g.translate(wx, wy);
@@ -422,7 +453,7 @@ A.room({
     if (!L.hovered) R.jumped = false;
   },
   draw(g, t, L, R) {
-    K.lampJar(g, 870, 196, 0.8, t, 3, L.hover + A.flare(R.k));
+    K.tethered(g, 872, 200, 0.85, t, 3, L.hover + A.flare(R.k));
     // inside: the eyepiece end of the telescope, angled up to the hole in the roof
     const a = R.aim, [px, py] = SCOPE.pivot;
     const ex = px - Math.cos(a) * 70, ey = py - Math.sin(a) * 70;
@@ -483,7 +514,7 @@ A.room({
     if (R.act.is('read') > 0.95 && !R.page.live) R.page.start();
   },
   draw(g, t, L, R) {
-    K.lampJar(g, 806, 205, 0.75, t, 4, L.hover + A.flare(R.k));
+    K.sconce(g, 806, 212, 0.8, t, L.hover + A.flare(R.k));
     // the open book on the lectern; a page turning over
     g.save(); g.translate(788, 312); g.rotate(-0.17);
     ink(g, curve([[-16, 0], [-8, -4], [0, -1], [8, -4], [16, 0], [16, 3], [0, 4], [-16, 3]]), '#fbf3e2', 1);
@@ -538,7 +569,7 @@ A.room({
     if (R.water > 0.6 && Math.random() < dt * 14) A.spawn({ kind: 'bubble', x: 744 + Math.random() * 4, y: 378, vx: (Math.random() - 0.5) * 8, vy: -30, size: 1 + Math.random() * 1.6, life: 1.1 });
   },
   draw(g, t, L, R) {
-    K.lampJar(g, 734, 305, 0.7, t, 5, L.hover + A.flare(R.k));
+    K.tethered(g, 736, 300, 0.75, t, 5, L.hover + A.flare(R.k));
     // anemones: soft columns with a crown of tentacles that open and wave
     for (const [x, s, col, k] of [[712, 1, ['#f29ab2', '#c86a8a', '#ffd0dc'], 0], [732, 0.8, ['#9ad4b8', '#5fa38a', '#d4f2e2'], 1], [772, 0.9, ['#f6b46a', '#c9803a', '#ffe0b0'], 2]]) {
       const op = 0.35 + R.open * 0.65 + Math.sin(t * 0.7 + k) * 0.08;

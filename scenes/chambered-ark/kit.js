@@ -117,15 +117,15 @@ A.stepBob = (dt, t) => {
 };
 // draw something in shell space (bobbing with the ark)
 A.inShell = (g, fn) => {
+  // translate only: rotating the shell's big sprites every frame costs more than the whole frame
   g.save();
-  g.translate(A.C[0] + A.dx, A.C[1] + A.bob); g.rotate(A.tilt); g.translate(-A.C[0], -A.C[1]);
+  g.translate(Math.round((A.dx + A.tiltT * 400) * 4) / 4, Math.round(A.bob * 4) / 4);
   fn();
   g.restore();
 };
 // a pointer position (artboard) in shell space
 A.toShell = (x, y) => {
-  const dx = x - A.C[0] - A.dx, dy = y - A.C[1] - A.bob, c = Math.cos(-A.tilt), s = Math.sin(-A.tilt);
-  return [A.C[0] + dx * c - dy * s, A.C[1] + dx * s + dy * c];
+  return [x - Math.round((A.dx + A.tiltT * 400) * 4) / 4, y - Math.round(A.bob * 4) / 4];
 };
 A.hitIn = (path) => (x, y) => { const [sx, sy] = A.toShell(x, y); return A.hitCtx.isPointInPath(path, sx, sy); };
 A.hitCtx = document.createElement('canvas').getContext('2d');
