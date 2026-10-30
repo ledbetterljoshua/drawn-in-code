@@ -275,7 +275,7 @@
         "mechanic": "something you can wake up",
         "feeling": "busy and funny"
       },
-      "status": "pitched",
+      "status": "in-progress",
       "batch": "2026-10-29-1",
       "scores": {
         "bold": 4,
@@ -285,7 +285,8 @@
       },
       "cliche": "Wes Anderson hotel-porter whimsy, or a cliff-sized advent calendar of cute sleeping animals.",
       "fix": "Cut the face to about 60-80 drawers of wildly uneven size, foreshortened so the lowest are big and the far ones are rough texture. Five hundred drawers at sea-stack scale turns into a spreadsheet, and the sleepers stop reading at the size where the contagious yawn has to land.",
-      "rank": 1
+      "rank": 1,
+      "scene": "the-overwinter"
     },
     {
       "id": "the-sunloft",
