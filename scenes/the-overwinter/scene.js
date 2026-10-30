@@ -6,7 +6,7 @@ const { TAU, clamp, rng, wind, st, P, layer } = Drawn;
 const flakes = [];
 {
   const R = rng(11);
-  for (let i = 0; i < 420; i++) flakes.push({ x: R(), y: R(), d: R() ** 1.6, ph: R() * TAU, vx: 0, vy: 0 });
+  for (let i = 0; i < 360; i++) flakes.push({ x: R(), y: R(), d: R() ** 1.6, ph: R() * TAU, vx: 0, vy: 0 });
 }
 layer({
   id: 'snow', z: 40,
@@ -30,12 +30,28 @@ layer({
     const v = st.view, W = v.x1 - v.x0, H = v.y1 - v.y0;
     g.fillStyle = '#eef0fb';
     for (const f of flakes) {
-      const r = 0.5 + f.d * 1.5;
-      g.globalAlpha = 0.35 + f.d * 0.55;
+      const r = 0.8 + f.d * 2.2;
+      g.globalAlpha = 0.4 + f.d * 0.55;
       g.fillRect(v.x0 + f.x * W - r / 2, v.y0 + f.y * H - r / 2, r, r);
     }
     g.globalAlpha = 1;
+    // a few near flakes, big and soft, drifting past the lens
+    for (const f of near) {
+      g.globalAlpha = 0.5;
+      g.fill(Drawn.circ(v.x0 + f.x * W, v.y0 + f.y * H, f.r));
+    }
+    g.globalAlpha = 1;
   },
+});
+const near = [];
+{ const R = rng(12); for (let i = 0; i < 26; i++) near.push({ x: R(), y: R(), r: 2 + R() * 2.4, ph: R() * TAU }); }
+layer({
+  id: 'snow-near', z: 39,
+  update(dt, t) {
+    const v = st.view, W = v.x1 - v.x0, H = v.y1 - v.y0;
+    for (const f of near) { f.y += (dt * 70) / H; f.x += (dt * (wind(t, f.x * W) * 50 + Math.sin(t + f.ph) * 14)) / W; if (f.y > 1.03) { f.y = -0.03; f.x = Math.random(); } if (f.x > 1.03) f.x -= 1.06; }
+  },
+  draw() {},
 });
 
 Drawn.start({ W: OW.W, H: OW.H, hint: 'tap a drawer to wake its guest' });

@@ -239,16 +239,16 @@ layer({
   id: 'foreground', z: 36, still: true,
   draw(g) {
     const R = rng(909);
-    const rocks = [[-150, 1530, 150, 70], [40, 1555, 90, 46], [-430, 1500, 120, 60], [-20, 1480, 40, 20], [1040, 1600, 120, 50], [1240, 1540, 90, 40]];
+    const rocks = [[-420, 1520, 190, 110], [-150, 1560, 170, 90], [30, 1590, 110, 70], [-40, 1488, 34, 16], [1100, 1620, 160, 70], [1330, 1560, 120, 70]];
     for (const [x, y, w, h] of rocks) {
       // angular slabs of the same bedded stone as the stack, tilted, with flat tops
       const tilt = (R() - 0.5) * 0.3;
       const pts = [[x - w, y + h], [x - w * 0.95, y - h * 0.3], [x - w * 0.7, y - h * 0.85], [x - w * 0.2, y - h - tilt * w], [x + w * 0.35, y - h * 0.95 + tilt * w * 0.5], [x + w * 0.8, y - h * 0.6 + tilt * w], [x + w, y - h * 0.1], [x + w, y + h]];
       const p = poly(pts.map(([px, py]) => [px + (R() - 0.5) * 6, py + (R() - 0.5) * 4]));
-      ink(g, p, '#1c1626', 3);
+      ink(g, p, '#120e1a', 3.4);
       g.save(); g.clip(p);
       // the top plane catches the glow; bedding lines run across the face
-      g.fillStyle = 'rgba(255,170,160,0.22)'; g.fill(poly([pts[1], pts[2], pts[3], pts[4], pts[5], [pts[5][0], pts[5][1] + h * 0.25], [pts[1][0], pts[1][1] + h * 0.2]]));
+      g.fillStyle = 'rgba(240,150,150,0.16)'; g.fill(poly([pts[1], pts[2], pts[3], pts[4], pts[5], [pts[5][0], pts[5][1] + h * 0.18], [pts[1][0], pts[1][1] + h * 0.14]]));
       g.strokeStyle = 'rgba(8,4,14,0.6)'; g.lineWidth = 1.6;
       for (let k = 1; k < 4; k++) { const yy = y - h * 0.5 + k * h * 0.35; g.beginPath(); g.moveTo(x - w, yy + tilt * 20); g.lineTo(x + w, yy - tilt * 20 + (R() - 0.5) * 6); g.stroke(); }
       for (let i = 0; i < w * 0.5; i++) { g.fillStyle = R() < 0.6 ? '#5a5068' : '#0e0a16'; g.fill(circ(x - w + R() * 2 * w, y - R() * h * 0.9, 0.8 + R() * 1.8)); }

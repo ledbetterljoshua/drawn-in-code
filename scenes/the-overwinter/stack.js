@@ -276,6 +276,29 @@ function drawCabinet(g, cab) {
   }
 }
 
+// shelves of harder stone run round the stack between the cabinet rows; the cabinets sit on them
+function drawLedges(g) {
+  const R = rng(611);
+  g.save(); g.clip(stackPath());
+  for (const [v, th, ua, ub] of [[0.296, 0.008, -0.5, 0.12], [0.449, 0.009, 0.92, 1.5], [0.6, 0.007, -0.5, 0.1], [0.162, 0.008, 0.99, 1.5], [0.745, 0.01, 0.2, 0.62]]) {
+    const top = [], bot = [];
+    for (let u = ua; u <= ub + 1e-6; u += 0.04) {
+      const a = drum(u, v + th), b = drum(u, v - th * 0.4);
+      a[1] += OW.dip(u, v) - R() * 1.5; b[1] += OW.dip(u, v) + 1 + R() * 2;
+      top.push(a); bot.push(b);
+    }
+    if (top.length < 2) continue;
+    // its shadow on the rock and cabinets below
+    g.fillStyle = 'rgba(6,4,12,0.45)'; g.fill(poly(bot.concat(bot.slice().reverse().map(([x, y]) => [x, y + 9]))));
+    ink(g, poly(top.concat(bot.slice().reverse())), mix('#2c2440', '#4a3446', OW.warmAt(top[0][1])), 1.6);
+    // underside lit warm by the sand near the foot; a snow line along the top
+    g.lineWidth = 1.2; g.strokeStyle = `rgba(230,160,150,${0.1 + OW.warmAt(bot[0][1]) * 0.4})`; g.stroke(poly(bot.map(([x, y]) => [x, y - 1.5]), false));
+    const sn = top.map(([x, y]) => [x, y - 1 - R() * 2.5]);
+    ink(g, curve(sn.concat(top.slice().reverse().map(([x, y]) => [x, y + 1.6]))), C.snow, 0.7, C.snowShade);
+  }
+  g.restore();
+}
+
 // the face of a closed drawer, in its slot
 function drawerFront(g, d, q, R, lit = 0) {
   const T = C[d.tone];
@@ -524,6 +547,7 @@ onLayout(() => {
     g.save(); g.clip(stackPath()); lampLight(g, 0.4); g.restore();
     drawFoot(g);
     for (const cab of OW.cabinets) drawCabinet(g, cab);
+    drawLedges(g);
     drawRim(g);
     drawArch(g);
     drawCap(g);

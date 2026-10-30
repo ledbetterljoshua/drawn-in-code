@@ -151,3 +151,16 @@ Fixed:
 - Lamp halos bluer and softer (they were whitening fronts).
 - **Hedgehogs walk upright** in profile, scarves and suitcases swinging, 1.45× bigger.
 - Rock lips over cabinet corners were reading as ink blots: lighter, with a snow cap.
+
+## Round 6
+
+Five worst (mine, at thumbnail size):
+1. **The cloud's lit rolls were polka dots** (one bright ellipse per roll). Two retries — per-column
+   gradients left vertical seams; stepped strokes read as a neon line. What worked: soft shapes made
+   by drawing each shape far off-canvas and letting its blurred *shadow* land in place (shadow
+   offsets are device pixels, so divide by the transform scale). Portable — no `ctx.filter`.
+2. **Far stacks were flat light tombstones.** → cooler, lower contrast, five of varied width/height.
+3. **Foreground rocks were brown loaves.** → bigger, near-black slabs with only a faint glow plane.
+4. **Snowfall invisible at full frame.** → flakes 2× bigger, plus 26 near, soft, big flakes.
+5. **Cabinets float on the rock.** → shelves of harder stone run partway round between cabinet rows
+   (first try ran one all the way round: a wedding-cake ring; now broken into pieces).
