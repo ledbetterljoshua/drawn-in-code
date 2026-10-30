@@ -178,7 +178,7 @@
   });
   const blinkJ = Drawn.blinker(2, 5);
   layer({
-    id: 'jugLive', z: 15,
+    id: 'jugLive', z: 17.5,
     hit: (x, y) => Math.abs(x - 128) < 70 && y > 330 && y < 600,
     draw(g, t, L) {
       const f = lampFlicker(t, 1) * (1 + L.hover * 0.2) * (K.pulse ? 1 + K.pulse.jug : 1);
@@ -189,7 +189,7 @@
       const h = K.smooth(L.hover);
       if (h > 0.02) {
         const wave = L.since > 0.5 ? Math.sin((L.since - 0.5) * 9) * K.bell(Math.min(1, (L.since - 0.5) / 2)) : 0;
-        K.mole(g, 126, 430 + (1 - h) * 22, 0.55, { hands: { f: [18, -26 - wave * 6], b: [10, -16] }, open: blinkJ(t), smile: 1.6, lx: 128, ly: 420 });
+        K.mole(g, 126, 416 + (1 - h) * 22, 0.55, { hands: { f: [18, -26 - wave * 6], b: [10, -16] }, open: blinkJ(t), smile: 1.6, lx: 128, ly: 420 });
       }
       g.restore();
       // the shutter, hinged on the left of the window
@@ -225,7 +225,7 @@
     },
   });
   layer({
-    id: 'lanternLive', z: 15.2, spin: 0, sp: 0,
+    id: 'lanternLive', z: 17.6, spin: 0, sp: 0,
     hit: (x, y) => Math.hypot((x - 298) / 70, (y - 540) / 80) < 1,
     update(dt, t, L) { this.sp = ease(this.sp, L.hovered ? 1.6 : 0.12, 1.5, dt); this.spin += this.sp * dt; },
     draw(g, t, L) {
@@ -333,7 +333,7 @@
         if (s < 0.05) continue;
         const ring = i % 3, R = 150 + ring * 34;
         const x = TX + Math.cos(a) * R, y = TB + 8 + s * (8 + ring * 6);
-        if (x > 1240 && x < 1290) continue;
+        if (x > 1232) continue;
         K.glow(g, x, y, 10 + ring * 3, '#ffb868', 0.32 * f * s, 0.35);
       }
       g.globalCompositeOperation = 'source-over';
@@ -373,7 +373,7 @@
   const bowlHoles = piercings(bowl, [{ y: 848, n: 9, size: 3.6, shape: 'moon', from: 0.4, to: Math.PI - 0.4 }, { y: 874, n: 12, size: 3.4, shape: 'tri', off: 0.5 }]);
   const bowlDoor = surfArch(bowl, Math.PI / 2 - 0.12, 34, 52, BB);
   layer({
-    id: 'bowl', z: 40, still: true,
+    id: 'bowl', z: 38.2, still: true,
     draw(g) {
       throwPot(g, bowl, { skip: K.L.bowl, clay: M.clayPale, glaze: { col: M.glazeBlue, edge: 900, seed: 21 }, seed: 22 });
       // the foot ring on top, a parapet with a chimney pot behind it
@@ -466,7 +466,7 @@
   const breakPts = [[804, WB - 2], [808, 900], [802, 870], [816, 842], [826, 812], [846, 800], [862, 784], [884, 792], [904, 778], [924, 796], [946, 806], [958, 832], [970, 860], [962, 890], [968, WB - 2]];
   const breakP = curve(breakPts, true);
   layer({
-    id: 'shop', z: 42, still: true,
+    id: 'shop', z: 38.4, still: true,
     draw(g) {
       throwPot(g, shop, { skip: K.L.shop, clay: M.clay, glaze: { col: M.glazeCream, edge: 818, seed: 41 }, seed: 42 });
       rim(g, shop, M.clay);
@@ -559,7 +559,7 @@
   // clay pipe from the kiln's right flank, over the workshop, to the teapot
   const pipePts = [[742, 760], [790, 752], [840, 746], [884, 744], [940, 742], [990, 744]];
   layer({
-    id: 'pipe', z: 33, still: true,
+    id: 'pipe', z: 30.5, still: true,
     draw(g) {
       const p = curve(pipePts, false);
       // a forked post holding it up between the kiln and the workshop

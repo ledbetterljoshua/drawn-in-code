@@ -185,7 +185,7 @@
   });
   const rings = [];
   layer({
-    id: 'puddleLive', z: 51.5,
+    id: 'puddleLive', z: 54.6,
     hit: (x, y) => Math.hypot((x - PU.x) / PU.rx, (y - PU.y) / (PU.ry + 6)) < 1,
     update(dt, t, L) {
       if (L.hovered && Math.random() < dt * 3) rings.push({ x: P.x, y: PU.y + clamp(P.y - PU.y, -6, 6), age: 0 });
@@ -279,7 +279,7 @@
   // ------------------------------------------------------------------ ground door
   const GX = 700, GY = 1480;
   layer({
-    id: 'groundDoor', z: 60, still: true,
+    id: 'groundDoor', z: 50.8, still: true,
     draw(g) {
       // a grassy mound with a round hatch in its face, propped open
       const mound = curve([[GX - 190, GY + 40], [GX - 150, GY + 6], [GX - 90, GY - 30], [GX - 30, GY - 46], [GX + 40, GY - 44], [GX + 110, GY - 24], [GX + 160, GY + 8], [GX + 200, GY + 40]], false);

@@ -59,7 +59,7 @@
       f *= 0.18 + 0.82 * Math.max(0, (n[0] * dx + n[1] * dy + n[2] * l.z) / d3);
       L[0] += l.col[0] * f; L[1] += l.col[1] * f; L[2] += l.col[2] * f;
     }
-    const bounce = Math.exp(-(base - y) / 95) * (0.5 + 0.5 * Math.max(0, n[2])) * (0.35 + 0.65 * Math.exp(-(((x - cx) / 170) ** 2)));
+    const bounce = Math.exp(-(base - y) / 78) * (0.5 + 0.5 * Math.max(0, n[2])) * (0.35 + 0.65 * Math.exp(-(((x - cx) / 170) ** 2)));
     let arch = 0;
     for (const m of mouths) { const d = Math.hypot((x - m.c[0]) / 1.1, y - m.c[1]); arch += Math.max(0, 1 - d / (m.w * 1.1)) ** 2 * (m === mouths[0] ? 1.6 : 1.1); }
     const lip = Math.max(0, 1 - (y - 236) / 50) ** 2 * 1.2;
@@ -176,6 +176,9 @@
         const a = onK(Math.PI / 2, -u0, y + 0.6), b = onK(Math.PI / 2, -u0 - 17, y + 0.6), c = onK(Math.PI / 2, -u0 - 17, y + 7.8), d = onK(Math.PI / 2, -u0, y + 7.8);
         g.fillStyle = K.css(kilnLit('#d08a5a', a[0], a[1], [0.3, 0, 0.95])); g.fill(poly([a, b, c, d]));
       }
+      // and the upper bottle sinks into the night: nothing up there is lit but the lip
+      g.fillStyle = grad(g, 0, 260, 0, 700, [[0, 'rgba(6,6,16,0.35)'], [0.15, 'rgba(6,6,16,0.5)'], [0.6, 'rgba(6,6,16,0.25)'], [1, 'rgba(6,6,16,0)']]);
+      g.fillRect(cx - 200, 262, 400, 440);
       // the bottle turns away at its edges: darken the silhouette sides (ambient occlusion)
       g.fillStyle = grad(g, cx - 190, 0, cx + 190, 0, [[0, 'rgba(6,4,12,0.6)'], [0.14, 'rgba(6,4,12,0.15)'], [0.5, 'rgba(6,4,12,0)'], [0.86, 'rgba(6,4,12,0.12)'], [1, 'rgba(6,4,12,0.55)']]);
       g.fillRect(cx - 200, 220, 400, 660);
@@ -310,6 +313,21 @@
         }
         g.restore();
       });
+      // heat bleeding onto the brick lips of each arch, breathing with the fire
+      g.globalCompositeOperation = 'lighter';
+      mouths.forEach((m, i) => {
+        const lv = K.fire.level + this.roar[i] * 0.5 + salt * 0.3;
+        const top = onK(m.th, 0, m.y0 - m.h - 4);
+        K.glow(g, top[0], top[1] + 8, m.w * 0.7, salt > 0.05 ? '#60ffb0' : '#ff6020', 0.18 * lv, 0.6);
+        for (const s2 of [-1, 1]) { const side = onK(m.th, s2 * (m.w / 2 + 5), m.y0 - m.h * 0.35); K.glow(g, side[0], side[1], 16, '#ff5a18', 0.16 * lv, 2); }
+      });
+      // heat shimmer: faint rising ripples in front of the main mouth
+      for (let k = 0; k < 3; k++) {
+        const u = ((t * 0.6 + k / 3) % 1), y = mouths[0].y0 - mouths[0].h - u * 70;
+        g.lineWidth = 1.2; g.strokeStyle = `rgba(255,170,100,${0.1 * Math.sin(u * Math.PI)})`;
+        g.beginPath(); g.moveTo(cx - 22, y); g.bezierCurveTo(cx - 8, y - 6 + Math.sin(t * 5 + k) * 3, cx + 8, y + 6, cx + 22, y - 2); g.stroke();
+      }
+      g.globalCompositeOperation = 'source-over';
       // the wicket seams glow where the clay has cracked
       const r = rng(5);
       g.globalCompositeOperation = 'lighter';

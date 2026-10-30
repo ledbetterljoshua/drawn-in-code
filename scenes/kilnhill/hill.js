@@ -323,7 +323,7 @@
   // a sleepy mole in the wall's burrow: yawns on hover and draws its head in
   const blinkR = Drawn.blinker(3, 6);
   layer({
-    id: 'burrowR', z: 25,
+    id: 'burrowR', z: 30.8,
     hit: (x, y) => Math.hypot((x - 1210) / 36, (y - 954) / 28) < 1,
     draw(g, t, L) {
       const h = L.hover, yawn = L.since > 0.25 ? K.bell(Math.min(1, (L.since - 0.25) / 1.6)) : 0;
@@ -442,7 +442,7 @@
       // grass creeping over the path's edges so it isn't a hard strip
 
       stones(g, p, [-700, 1030, 3000, Math.max(200, v.y1 - 1030)], 26, 63, M.stone, 10);
-      burrowMouth(g, 140, 1196, 32, 22, 12);
+      burrowMouth(g, 1300, 1196, 32, 22, 12);
       // the near ground's lip: a soft shadowed crest rather than an inked line
       g.save(); g.clip(p); g.lineWidth = 10; g.strokeStyle = 'rgba(20,10,14,0.35)'; g.stroke(curve(frontEdge.map(([x, y]) => [x, y + 6]), false)); g.restore();
       K.applyLight(g, p);
@@ -460,15 +460,15 @@
   const fam = [[-14, 1, 1], [8, 2, 0.8], [20, -1, 0.6], [-2, -3, 0.55]];
   const blinkF = fam.map(() => Drawn.blinker(2.5, 5));
   layer({
-    id: 'burrowF', z: 51,
-    hit: (x, y) => Math.hypot((x - 140) / 48, (y - 1196) / 34) < 1,
+    id: 'burrowF', z: 54.5,
+    hit: (x, y) => Math.hypot((x - 1300) / 48, (y - 1196) / 34) < 1,
     draw(g, t, L) {
-      g.save(); g.beginPath(); g.ellipse(140, 1196, 31, 21, 0, 0, TAU); g.clip();
+      g.save(); g.beginPath(); g.ellipse(1300, 1196, 31, 21, 0, 0, TAU); g.clip();
       fam.forEach(([dx, dy, s], i) => {
         const on = K.smooth((L.since - i * 0.35) / 0.4) * (L.hovered ? 1 : L.hover);
         if (on < 0.02 && i > 0) return;
         const y = 1204 + dy + (1 - on) * 16 * s - (i === 0 ? 2 : 0);
-        const x = 140 + dx;
+        const x = 1300 + dx;
         g.fillStyle = '#3a3240'; g.fill(ell(x, y + 6 * s, 12 * s, 10 * s));
         const o = blinkF[i](t);
         for (const ex of [-4, 4]) if (o > 0.25) { g.fillStyle = '#ffe0a0'; g.fill(ell(x + ex * s, y, 1.4 * s + 0.3, 1.3 * s * o + 0.2)); }

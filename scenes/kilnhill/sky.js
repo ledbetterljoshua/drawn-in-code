@@ -2,7 +2,7 @@
    z 0   sky: near-black, warming faintly toward the horizon haze where far kiln towns burn
    z 2   canopy (still): the smoke the kiln has been making for three nights, a ceiling lit by the town
    z 4   far hills: the other kiln towns on the horizon. Hover: they flash back, like answering a signal
-   z 6   bats: flit through the lit smoke. Hover: the nearest swerves away and the others follow
+   z 59  bats: flit through the lit smoke. Hover: the nearest swerves away and the others follow
    z 60  plume (live, drawn over the kiln top): new smoke rolling off the chimney, sparks rising. */
 (function () {
   const { TAU, clamp, lerp, ease, rng, noise, wind, circ, ell, poly, curve, grad, radial, st, P, layer } = Drawn;
@@ -234,7 +234,7 @@
   const bats = [];
   { const r = rng(5); for (let i = 0; i < 5; i++) bats.push({ cx: 760 + r() * 700, cy: 120 + r() * 260, rx: 120 + r() * 160, ry: 40 + r() * 60, sp: 0.18 + r() * 0.16, ph: r() * TAU, x: 0, y: 0, vx: 0, vy: 0, flap: r() * TAU, fear: 0, fx: 0, fy: 0, s: 0.8 + r() * 0.5 }); }
   const batLayer = layer({
-    id: 'bats', z: 6,
+    id: 'bats', z: 59,
     hit(x, y) { return bats.some((b) => Math.hypot(b.x - x, b.y - y) < 34); },
     onEnter() {
       for (const b of bats) { const d = Math.hypot(b.x - P.x, b.y - P.y); b.fear = clamp(1.4 - d / 400, 0.3, 1); b.fx = Math.sign(b.x - P.x || 1); b.fy = -1; }

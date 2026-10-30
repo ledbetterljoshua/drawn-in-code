@@ -90,7 +90,7 @@
     },
   });
   layer({
-    id: 'rackLive', z: 53, wave: -1,
+    id: 'rackLive', z: 54.7, wave: -1,
     hit: (x, y) => x > RX0 && x < RX1 + 10 && y > 930 && y < 1196,
     onEnter() { this.wave = 0; this.dir = P.vx >= 0 ? 1 : -1; },
     update(dt, t, L) {

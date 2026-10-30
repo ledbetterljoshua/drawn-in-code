@@ -156,3 +156,16 @@ the clip-art flames and depth. What changed:
    watchers stand, raked ash. The rack is cropped harder off the left edge with fewer, spaced pots.
    Round saggars (read as tyres) removed from the wall. The dug alcove read as a hooded figure, so
    it's now just pale fresh-cut scars in the clay face.
+
+## Round 7
+1. **The kiln was still warm from base to collar** (critic 2, point 4). The yard's bounce light now
+   dies faster up the wall, and the upper bottle sits under a night shadow gradient, so the
+   brickwork is lit at the foot and sinks into dark toward the lip.
+2. **No heat at the firemouths' edges.** Ember glow now bleeds onto each arch's brick lip and its
+   sides, breathing with the fire (green during a salt throw), with faint heat shimmer rising off
+   the main mouth.
+3. **The jug's waving mole never showed**: it stood too low for the window. Raised into the frame.
+4. **Too slow on a phone.** 13 cached still bitmaps were composited every frame because live
+   layers sat between stills. Regrouped z so stills merge into 5 buckets (moved the front burrow
+   out from behind the rack to under the bench). With the CPU throttled 4× in headless Chromium:
+   desktop 17 → 26 fps, phone frame 21 → 31 fps. Unthrottled: 60 fps on both.
