@@ -329,8 +329,9 @@
       g.restore();
       for (const s of steam) {
         const u = s.age / s.life;
-        g.fillStyle = `rgba(190,180,180,${0.28 * (1 - u) * Math.min(1, s.age * 3)})`;
-        g.fill(circ(s.x, s.y, s.r));
+        // steam: thin curling wisps, not blobs
+        g.lineWidth = 1.2 + u * 2; g.strokeStyle = `rgba(200,190,190,${0.22 * (1 - u) * Math.min(1, s.age * 3)})`;
+        g.beginPath(); g.moveTo(s.x - s.r, s.y); g.quadraticCurveTo(s.x, s.y - s.r * 0.8 + Math.sin(s.age * 4) * 3, s.x + s.r, s.y - s.r * 0.2); g.stroke();
       }
     },
   });
@@ -430,7 +431,7 @@
       holesLive(g, jarHolesHi, f, [1, 0.8, 0.46], t, 6);
       // a mole on the very top, sitting with its feet over the rim, holding a little lamp
       const grab = clamp(Math.abs(wob.x) * 2, 0, 1);
-      K.mole(g, JX - 2, 634, 0.5, { flip: true, hands: grab > 0.2 ? { f: [12, -4], b: [-12, -4] } : { f: [16, -18], b: [-8, -14] }, open: 1, mouth: grab > 0.3 ? 0.5 : 0, lean: -a * 2, lx: JX, ly: 700 });
+      K.mole(g, JX - 2, 634, 0.5, { flip: true, hands: grab > 0.2 ? { f: [12, -4], b: [-12, -4] } : { f: [20, -30], b: [-8, -14] }, open: 1, mouth: grab > 0.3 ? 0.5 : 0, lean: -a * 2, lx: JX, ly: 700 });
       g.restore();
     },
   });

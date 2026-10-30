@@ -106,3 +106,16 @@ slumped against the bench leg (it read as a slug), the far jar stack has lighter
 Rejected: "add a cool moonlight fill" and "stars through gaps": the lane is light from within only.
 Disagreed: "brick rows run dead straight" — they follow the viewpoint ellipses; near eye level
 they're nearly straight, which is correct.
+
+## Round 4
+1. **The mole rig looked crude at the near figures' scale**: tube arms, paws like pink flowers,
+   flat grey fur. Arms now taper from shoulder to wrist with a lit edge; paws are broad spades with
+   a pad and five short cream claws; the fire-side rim is stronger and always present; moles drawn
+   big get velvet fur strokes along the silhouette.
+2. **The upper right was still an empty black field.** The mole on top of the jar stack is now
+   flying a paper lantern-kite on a long sagging string, the candle glowing through the paper and
+   a tail of paper bows. It gives the sky a small lit accent that belongs to the world.
+3. **The greenware on the rack was flat grey-blue with no light.** It now has a warm rim on the
+   side facing the kiln and a dark far side.
+4. **Teapot spout steam was grey blobs.** Now thin curling wisps.
+5. Checked every hit area with `--hits`: all generous and matching the shapes.

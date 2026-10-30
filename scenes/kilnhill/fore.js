@@ -44,7 +44,8 @@
     else body = curve([[-w * 0.45, -h], [-w * 0.35, -h * 0.75], [-w, -h * 0.3], [-w * 0.55, 0], [w * 0.55, 0], [w, -h * 0.3], [w * 0.35, -h * 0.75], [w * 0.45, -h]], false);
     body.closePath();
     g.fillStyle = 'rgba(8,4,10,0.4)'; g.fill(ell(2, 0, w * 0.9, 3));
-    g.fillStyle = grad(g, -w, 0, w, 0, [[0, base], [0.6, base], [1, dark]]); g.fill(body);
+    const rimc = K.css(K.mix(col, [1, 0.72, 0.45], 0.5));
+    g.fillStyle = grad(g, -w, 0, w, 0, [[0, dark], [0.5, base], [0.82, base], [1, rimc]]); g.fill(body);
     g.lineWidth = 1.5; g.strokeStyle = line; g.stroke(body);
     if (kind !== 'upturned') {
       const rw = kind === 'bowl' ? w : kind === 'jar' ? w * 0.6 : w * 0.45;

@@ -9,6 +9,9 @@
    z 50.5 / 51.5  puddle (still / live): a slip puddle by the path that catches the kiln's glow in
      shivering streaks. Hover: it ripples out from the pointer
    z 52.5  barrow (still): a barrow of dug clay with a spade stuck in it
+   z 37  kite (live): the mole on top of the jar stack is flying a paper lantern-kite, its candle
+     glowing through the paper. Idle: it rides the breeze. Hover: it dips on a tug and climbs back;
+     linger and it loops right round
    z 60 / 61  ground door (still / live): a hatch in a grassy mound, propped open on a stick,
      light pouring up the steps; boots left by it (mostly below the artboard: the phone frame).
      Hover: a mole climbs up and looks out */
@@ -227,6 +230,48 @@
       const wx = x - 40, wy = y - 14;
       g.fillStyle = K.litc(M.woodDark, wx, wy); g.fill(ell(wx, wy, 6, 14)); g.lineWidth = 1.6; g.strokeStyle = K.LINE; g.stroke(ell(wx, wy, 6, 14));
       g.fillStyle = K.litc(M.iron, wx, wy); g.fill(ell(wx, wy, 1.6, 3));
+    },
+  });
+
+  // ------------------------------------------------------------------ the lantern kite
+  const kite = { x: 1290, y: 380, dip: K.spring({ k: 14, d: 3 }), loop: -1 };
+  K.kiteHand = [1452, 612];
+  layer({
+    id: 'kite', z: 37,
+    hit(x, y) { return Math.hypot(x - kite.x, y - kite.y) < 40; },
+    onEnter() { kite.dip.v += 90; },
+    update(dt, t, L) {
+      const w = Drawn.wind(t, 1300);
+      K.springTo(kite.dip, 0, dt);
+      if (L.hovered && L.since > 1.4 && kite.loop < 0) kite.loop = 0;
+      if (kite.loop >= 0) { kite.loop += dt / 2.2; if (kite.loop >= 1) kite.loop = -1; }
+      const lp = kite.loop >= 0 ? K.smooth(kite.loop) * TAU : 0;
+      kite.x = 1290 + w * 40 + noise(t * 0.3) * 30 + Math.sin(lp) * 40;
+      kite.y = 380 - w * 20 + noise(t * 0.4 + 5) * 20 + kite.dip.x + (1 - Math.cos(lp)) * 40;
+      kite.rot = -0.25 + noise(t * 0.7 + 2) * 0.15 + kite.dip.v * 0.003 + lp;
+    },
+    draw(g, t) {
+      const [hx, hy] = K.kiteHand;
+      // the string sags in a long curve
+      g.lineWidth = 0.8; g.strokeStyle = 'rgba(200,170,130,0.55)';
+      g.beginPath(); g.moveTo(hx, hy); g.quadraticCurveTo((hx + kite.x) / 2 + 30, (hy + kite.y) / 2 + 60, kite.x, kite.y + 14); g.stroke();
+      // the tail: paper bows on a thread, trailing downwind
+      const tail = []; for (let i = 0; i <= 7; i++) tail.push([kite.x - 4 + i * 9 + Math.sin(t * 3 + i * 0.8) * 4 * (i / 7), kite.y + 18 + i * 8 + Math.cos(t * 2.4 + i) * 3]);
+      g.lineWidth = 0.7; g.strokeStyle = 'rgba(180,150,120,0.6)'; g.stroke(curve(tail, false));
+      for (let i = 2; i <= 7; i += 2) { const [bx, by] = tail[i]; g.fillStyle = i % 4 ? '#a84438' : '#c8902e'; g.fill(poly([[bx - 4, by - 2], [bx, by], [bx - 4, by + 2]])); g.fill(poly([[bx + 4, by - 2], [bx, by], [bx + 4, by + 2]])); }
+      g.save(); g.translate(kite.x, kite.y); g.rotate(kite.rot);
+      const f = 0.85 + 0.15 * noise(t * 7);
+      g.globalCompositeOperation = 'lighter';
+      K.glow(g, 0, 0, 60, '#ff9a40', 0.25 * f);
+      g.globalCompositeOperation = 'source-over';
+      // paper lit from inside: brightest round the candle, the bamboo frame dark across it
+      const body = poly([[0, -22], [16, 0], [0, 16], [-16, 0]]);
+      g.fillStyle = radial(g, 0, 2, 2, 22, [[0, K.css(K.fireAt(0.86 * f))], [0.5, K.css(K.fireAt(0.66 * f))], [1, K.css(K.fireAt(0.46))]]); g.fill(body);
+      g.lineWidth = 1.2; g.strokeStyle = 'rgba(60,24,10,0.85)';
+      g.beginPath(); g.moveTo(0, -22); g.lineTo(0, 16); g.moveTo(-16, 0); g.lineTo(16, 0); g.stroke();
+      g.fillStyle = 'rgba(120,40,20,0.35)'; g.fill(poly([[0, -22], [8, -11], [0, -2], [-8, -11]]));
+      g.lineWidth = 1.6; g.strokeStyle = K.LINE; g.stroke(body);
+      g.restore();
     },
   });
 
