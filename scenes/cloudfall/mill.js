@@ -102,15 +102,15 @@ layer({
       void w;
     }
     // flour sacks by the door, one slumped
-    const sack = (a, r0, h, tilt) => {
+    const sack = (a, r0, h, tilt, label) => {
       const [x, y] = pr(MX + Math.cos(a) * 72, 0, MZ + Math.sin(a) * 72);
       CF.contact(g, x, y, 14, 4, 0.5);
       const p = new Path2D(); p.moveTo(x - r0, y); p.bezierCurveTo(x - r0 - 2, y - h * 0.6, x - r0 * 0.5 + tilt, y - h, x + tilt, y - h); p.bezierCurveTo(x + r0 * 0.5 + tilt, y - h, x + r0 + 2, y - h * 0.6, x + r0, y); p.closePath();
       ink(g, p, grad(g, x - r0, 0, x + r0, 0, ['#b8a38a', '#e8d8bc', '#fff2da']), 1.5);
       g.lineWidth = 1.6; g.strokeStyle = '#a0734a'; g.beginPath(); g.moveTo(x - 5 + tilt, y - h + 4); g.lineTo(x + 5 + tilt, y - h + 4); g.stroke();
-      g.font = 'italic 700 6px Georgia, serif'; g.fillStyle = 'rgba(120,70,60,0.6)'; g.textAlign = 'center'; g.fillText('FLOUR', x + tilt * 0.4, y - h * 0.4);
+      if (label) { g.font = 'italic 700 5px Georgia, serif'; g.fillStyle = 'rgba(120,70,60,0.6)'; g.textAlign = 'center'; g.fillText('FLOUR', x + tilt * 0.4, y - h * 0.4); }
     };
-    sack(1.95, 10, 22, -2); sack(2.2, 9, 18, 3); sack(1.72, 10, 14, 6);
+    sack(2.2, 9, 18, 3); sack(1.95, 10, 22, -2, true); sack(1.72, 10, 14, 6);
   },
 });
 

@@ -279,7 +279,7 @@ layer({
     const w = gard.water;
     frog(g, gx, gy, 0.8, { wide: 1.18, tall: 0.94, c: CF.FROG_TINTS.gold, open: gard.blink(t), look: CF.lookAt(gx, gy, [-0.9 + w * 0.2, 0.5 + w * 0.3]).map((v, i) => (i ? v : -v)), smile: 2.2 + w, flip: true, rot: -w * 0.08,
       arms: [[-16 - w * 2, -16 + w * 6], [12, -10]],
-      hat: (g, lw) => { ink(g, D.ell(0, -31, 22, 5), '#f0d68a', lw); ink(g, D.ell(0, -36, 11, 7), '#f0d68a', lw); g.lineWidth = 2.2; g.strokeStyle = '#7fb8b0'; g.beginPath(); g.ellipse(0, -33, 10.6, 2.6, 0, 0, Math.PI); g.stroke(); ink(g, circ(8, -35, 2.4), '#f3a0b0', 0.8); } });
+      hat: (g, lw) => { ink(g, D.ell(0, -36, 22, 4.5), '#f0d68a', lw); ink(g, D.ell(0, -40, 11, 6.5), '#f0d68a', lw); g.lineWidth = 2.2; g.strokeStyle = '#7fb8b0'; g.beginPath(); g.ellipse(0, -37.5, 10.6, 2.4, 0, 0, Math.PI); g.stroke(); ink(g, circ(8, -39, 2.4), '#f3a0b0', 0.8); } });
     const [sx, sy] = pr(...canSpout());
     const [hx, hy] = [gx - 13, gy - (16 - w * 6) * 0.7];
     g.save(); g.translate(hx, hy); g.rotate(-w * 0.6);

@@ -474,7 +474,7 @@ layer({
   update(dt, t, L) {
     if (!G) G = { upper: (x, y) => pointIn(CF.P3([P3d(-103, H1, 67), P3d(99, H1, 67), P3d(99, YT, 67), P3d(-103, YT, 67)]), x, y), house: (x, y) => pointIn(CF.P3([P3d(-117, 0, 74), P3d(104, 0, 74), P3d(113, RIDGE, RB), P3d(-117, RIDGE, RB), P3d(-117, 0, -60)]), x, y) };
     const onDoor = L.hovered && this.part === 'door', onUp = L.hovered && this.part === 'up';
-    cot.open = ease(cot.open, onDoor ? 1 : 0.28, onDoor ? 2.6 : 1.4, dt);
+    cot.open = ease(cot.open, onDoor ? 1 : 0.55, onDoor ? 2.6 : 1.4, dt);
     cot.cup = ease(cot.cup, onDoor && L.since > 1 ? 1 : 0, 3, dt);
     cot.gran = ease(cot.gran, onUp ? 1 : 0, onUp ? 2.5 : 1.2, dt);
     const w = wind(t, 600);

@@ -233,7 +233,7 @@ onLayout(() => {
   for (const c of clouds) {
     c.cs = cumulusCircles(c.seed, c.w, c.h);
     // the underside of a cloud above us is in its own shade; its top catches the sun
-    c.sp_ = sprite(-c.w * 0.6 - 10, -c.h * 1.25, c.w * 1.2 + 20, c.h * 1.45, (g) => {
+    c.sp_ = sprite(-c.w * 0.6 - 10, -c.h * 1.7, c.w * 1.2 + 20, c.h * 1.9, (g) => {
       // a base of small lumps, so the underside is nearly flat but never ruled
       const r = rng(c.seed * 5), cs = c.cs.slice();
       for (let x = -c.w * 0.46; x < c.w * 0.46; x += c.h * 0.2) cs.push([x, -c.h * 0.1 + (r() - 0.5) * c.h * 0.05, c.h * (0.13 + r() * 0.06)]);

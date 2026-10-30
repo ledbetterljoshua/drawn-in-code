@@ -169,3 +169,13 @@ Fixed:
 - A static story at the focal point: the cottage door now rests ajar, lamplight on the step,
   tea steaming on the bench outside.
 - The sky-fish school is a clear stream of fourteen with splash rings where they surface.
+
+## Round 9
+1. The foreground bank and the sky clouds had their tops sliced flat: their sprites were shorter
+   than the tallest heads. Sprites now leave room for them.
+2. The resting door didn't read as ajar. It now stands half open on the lamplight, someone just
+   inside.
+3. The gardener's hat brim sat on her eyes like sunglasses; raised it.
+4. The flour-sack labels were clipped by the sacks in front; only the front one is lettered.
+5. (Checked, not changed: the left cloud bank is paler and flatter than the right one. That's the
+   side away from the sun, so it should be.)
