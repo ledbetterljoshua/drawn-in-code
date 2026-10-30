@@ -133,3 +133,26 @@ they're nearly straight, which is correct.
    back) and its door leaf stands open against the jamb.
 5. **The thorn tree on the right knoll read as balls of dark smoke** next to the jar stack.
    Removed.
+
+## Round 6 — second fresh-eyes critique
+The second critic (screenshots only) led with the smoke, the phone frame, the shelf of buildings,
+the clip-art flames and depth. What changed:
+1. **"The smoke is a stack of circles."** Rebuilt as one designed shape: a ribbon along a spine
+   that leaves the lip tight, twists, shears right and thins to wisps, with billows only on the
+   leading edge, a smoother underside lit near the chimney, fold lines where it turns, and a soft
+   edgeless haze high up instead of the disc ceiling. It exits the top of the desktop frame early,
+   so it covers far less sky.
+2. **"Flames look like clip-art"** (zigzag crown, a row of ellipses). Flames are now a handful of
+   large licking tongues (`Kiln.tongue`) with curled tips and a gradient from a white-yellow root
+   to a dark red tip, a different count and rhythm per firemouth, bent by the shared wind.
+3. **"Every building sits on one baseline; kiln and teapot compete."** The teapot stands a step
+   further back up the terrace at 84% size, so the kiln is clearly first and the bowl house
+   overlaps in front of it.
+4. **"Brick outlines buzz; no depth from atmosphere."** Mortar is darker so the brickwork reads as
+   a surface, not a grid; the far jar stack sits behind a layer of night haze with lighter lines.
+5. **"Phone path leads nowhere; ground is procedural noise; shelf is clone-stamped."** The path
+   now ends at the ground door on the phone frame. Random ground blotches replaced with designed
+   wear: barrow ruts running up to the kiln steps, spilled clay, a trodden patch where the
+   watchers stand, raked ash. The rack is cropped harder off the left edge with fewer, spaced pots.
+   Round saggars (read as tyres) removed from the wall. The dug alcove read as a hooded figure, so
+   it's now just pale fresh-cut scars in the clay face.

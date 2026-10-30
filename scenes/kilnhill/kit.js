@@ -70,7 +70,7 @@
 
   // materials (albedo: the colour the thing would be in daylight)
   K.M = {
-    brick: '#b45a3c', brick2: '#9c4a34', brick3: '#c4704a', brickBurnt: '#5e3a34', mortar: '#a89a88',
+    brick: '#b45a3c', brick2: '#9c4a34', brick3: '#c4704a', brickBurnt: '#5e3a34', mortar: '#7a6a5e',
     iron: '#3a3a44', soot: '#1a1418',
     clay: '#c89a74', clayPale: '#e2c7a4', clayDark: '#8e6248', terracotta: '#c86a44', slip: '#b8a088',
     glazeTeal: '#3e8c8a', glazeCream: '#e8dcc0', glazeOx: '#7a3a30', glazeHoney: '#c8902e', glazeBlue: '#3a5a9a',
@@ -83,6 +83,22 @@
   // fire colours, from coolest to hottest
   K.FIRE = ['#3a0c08', '#8a1e0a', '#d8500e', '#ff8a1e', '#ffc04a', '#fff0b0', '#fffbe8'];
   K.fireAt = (v) => { v = clamp(v, 0, 0.999) * (K.FIRE.length - 1); const i = Math.floor(v); return K.mix(K.FIRE[i], K.FIRE[i + 1], v - i); };
+
+  // a licking tongue of flame from (x, y) up: hot at the root, fading to a dark red tip.
+  // lean bends the tip sideways; hot (0..1) sets how white the root burns; green tints toward salt
+  K.tongue = (g, x, y, w, h, lean, hot = 0.8, green = 0) => {
+    const p = new Path2D();
+    p.moveTo(x - w, y);
+    p.bezierCurveTo(x - w * 1.25, y - h * 0.4, x - w * 0.5 + lean * 0.4, y - h * 0.75, x + lean, y - h);
+    p.bezierCurveTo(x + lean * 0.9 + w * 0.5, y - h * 0.82, x + w * 0.7 + lean * 0.4, y - h * 0.5, x + w * 1.05, y - h * 0.2);
+    p.quadraticCurveTo(x + w * 1.1, y - h * 0.05, x + w, y);
+    p.closePath();
+    const c0 = K.mix(K.fireAt(0.6 + hot * 0.35), [0.6, 1, 0.8], green), c1 = K.mix(K.fireAt(0.5), [0.3, 0.9, 0.6], green), c2 = K.fireAt(0.22);
+    const gr = g.createLinearGradient(x, y, x + lean, y - h);
+    gr.addColorStop(0, K.css(c0, 0.95)); gr.addColorStop(0.45, K.css(c1, 0.85)); gr.addColorStop(1, K.css(c2, 0));
+    g.fillStyle = gr; g.fill(p);
+    return p;
+  };
 
   // ------------------------------------------------------------------ bus
   const bus = {};

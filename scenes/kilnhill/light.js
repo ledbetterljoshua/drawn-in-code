@@ -20,7 +20,7 @@
       K.glow(g, 560, 120, 260, '#a03a18', 0.12 * lv);
       // doors and windows spill a little glare
       const f = (s) => 0.9 + 0.1 * noise(t * 2 + s);
-      K.glow(g, 1104, 860, 60, '#ffb050', 0.22 * f(1));
+      K.glow(g, 1102, 842, 52, '#ffb050', 0.2 * f(1));
       K.glow(g, 884, 860, 90, '#ffb050', 0.18 * f(2));
       K.glow(g, 128, 400, 40, '#ffb050', 0.2 * f(3));
       K.glow(g, 1296, 1070, 140, '#ff4010', 0.14 * f(4));

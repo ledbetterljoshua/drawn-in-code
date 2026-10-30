@@ -272,7 +272,7 @@
           const w = 34 + r() * 22;
           // the courses sag a little between the terrace's buried posts
           const sag = Math.sin((x - 940) / 220 * Math.PI) * 3 + (r() - 0.5) * 2;
-          if (r() < 0.12) roundSaggar(g, x + w / 2, y + sag + h / 2, Math.min(w, h) * 0.52, r);
+          if (false) roundSaggar(g, x + w / 2, y + sag + h / 2, Math.min(w, h) * 0.52, r);
           else saggar(g, x, y + sag, w, h, r);
           x += w + 1 + r() * 2;
         }
@@ -407,21 +407,33 @@
       g.save(); g.clip(p);
       g.fillStyle = grad(g, 0, 1000, 0, v.y1, [[0, M.earth], [0.4, M.earthDark], [1, '#22181a']]); g.fill(p);
       const r = rng(61);
-      for (let i = 0; i < 220; i++) {
-        const y = 1010 + Math.pow(r(), 1.4) * (v.y1 - 1000), s = 1 + (y - 1000) / 300;
-        g.fillStyle = r() < 0.5 ? 'rgba(130,90,64,0.35)' : 'rgba(30,20,20,0.35)';
-        g.fill(ell(-700 + r() * 3000, y, (8 + r() * 26) * s, (2 + r() * 4) * s));
+      // designed wear, not noise: barrow ruts running up to the kiln steps, clay spilled near
+      // them, a trodden patch where the watchers stand, ash raked out by the stoker
+      g.lineCap = 'round';
+      for (const off of [-9, 9]) {
+        g.lineWidth = 4; g.strokeStyle = 'rgba(30,18,18,0.45)';
+        g.beginPath(); g.moveTo(400 + off, 1190); g.bezierCurveTo(470 + off, 1120, 560 + off * 0.6, 1060, 612 + off * 0.5, 1012); g.stroke();
+        g.lineWidth = 1.2; g.strokeStyle = 'rgba(200,170,140,0.25)';
+        g.beginPath(); g.moveTo(402 + off, 1186); g.bezierCurveTo(472 + off, 1116, 562 + off * 0.6, 1056, 614 + off * 0.5, 1009); g.stroke();
+      }
+      for (let i = 0; i < 9; i++) { g.fillStyle = 'rgba(200,170,130,0.35)'; g.fill(ell(560 + r() * 120, 1020 + r() * 40, 6 + r() * 14, 2 + r() * 3)); }
+      g.fillStyle = 'rgba(150,120,96,0.3)'; g.fill(ell(860, 1172, 110, 14));
+      g.fillStyle = 'rgba(170,160,150,0.25)'; g.fill(ell(530, 1030, 70, 8));
+      for (let i = 0; i < 40; i++) {
+        const y = 1060 + Math.pow(r(), 1.2) * (v.y1 - 1060), s = 1 + (y - 1000) / 300;
+        g.fillStyle = 'rgba(30,20,20,0.22)';
+        g.fill(ell(-700 + r() * 3000, y, (14 + r() * 30) * s, (2 + r() * 3) * s));
       }
       // the path: packed clay, worn pale, widening toward us
-      const path = curve([[598, 1014], [642, 1014], [690, 1052], [718, 1110], [706, 1180], [690, 1260], [736, 1400], [840, v.y1 + 40], [580, v.y1 + 40], [552, 1400], [556, 1260], [590, 1180], [610, 1110], [592, 1060]], true);
-      g.fillStyle = '#9a8270'; g.fill(path);
+      const path = curve([[598, 1014], [642, 1014], [690, 1052], [718, 1110], [706, 1180], [690, 1260], [736, 1380], [790, 1460], [700, 1476], [612, 1462], [552, 1380], [556, 1260], [590, 1180], [610, 1110], [592, 1060]], true);
+      g.fillStyle = grad(g, 0, 1000, 0, 1600, [[0, '#9a8270'], [0.5, '#7a6a5c'], [1, '#54483e']]); g.fill(path);
       g.save(); g.clip(path);
       for (let i = 0; i < 80; i++) { const y = 1010 + r() * (v.y1 - 1000); g.fillStyle = r() < 0.5 ? 'rgba(255,240,220,0.25)' : 'rgba(90,60,50,0.3)'; g.fill(ell(560 + r() * 400, y, 4 + r() * 10, 1.5 + r() * 2)); }
       // broken brick and sherds pressed into it
-      for (let i = 0; i < 26; i++) { const y = 1020 + r() * 500, x = 600 + Math.sin((y - 1000) / 140) * 26 + r() * 90; g.fillStyle = r() < 0.5 ? M.brick2 : M.terracotta; g.fill(poly([[x, y], [x + 7, y - 2], [x + 9, y + 3], [x + 2, y + 4]])); }
+      for (let i = 0; i < 20; i++) { const y = 1020 + r() * 400, x = 600 + Math.sin((y - 1000) / 140) * 26 + r() * 90; g.fillStyle = r() < 0.5 ? M.brick2 : M.terracotta; g.fill(poly([[x, y], [x + 7, y - 2], [x + 9, y + 3], [x + 2, y + 4]])); }
       g.restore();
       // footprints: mole feet, five toes, going both ways
-      for (let i = 0; i < 22; i++) {
+      for (let i = 0; i < 16; i++) {
         const y = 1030 + i * 26 + r() * 8, side = i % 2 ? 1 : -1, x = 640 + Math.sin((y - 1000) / 140) * 26 + side * 12 + r() * 4, s = 1 + (y - 1000) / 500;
         g.fillStyle = 'rgba(60,40,36,0.35)'; g.fill(ell(x, y, 3.2 * s, 1.6 * s));
         for (let k = 0; k < 4; k++) g.fill(ell(x - 3 * s + k * 2 * s, y - 2.6 * s, 0.8 * s, 0.6 * s));
@@ -434,12 +446,12 @@
       // the near ground's lip: a soft shadowed crest rather than an inked line
       g.save(); g.clip(p); g.lineWidth = 10; g.strokeStyle = 'rgba(20,10,14,0.35)'; g.stroke(curve(frontEdge.map(([x, y]) => [x, y + 6]), false)); g.restore();
       K.applyLight(g, p);
-      tufts(g, [[592, 1060], [610, 1110], [590, 1180], [556, 1260], [552, 1400], [580, 1700]], 66, { n: 7, h: 10 });
-      tufts(g, [[690, 1052], [718, 1110], [706, 1180], [690, 1260], [736, 1400], [840, 1700]], 67, { n: 7, h: 10 });
+      tufts(g, [[592, 1060], [610, 1110], [590, 1180], [556, 1260], [552, 1380], [600, 1460]], 66, { n: 7, h: 10 });
+      tufts(g, [[690, 1052], [718, 1110], [706, 1180], [690, 1260], [736, 1380], [790, 1460]], 67, { n: 7, h: 10 });
       tufts(g, frontEdge, 64, { n: 3, h: 14 });
       // tall grass in the very front, mostly beyond the artboard's bottom on a phone
       const rr = rng(65);
-      for (let i = 0; i < 40; i++) { const x = -700 + rr() * 3000, y = 1180 + rr() * Math.max(80, v.y1 - 1180); if (x > 540 && x < 1000) continue; tufts(g, [[x - 30, y], [x + 30, y]], x | 0, { n: 6, h: 20 + (y - 1100) * 0.05 }); }
+      for (let i = 0; i < 40; i++) { const x = -700 + rr() * 3000, y = 1180 + rr() * Math.max(80, v.y1 - 1180); if (x > 540 && x < 1000 && y < 1520) continue; tufts(g, [[x - 30, y], [x + 30, y]], x | 0, { n: 6, h: 20 + (y - 1100) * 0.05 }); }
       g.lineWidth = 1.2; g.strokeStyle = 'rgba(12,6,12,0.5)'; g.stroke(curve(frontEdge, false));
     },
   });

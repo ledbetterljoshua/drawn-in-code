@@ -49,31 +49,62 @@
     }
     g.restore();
   }
-  // the plume: up off the lip, leaning right with the breeze, flattening into a long drift
-  const spine = [[560, 196], [550, 150], [566, 96], [612, 50], [690, 18], [800, 0], [940, -6], [1100, 4], [1280, 22], [1480, 40], [1720, 52], [2000, 60], [2300, 64]];
-  const plumeBanks = [];
-  {
-    const r = rng(77);
-    for (let i = 0; i < spine.length - 1; i++) {
-      const [x0, y0] = spine[i], [x1, y1] = spine[i + 1], bank = [];
-      const s = 26 + Math.pow(i, 1.25) * 12;
-      for (let k = 0; k < 7; k++) {
-        const u = k / 7, x = lerp(x0, x1, u), y = lerp(y0, y1, u);
-        bank.push([x + (r() - 0.5) * s * 0.8, y + (r() - 0.6) * s * 0.7, s * (0.75 + r() * 0.5)]);
-        if (i > 3 && r() < 0.6) bank.push([x + (r() - 0.5) * s, y - s * (0.5 + r() * 0.4), s * (0.5 + r() * 0.4)]);
-      }
-      plumeBanks.push(bank);
+  // The plume, as one designed shape: a ribbon that leaves the lip tight, twists up, shears off
+  // to the right with the breeze and thins out to wisps. The leading (upper) edge billows crisp;
+  // the trailing underside is smoother and takes the fire's light near the chimney.
+  const spine = [[560, 208], [550, 150], [570, 92], [626, 44], [714, 8], [830, -26], [970, -60], [1130, -84], [1310, -100], [1500, -108], [1720, -110], [2000, -108]];
+  function ribbon(k = 1, dy = 0, seed = 1) {
+    // sample the spine, then offset each side by the width at that point
+    const n = 120, pts = [];
+    for (let i = 0; i <= n; i++) {
+      const u = i / n, f = u * (spine.length - 1), j = Math.min(spine.length - 2, Math.floor(f)), fr = f - j;
+      const a = spine[j], b = spine[j + 1];
+      pts.push([lerp(a[0], b[0], fr), lerp(a[1], b[1], fr), u]);
     }
+    const W = (u) => (u < 0.12 ? lerp(22, 56, u / 0.12) : u < 0.34 ? lerp(56, 92, (u - 0.12) / 0.22) : u < 0.7 ? lerp(92, 70, (u - 0.34) / 0.36) : lerp(70, 6, (u - 0.7) / 0.3)) * k;
+    const top = [], bot = [];
+    for (let i = 0; i < pts.length; i++) {
+      const [x, y, u] = pts[i], [x2, y2] = pts[Math.min(pts.length - 1, i + 1)], [x0, y0] = pts[Math.max(0, i - 1)];
+      const dx = x2 - x0, dyy = y2 - y0, L = Math.hypot(dx, dyy) || 1, nx = dyy / L, ny = -dx / L;
+      const w = W(u);
+      // billows on the leading edge, of irregular size; a gentle waver underneath
+      const bill = Math.abs(Math.sin(u * 46 + seed + noise(u * 9 + seed) * 2)) * 0.22 + noise(u * 13 + seed * 3) * 0.12;
+      top.push([x + nx * w * (1 + bill), y + ny * w * (1 + bill) + dy]);
+      bot.push([x - nx * w * (0.78 + noise(u * 7 + seed * 5) * 0.1), y - ny * w * (0.78 + noise(u * 7 + seed * 5) * 0.1) + dy]);
+    }
+    return curve([...top, ...bot.reverse()]);
   }
-  // the old smoke ceiling above, from three nights of firing: seen mostly on a tall phone screen
-  const ceiling = [];
-  { const r = rng(78); for (let i = 0; i < 46; i++) ceiling.push([-600 + r() * 2900, -760 + r() * 560, 110 + r() * 150]); }
+  const plumeA = ribbon(1, 0, 1), plumeSoft = ribbon(1.12, -4, 1), plumeLit = ribbon(0.62, 26, 4), plumeCore = ribbon(0.36, 34, 7);
   layer({
     id: 'canopy', z: 2, still: true,
     draw(g) {
-      smokeMass(g, ceiling, { warm: 0.3, reach: 1200 });
-      // far end first, so nearer banks overlap it
-      for (let i = plumeBanks.length - 1; i >= 0; i--) smokeMass(g, plumeBanks[i], { warm: 1, reach: 620, curls: plumeBanks[i].filter((c, k) => k % 3 === 1).map(([x, y, r]) => [x, y - r * 0.2, r * 0.55]) });
+      const v = view();
+      // old smoke from three nights of firing hangs high up as a soft haze, no edges at all
+      for (const [x, y, r] of [[300, -420, 700], [1100, -520, 800], [1800, -380, 600]]) {
+        g.fillStyle = radial(g, x, y, 0, r, [[0, 'rgba(26,26,44,0.55)'], [0.6, 'rgba(20,20,38,0.25)'], [1, 'rgba(14,14,30,0)']]);
+        g.fillRect(x - r, y - r, r * 2, r * 2);
+      }
+      const rg = (list, R = 760) => radial(g, CH[0], CH[1], 0, R, list);
+      // a feathered outer edge, then the body: warm-dark near the lip, dissolving into the sky
+      g.fillStyle = rg([[0, 'rgba(40,24,26,0.5)'], [0.5, 'rgba(18,18,32,0.45)'], [1, 'rgba(12,13,28,0.3)']], 1400); g.fill(plumeSoft);
+      g.fillStyle = rg([[0, '#2a1a1c'], [0.18, '#1c1620'], [0.45, '#141424'], [0.8, '#10111f'], [1, '#0d0e1c']], 1500); g.fill(plumeA);
+      g.save(); g.clip(plumeA);
+      g.fillStyle = rg([[0, 'rgba(170,72,32,0.7)'], [0.12, 'rgba(110,46,30,0.55)'], [0.3, 'rgba(56,30,34,0.4)'], [0.6, 'rgba(30,26,42,0.3)'], [1, 'rgba(24,24,40,0.15)']], 1300); g.fill(plumeLit);
+      g.fillStyle = rg([[0, 'rgba(230,120,50,0.45)'], [0.08, 'rgba(170,70,34,0.28)'], [0.2, 'rgba(100,44,30,0.1)'], [0.4, 'rgba(60,30,30,0)']], 900); g.fill(plumeCore);
+      // folds where the column twists
+      for (const [x, y, r, a0, a1] of [[566, 130, 30, 0.2, 2.2], [604, 70, 40, 3.6, 5.6], [700, 30, 54, 0.3, 2.4], [870, -20, 70, 3.7, 5.4], [1080, -50, 70, 0.4, 2.2]]) {
+        const d = Math.hypot(x - CH[0], y - CH[1]), k = clamp(1 - d / 700, 0, 1);
+        g.lineWidth = 2; g.strokeStyle = K.mixc('#1e1e30', '#d06a30', k * k, 0.25 + 0.45 * k);
+        g.beginPath(); g.arc(x, y, r, a0, a1); g.stroke();
+      }
+      g.restore();
+      // detached wisps trailing off the end
+      const r = rng(13);
+      for (let i = 0; i < 6; i++) {
+        const x = 1500 + r() * 700, y = -90 + r() * 90, w = 60 + r() * 90;
+        g.lineCap = 'round'; g.lineWidth = 6 + r() * 8; g.strokeStyle = 'rgba(22,22,38,0.6)';
+        g.beginPath(); g.moveTo(x - w, y + 6); g.quadraticCurveTo(x, y - 10 - r() * 10, x + w, y + 4); g.stroke();
+      }
     },
   });
 
@@ -143,7 +174,7 @@
       puffClock -= dt;
       if (puffClock <= 0) {
         puffClock = 0.22 - salt * 0.12;
-        puffs.push({ x: 560 + (Math.random() - 0.5) * 30, y: 222, r: 16 + Math.random() * 8, age: 0, life: 9 + Math.random() * 4, sd: Math.random() * 100, white: salt });
+        puffs.push({ x: 560 + (Math.random() - 0.5) * 24, y: 222, r: 12 + Math.random() * 6, age: 0, life: 5 + Math.random() * 2, sd: Math.random() * 100, white: salt });
       }
       sparkClock -= dt;
       if (sparkClock <= 0) { sparkClock = 0.08 + Math.random() * 0.25; spark(1); }
@@ -175,11 +206,11 @@
         const i = clamp(K.glowAt(p.x, p.y + p.r * 0.6) * 1.1, 0, 1.2);
         const base = K.mix('#120e15', '#2e1816', clamp(i * 0.6, 0, 1));
         const wb = K.mix(base, '#c8d0cc', p.white * (1 - u) * 0.75);
-        g.fillStyle = K.css(wb, a * 0.42);
+        g.fillStyle = K.css(wb, a * 0.26);
         g.fill(circ(p.x, p.y, p.r));
         // the underside catches the flame for the first few seconds
         const hot = clamp(i * 0.4, 0, 0.4) * Math.max(0, 1 - p.age / 3);
-        if (hot > 0.02) { g.fillStyle = K.css(K.mix(wb, '#a84a26', hot), a * 0.3); g.fill(circ(p.x + p.r * 0.05, p.y + p.r * 0.38, p.r * 0.62)); }
+        if (hot > 0.02) { g.fillStyle = K.css(K.mix(wb, '#a84a26', hot), a * 0.18); g.fill(circ(p.x + p.r * 0.05, p.y + p.r * 0.38, p.r * 0.62)); }
       }
       g.globalCompositeOperation = 'lighter';
       for (const s of sparks) {

@@ -98,7 +98,8 @@
     },
     draw(g, t, L) {
       // the dug alcove in the face, and the heap of clay beside it
-      { const al = curve([[12, 886], [14, 838], [28, 818], [50, 814], [62, 838], [64, 886]]); g.fillStyle = '#1c0e0c'; g.fill(al); g.lineWidth = 1.6; g.strokeStyle = K.LINE; g.stroke(al); g.lineWidth = 2; g.strokeStyle = K.litc(M.clayPale, 40, 830); g.beginPath(); g.moveTo(30, 820); g.quadraticCurveTo(50, 812, 62, 838); g.stroke(); }
+      // fresh-cut clay where it's digging: paler scars in the face
+      g.fillStyle = K.css(K.lit(M.clayPale, 40, 850), 0.5); for (const [x, y, w] of [[34, 858, 14], [26, 842, 10], [44, 872, 12]]) g.fill(ell(x, y, w, w * 0.45, undefined, -0.4));
       Drawn.lumps(g, [[148, 880, 10], [160, 878, 12], [172, 881, 8], [156, 868, 9], [166, 870, 7]], { line: K.LINE, lw: 1.2, shade: K.litc(M.clayDark, 160, 874), base: K.litc(M.clay, 160, 874), lit: K.litc(M.clayPale, 150, 866) });
       // his lantern on the ground
       const f = 0.9 + 0.1 * noise(t * 5);
@@ -276,12 +277,12 @@
   });
 
   // ------------------------------------------------------------------ ground door
-  const GX = 1040, GY = 1400;
+  const GX = 700, GY = 1480;
   layer({
     id: 'groundDoor', z: 60, still: true,
     draw(g) {
       // a grassy mound with a round hatch in its face, propped open
-      const mound = curve([[GX - 150, GY + 34], [GX - 110, GY - 20], [GX - 40, GY - 50], [GX + 40, GY - 50], [GX + 110, GY - 22], [GX + 150, GY + 34]], false);
+      const mound = curve([[GX - 190, GY + 40], [GX - 150, GY + 6], [GX - 90, GY - 30], [GX - 30, GY - 46], [GX + 40, GY - 44], [GX + 110, GY - 24], [GX + 160, GY + 8], [GX + 200, GY + 40]], false);
       mound.closePath();
       g.fillStyle = M.earth; g.fill(mound);
       g.save(); g.clip(mound);
@@ -289,19 +290,24 @@
       g.restore();
       K.applyLight(g, mound);
       g.lineWidth = 2.2; g.strokeStyle = K.LINE; g.stroke(mound);
-      // the opening: steps going down into the light
-      const hole = ell(GX, GY + 4, 46, 20);
-      g.fillStyle = grad(g, 0, GY - 16, 0, GY + 24, [[0, '#3a1408'], [1, '#f0a040']]); g.fill(hole);
+      // the hatch: a round plank door swung up on its back hinge, standing open, its inner face lit
+      // from below by the light pouring out of the hole
+      const hatch = ell(GX + 2, GY - 34, 44, 36);
+      g.fillStyle = grad(g, 0, GY - 70, 0, GY - 2, [[0, K.litc(M.wood, GX, GY - 60)], [1, K.css(K.mix(K.lit(M.wood, GX, GY - 20), [1, 0.62, 0.3], 0.55))]]); g.fill(hatch);
+      g.save(); g.clip(hatch);
+      g.lineWidth = 1; g.strokeStyle = 'rgba(30,16,10,0.55)';
+      for (const dx of [-30, -15, 0, 15, 30]) { g.beginPath(); g.moveTo(GX + 2 + dx, GY - 72); g.lineTo(GX + 2 + dx, GY + 2); g.stroke(); }
+      g.fillStyle = K.litc(M.iron, GX, GY - 40); g.fillRect(GX - 44, GY - 52, 92, 4); g.fillRect(GX - 44, GY - 24, 92, 4);
+      g.restore();
+      g.lineWidth = 2; g.strokeStyle = K.LINE; g.stroke(hatch);
+      g.fillStyle = '#c8a050'; g.fill(circ(GX + 30, GY - 34, 3)); g.lineWidth = 1; g.stroke(circ(GX + 30, GY - 34, 3));
+      // the hole in front of it, steps going down into the light
+      const hole = ell(GX, GY + 4, 46, 18);
+      g.fillStyle = grad(g, 0, GY - 14, 0, GY + 22, [[0, '#3a1408'], [1, '#f0a040']]); g.fill(hole);
       g.save(); g.clip(hole);
       for (let k = 0; k < 4; k++) { g.fillStyle = `rgba(255,${200 - k * 20},${110 - k * 20},${0.4 + k * 0.1})`; g.fillRect(GX - 40, GY - 6 + k * 7, 80, 2.5); }
       g.restore();
       g.lineWidth = 2.4; g.strokeStyle = K.LINE; g.stroke(hole);
-      // the hatch, swung up and back on its stick
-      const hatch = ell(GX + 8, GY - 40, 46, 26, undefined, -0.12);
-      g.fillStyle = K.litc(M.wood, GX, GY - 30, [0, 0.4, 0.9]); g.fill(hatch);
-      g.lineWidth = 0.9; g.strokeStyle = 'rgba(30,18,14,0.6)'; for (const dx of [-24, -8, 8, 24]) { g.beginPath(); g.moveTo(GX + 8 + dx, GY - 62 + Math.abs(dx) * 0.3); g.lineTo(GX + 8 + dx, GY - 18 - Math.abs(dx) * 0.3); g.stroke(); }
-      g.lineWidth = 2; g.strokeStyle = K.LINE; g.stroke(hatch);
-      Drawn.tube(g, Drawn.seg(GX + 30, GY - 2, GX + 34, GY - 26), K.litc(M.woodPale, GX + 30, GY - 14), 2.4, 1.2);
       // a pair of boots by the door, a mat
       g.fillStyle = K.litc(M.clothRed, GX - 60, GY + 30); g.fill(K.rrect(GX - 80, GY + 26, 40, 9, 3)); g.lineWidth = 1.3; g.strokeStyle = K.LINE; g.stroke(K.rrect(GX - 80, GY + 26, 40, 9, 3));
       for (const bx of [GX + 64, GX + 82]) {

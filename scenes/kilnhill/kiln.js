@@ -290,19 +290,15 @@
         g.fillRect(mx - sw - 4, m.y0 - m.h - 4, sw * 2 + 8, m.h + 8);
         // the far wall of the firebox and its fire-bars
         g.fillStyle = 'rgba(60,10,4,0.35)'; g.fillRect(mx - sw, m.y0 - m.h * 0.95, sw * 2, m.h * 0.3);
-        // flames: tongues rising off the coal bed, each with its own flicker
-        for (let k = 0; k < 7; k++) {
-          const fx = mx + (k / 6 - 0.5) * sw * 1.6, ph = t * (5 + k * 0.7) + k * 13;
-          const fh = m.h * (0.45 + 0.3 * (0.5 + 0.5 * noise(ph * 0.4))) * lv;
-          const lean = noise(ph * 0.3 + 5) * 6;
-          const p = new Path2D();
-          p.moveTo(fx - 7, m.y0 - 6);
-          p.quadraticCurveTo(fx - 8 + lean * 0.5, m.y0 - fh * 0.5, fx + lean, m.y0 - fh);
-          p.quadraticCurveTo(fx + 6 + lean * 0.5, m.y0 - fh * 0.45, fx + 7, m.y0 - 6);
-          const fc = salt > 0.05 ? K.mix(K.fireAt(0.7), [0.4, 1, 0.72], salt) : K.fireAt(0.72 + 0.1 * noise(ph));
-          g.fillStyle = K.css(fc, 0.85); g.fill(p);
-          g.fillStyle = K.css(K.fireAt(0.92), 0.7);
-          g.fill(ell(fx + lean * 0.3, m.y0 - fh * 0.3, 3, fh * 0.25));
+        // flames: a few big tongues licking up off the coal bed, each mouth with its own count
+        // and rhythm, white-yellow at the root
+        const nT = [4, 3, 3][i];
+        for (let k = 0; k < nT; k++) {
+          const fx = mx + ((k + 0.5) / nT - 0.5) * sw * 1.5, ph = t * (2.2 + k * 0.37 + i * 0.21) + k * 13 + i * 5;
+          const fh = m.h * (0.55 + 0.35 * (0.5 + 0.5 * noise(ph * 0.5))) * lv;
+          const lean = noise(ph * 0.35 + 5) * 9;
+          K.tongue(g, fx, m.y0 - 4, sw * 0.42, fh, lean, 0.75 + 0.2 * noise(ph), salt);
+          K.tongue(g, fx + lean * 0.2, m.y0 - 4, sw * 0.16, fh * 0.55, lean * 0.6, 1, salt * 0.6);
         }
         // the coal bed: lumps glowing on their own slow clocks
         const r = rng(i * 99 + 7);
@@ -335,22 +331,15 @@
     draw(g, t) {
       const lv = K.fire.level, salt = K.fire.salt, top = F.top[1];
       const w = Drawn.wind(t, cx);
-      for (let k = 0; k < 9; k++) {
-        const fx = cx + (k / 8 - 0.5) * 100, ph = t * (3.5 + k * 0.4) + k * 7;
-        const fh = (16 + 22 * (0.5 + 0.5 * noise(ph * 0.5))) * lv * (1 - Math.abs(k / 8 - 0.5) * 0.9) + salt * 20;
-        const lean = w * 10 + noise(ph * 0.3) * 5;
-        const p = new Path2D();
-        p.moveTo(fx - 9, top + 4);
-        p.quadraticCurveTo(fx - 6 + lean * 0.4, top - fh * 0.5, fx + lean, top - fh);
-        p.quadraticCurveTo(fx + 6 + lean * 0.5, top - fh * 0.4, fx + 9, top + 4);
-        const c = salt > 0.05 ? K.mix(K.fireAt(0.62), [0.5, 1, 0.78], salt) : K.fireAt(0.58 + 0.12 * noise(ph));
-        g.fillStyle = K.css(c, 0.9); g.fill(p);
-      }
-      for (let k = 0; k < 5; k++) {
-        const fx = cx + (k / 4 - 0.5) * 60, fh = (10 + 10 * (0.5 + 0.5 * noise(t * 4 + k * 3))) * lv;
-        g.fillStyle = K.css(K.fireAt(0.86), 0.8);
-        g.fill(ell(fx + w * 4, top - fh * 0.4, 5, fh * 0.5));
-      }
+      // five big tongues off the lip, the wind bending them right, a white core in the middle
+      const spec = [[-40, 0.5, 1.1], [-14, 0.85, 1.5], [12, 1, 1.6], [38, 0.7, 1.2]];
+      spec.forEach(([dx, hk, wk], k) => {
+        const ph = t * (1.6 + k * 0.29) + k * 7;
+        const fh = (34 + 30 * (0.5 + 0.5 * noise(ph * 0.6))) * hk * lv + salt * 26;
+        const lean = w * 22 + noise(ph * 0.4) * 14;
+        K.tongue(g, cx + dx, top + 6, 13 * wk, fh, lean, 0.7, salt);
+      });
+      K.tongue(g, cx + 2, top + 6, 16, (22 + 8 * noise(t * 2.3)) * lv, w * 8, 1, salt * 0.5);
     },
   });
 

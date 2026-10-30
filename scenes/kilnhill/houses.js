@@ -247,6 +247,11 @@
 
   // ------------------------------------------------------------------ the teapot
   const TX = 1112, TB = 886;
+  // the teapot stands a step further back up the terrace than the bowl house, a little smaller,
+  // so it stays second to the kiln: drawn in its own frame, scaled about its foot
+  const TS = 0.84, TBn = 862;
+  const teaFrame = (g) => { g.translate(TX, TBn); g.scale(TS, TS); g.translate(-TX, -TB); };
+  const teaPt = (x, y) => [TX + (x - TX) / TS, TB + (y - TBn) / TS];
   const tea = K.lathe(TX, [[76, 634], [92, 642], [108, 660], [124, 690], [134, 730], [136, 774], [128, 822], [112, 860], [104, 878], [106, TB]]);
   const teaHoles = piercings(tea, [
     { y: 672, n: 11, size: 3, shape: 'dot', from: 0.3, to: Math.PI - 0.3 },
@@ -263,6 +268,7 @@
   layer({
     id: 'teapot', z: 38, still: true,
     draw(g) {
+      teaFrame(g);
       // the handle loop on the left, a rope ladder inside it up to the lid hatch
       const hp = new Path2D(); hp.moveTo(990, 676); hp.bezierCurveTo(912, 666, 900, 806, 992, 820);
       g.lineCap = 'round'; g.lineWidth = 22; g.strokeStyle = K.inkAt(940, 740, 0.5); g.stroke(hp);
@@ -292,7 +298,7 @@
   const steam = [];
   layer({
     id: 'teapotLive', z: 39, spin: 0, sp: 0.15,
-    hit: (x, y) => Math.hypot((x - TX) / 150, (y - 760) / 140) < 1 || (x > 1230 && x < 1340 && y > 680 && y < 860),
+    hit(x, y) { [x, y] = teaPt(x, y); return Math.hypot((x - TX) / 150, (y - 760) / 140) < 1 || (x > 1230 && x < 1340 && y > 680 && y < 860); },
     onEnter() { lidSpring.v += 30; },
     update(dt, t, L) {
       this.sp = ease(this.sp, L.hovered ? (L.since > 1 ? 2.2 : 0.6) : 0.15, 1.2, dt);
@@ -304,6 +310,7 @@
       while (steam.length && steam[0].age > steam[0].life) steam.shift();
     },
     draw(g, t, L) {
+      teaFrame(g);
       const f = lampFlicker(t, 3) * (1 + L.hover * 0.15) * (K.pulse ? 1 + K.pulse.teapot : 1);
       holesLive(g, teaHoles, f * 1.05, [1, 0.84, 0.5], t, 3);
       g.fillStyle = K.css(K.fireAt(0.7 * f)); g.fill(teaWin.path);
@@ -428,8 +435,9 @@
   const jarHolesLo = piercings(jarLo, [{ y: 730, n: 8, size: 2.8, shape: 'diamond' }, { y: 756, n: 9, size: 2.6, shape: 'diamond', off: 0.5 }]);
   const jarHolesHi = piercings(jarHi, [{ y: 662, n: 7, size: 2.4, shape: 'diamond' }]);
   const wob = K.spring({ k: 50, d: 3.2 });
-  const jarLoS = potSprite(jarLo, { skip: K.L.jar, clay: M.clay, glaze: { col: M.glazeOx, edge: 728, seed: 31 }, seed: 32, lw: 1.7, ambK: 1.3 }, (g) => holesStill(g, jarHolesLo));
-  const jarHiS = potSprite(jarHi, { skip: K.L.jar, clay: M.clay, glaze: { col: M.glazeCream, edge: 676, seed: 33 }, seed: 34, lw: 1.5, ambK: 1.3 }, (g) => { rim(g, jarHi, M.clay, 1.8); holesStill(g, jarHolesHi); });
+  const haze = (g) => { g.globalCompositeOperation = 'source-atop'; g.fillStyle = 'rgba(14,16,38,0.38)'; g.fillRect(1300, 560, 340, 260); g.globalCompositeOperation = 'source-over'; };
+  const jarLoS = potSprite(jarLo, { skip: K.L.jar, clay: M.clay, glaze: { col: M.glazeOx, edge: 728, seed: 31 }, seed: 32, lw: 1.7 }, (g) => { holesStill(g, jarHolesLo); haze(g); });
+  const jarHiS = potSprite(jarHi, { skip: K.L.jar, clay: M.clay, glaze: { col: M.glazeCream, edge: 676, seed: 33 }, seed: 34, lw: 1.5 }, (g) => { rim(g, jarHi, M.clay, 1.6); holesStill(g, jarHolesHi); haze(g); });
   layer({
     id: 'jarLive', z: 36,
     hit: (x, y) => Math.abs(x - JX) < 60 && y > 610 && y < 792,
@@ -440,10 +448,10 @@
       const a = wob.x * 0.12;
       g.save(); g.translate(JX, 788); g.rotate(a * 0.4); g.translate(-JX, -788);
       Drawn.blit(g, jarLoS.sp);
-      holesLive(g, jarHolesLo, f, [1, 0.8, 0.46], t, 5);
+      holesLive(g, jarHolesLo, f * 0.75, [1, 0.8, 0.46], t, 5);
       g.translate(JX, 692); g.rotate(a); g.translate(-JX, -692);
       Drawn.blit(g, jarHiS.sp);
-      holesLive(g, jarHolesHi, f, [1, 0.8, 0.46], t, 6);
+      holesLive(g, jarHolesHi, f * 0.75, [1, 0.8, 0.46], t, 6);
       // a mole on the very top, sitting with its feet over the rim, holding a little lamp
       const grab = clamp(Math.abs(wob.x) * 2, 0, 1);
       K.mole(g, JX - 2, 634, 0.5, { flip: true, hands: grab > 0.2 ? { f: [12, -4], b: [-12, -4] } : { f: [20, -30], b: [-8, -14] }, open: 1, mouth: grab > 0.3 ? 0.5 : 0, lean: -a * 2, lx: JX, ly: 700 });

@@ -17,7 +17,7 @@
   const K = window.Kiln, M = K.M;
 
   // ------------------------------------------------------------------ drying rack
-  const RX0 = -150, RX1 = 330, shelves = [1176, 1086, 996];
+  const RX0 = -270, RX1 = 236, shelves = [1176, 1086, 996];
   const greenware = [];
   {
     const r = rng(71);
@@ -26,7 +26,7 @@
       while (x < RX1 - 30) {
         const kind = r(), w = 14 + r() * 12, h = kind < 0.25 ? 12 + r() * 8 : 22 + r() * 26;
         greenware.push({ x, y: sy, w, h, kind: kind < 0.25 ? 'bowl' : kind < 0.4 ? 'upturned' : kind < 0.75 ? 'jar' : 'vase', shelf: si, seed: r() * 1000, col: K.mix(M.slip, M.clayPale, r()), wob: K.spring({ k: 90, d: 5 }) });
-        x += w * 2 + 6 + r() * 10;
+        x += w * 2 + 14 + r() * 22;
       }
     });
   }
@@ -386,7 +386,7 @@
 
   // ------------------------------------------------------------------ moths
   // each moth circles a lamp; a still pointer nearby draws them, a fast one scatters them
-  const homes = [[PX + 34, PT + 50, 30], [1112 + 10, 846, 40], [128, 400, 30], [884, 812, 26], [1352, 880, 26], [298, 540, 34], [560, 790, 50]];
+  const homes = [[PX + 34, PT + 50, 30], [1120, 828, 34], [128, 400, 30], [884, 812, 26], [1352, 880, 26], [298, 540, 34], [560, 790, 50]];
   const moths = [];
   { const r = rng(91); for (const [x, y, R] of homes) for (let i = 0; i < 3; i++) moths.push({ hx: x, hy: y, R: R * (0.6 + r() * 0.8), ph: r() * TAU, sp: 1.4 + r() * 1.6, x, y, flap: r() * TAU, pull: 0, s: 0.7 + r() * 0.5 }); }
   layer({
