@@ -164,7 +164,7 @@ layer({
 });
 
 // ============================================================ the parcel cart, tipped over under the bunting
-const cart = { x: 1150, y: 694, up: 0, folks: [F.makeFolk({ sp: 'otter', coat: '#3f6aa1', acc: '#e7a43c', dir: 1, hat: F.HATS.cap('#3f6aa1') }), F.makeFolk({ sp: 'vole', coat: '#efe2c8', dir: -1 })] };
+const cart = { x: 1205, y: 618, up: 0, folks: [F.makeFolk({ sp: 'otter', coat: '#3f6aa1', acc: '#e7a43c', dir: 1, hat: F.HATS.cap('#3f6aa1') }), F.makeFolk({ sp: 'vole', coat: '#efe2c8', dir: -1 })] };
 const parcels = [[-30, 6, 9, '#d6b27a'], [-16, 10, 7, '#c99a5a'], [8, 12, 8, '#e0c79a'], [26, 4, 6, '#b98a5a'], [-4, -2, 10, '#d8b88a']];
 layer({
   id: 'cart', z: F.zOf(cart.y + 8),
@@ -195,7 +195,7 @@ layer({
 });
 
 // ============================================================ a picnic between the bookbinder and the tower
-const picnic = { x: 585, y: 622, wave: 0, gull: 0, folks: [F.makeFolk({ sp: 'hare', coat: '#a8689b', dir: 1, hat: F.HATS.straw() }), F.makeFolk({ sp: 'mole', coat: '#f2c95c', dir: -1 }), F.makeFolk({ sp: 'shrew', coat: '#6f9d58', dir: -1, k: 0.8 })] };
+const picnic = { x: 478, y: 646, wave: 0, gull: 0, folks: [F.makeFolk({ sp: 'hare', coat: '#a8689b', dir: 1, hat: F.HATS.straw() }), F.makeFolk({ sp: 'mole', coat: '#f2c95c', dir: -1 }), F.makeFolk({ sp: 'shrew', coat: '#6f9d58', dir: -1, k: 0.8 })] };
 layer({
   id: 'picnic', z: F.zOf(picnic.y + 6),
   hit: (x, y) => Math.abs(x - picnic.x) < 70 && y > picnic.y - 40 && y < picnic.y + 18,

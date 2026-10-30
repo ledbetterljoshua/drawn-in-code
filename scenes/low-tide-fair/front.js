@@ -375,7 +375,7 @@ layer({
 // ============================================================ razor clams in the near sand
 const clams = [[1260, 1068], [1330, 1088], [880, 1080], [470, 1092], [1460, 1086], [1050, 1060]].map(([x, y], i) => ({ x, y, squirt: 0, ph: i * 2.1 }));
 layer({
-  id: 'clams', z: 39,
+  id: 'clams', z: 39.6,
   hit(x, y) { for (const c of clams) if (Math.hypot(x - c.x, (y - c.y) * 2) < 26) return (this.which = c), true; return false; },
   onEnter(L) { const c = L.which; if (c) { c.squirt = 1; for (let i = 0; i < 10; i++) F.spawn({ kind: 'drop', x: c.x, y: c.y - 2, vx: (Math.random() - 0.3) * 40, vy: -120 - Math.random() * 60, g: 320, life: 0.9, size: 1.3 }); } },
   update(dt) { for (const c of clams) c.squirt = Math.max(0, c.squirt - dt); },

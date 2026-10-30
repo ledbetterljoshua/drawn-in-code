@@ -198,3 +198,18 @@ The five worst now:
    and high cirrus brushed across the top of the sky.
 4. **The tea-house veranda floats** — its posts stop short of the foot. (Next.)
 5. **The far headland's foot is a pink band of fog** that cuts the cliffs in half. (Next.)
+
+## Round 7
+
+A second hover pass (picnic, cart, shrimpers, latecomers, clams, rock pool, chimes, youngster),
+which found the scene's worst remaining kind of bug: things you can't see or can't reach.
+
+1. **The picnic sat behind the tower's shell**, and even moved out, the tower's rectangular hit box
+   swallowed its hover. *Fixed:* moved to open sand; every snail now hit-tests its real shell
+   silhouette (bands or coil outline, padded) plus its foot and neck.
+2. **The parcel cart sat on the grandmother's head.** Moved back under the bunting, between her
+   eyestalks and the tea-house.
+3. **The near clams were under the dune bar.** Raised above it.
+4. **The grandmother's neck had a dark smear** for a core shadow and two tubes for lower
+   tentacles. Softer, wider core shadow; shorter, thinner feelers.
+5. **The headland's foot fog** cut the cliffs in half. Thinner and lower.

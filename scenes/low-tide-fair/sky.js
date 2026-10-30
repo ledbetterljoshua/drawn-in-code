@@ -168,7 +168,7 @@ layer({
     g.save(); g.clip(cap); g.fillStyle = grad(g, 0, 150, 0, 300, ['#b0a98a', '#8f8f78']); g.translate(-6, -6); g.fill(cap); g.restore();
     g.strokeStyle = 'rgba(70,66,70,0.5)'; g.lineWidth = 1; g.stroke(cap);
     // a band of haze at its foot, where it meets the far flats
-    g.fillStyle = grad(g, 0, HZ - 60, 0, HZ, ['rgba(236,222,210,0)', 'rgba(240,226,212,0.8)']);
+    g.fillStyle = grad(g, 0, HZ - 40, 0, HZ, ['rgba(236,222,210,0)', 'rgba(240,226,212,0.55)']);
     g.fillRect(-150, HZ - 60, 1600, 62);
     g.restore();
     g.lineWidth = 1.2; g.strokeStyle = 'rgba(80,66,104,0.55)'; g.stroke(hp);

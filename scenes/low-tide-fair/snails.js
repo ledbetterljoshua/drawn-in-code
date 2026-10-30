@@ -23,6 +23,7 @@ const D = Drawn, F = Fair;
 const { TAU, clamp, lerp, ease, rng, noise, circ, ell, poly, curve, ink, grad, radial, st, P, layer, onLayout, sprite, blit } = D;
 const { HZ, pxu, flat } = F;
 const LINE = F.LINE;
+const hitCtx = document.createElement('canvas').getContext('2d');
 F.zOf = (y) => 8 + (y - HZ) / 40;
 
 const SKIN = {
@@ -110,7 +111,7 @@ function drawHead(g, sn, t, mode = 'all', blitNeck) {
   // the underside of the neck in shadow, the skin's net of grooves, a wet highlight
   g.fillStyle = F.rgba(sk.shade, 0.55); g.fill(curve([[L * 0.3, -L * 0.02], [hx - L * 0.02, hy + L * 0.03], [hx + L * 0.07, hy + L * 0.05], [L * 0.52, 0], [L * 0.3, 0.5]]));
   // a core shadow where the neck turns from the sun, and warm light bounced up from the sand under it
-  g.strokeStyle = F.rgba(sk.shade, 0.6); g.lineWidth = L * 0.035; g.lineCap = 'round';
+  g.strokeStyle = F.rgba(sk.shade, 0.28); g.lineWidth = L * 0.05; g.lineCap = 'round';
   g.beginPath(); g.moveTo(L * 0.25 - sx * L * 0.0, -L * 0.07); g.quadraticCurveTo(L * 0.36, -L * 0.13, hx - L * 0.0, hy + L * 0.0); g.stroke();
   g.strokeStyle = 'rgba(240,190,150,0.35)'; g.lineWidth = L * 0.018;
   g.beginPath(); g.moveTo(L * 0.42, -L * 0.03); g.quadraticCurveTo(L * 0.48, -L * 0.05, hx + L * 0.06, hy + L * 0.05); g.stroke();
@@ -124,11 +125,11 @@ function drawHead(g, sn, t, mode = 'all', blitNeck) {
   // lower tentacles: two short soft feelers testing the sand
   for (const [k, ph, far] of [[1, 0, false], [0.75, 1.7, true]]) {
     const bx = hx + L * (far ? 0.055 : 0.07), by = hy + L * 0.04, a = 0.75 + Math.sin(t * 1.3 + ph + sn.ph) * 0.18;
-    const ex = bx + Math.cos(a) * L * 0.04 * k, ey = by + Math.sin(a) * L * 0.04 * k;
+    const ex = bx + Math.cos(a) * L * 0.03 * k, ey = by + Math.sin(a) * L * 0.03 * k;
     const p = new Path2D(); p.moveTo(bx, by); p.quadraticCurveTo(bx + L * 0.025 * k, by + L * 0.005, ex, ey);
     g.lineCap = 'round';
-    g.lineWidth = L * 0.014 + lw * 2; g.strokeStyle = LINE; g.stroke(p);
-    g.lineWidth = L * 0.014; g.strokeStyle = far ? sk.shade : sk.base; g.stroke(p);
+    g.lineWidth = L * 0.01 + lw * 2; g.strokeStyle = LINE; g.stroke(p);
+    g.lineWidth = L * 0.01; g.strokeStyle = far ? sk.shade : sk.base; g.stroke(p);
   }
   // a mouth, smiling when content
   g.beginPath(); g.moveTo(hx + L * 0.05, hy + L * 0.04); g.quadraticCurveTo(hx + L * 0.068, hy + L * 0.046 + sn.smile * L * 0.012, hx + L * 0.082, hy + L * 0.034);
@@ -577,7 +578,12 @@ layer({
 function snailLayer(sn, z, extra) {
   return layer(Object.assign({
     id: sn.id, z,
-    hit(x, y) { const [x0, y0, x1, y1] = sn.box, S = sn.S; const lx = (x - sn.x) / S, ly = (y - sn.y) / S; const sx = sn.dir > 0 ? lx : -lx; return (lx > x0 && lx < x1 && ly > y0 && ly < y1 + 5) || (sx > -sn.L * 0.5 && sx < sn.L * 0.55 && ly > -sn.L * 0.3 && ly < 4); },
+    hit(x, y) {
+      const S = sn.S, lx = (x - sn.x) / S, ly = (y - sn.y) / S, sx = sn.dir > 0 ? lx : -lx;
+      // the shell's own silhouette (padded a little), or the foot and neck
+      if (!sn.hitPath) { sn.hitPath = new Path2D(); if (sn.sp) { for (const w of sn.sp.ws) sn.hitPath.addPath(F.bandPath(w)); const [ax, ay] = sn.sp.apex; sn.hitPath.rect(ax - 30, ay - 70, 60, 80); } else sn.hitPath.addPath(sn.gl.outline); }
+      return hitCtx.isPointInPath(sn.hitPath, lx, ly) || hitCtx.isPointInPath(sn.hitPath, lx + 8, ly) || hitCtx.isPointInPath(sn.hitPath, lx - 8, ly) || (sx > -sn.L * 0.5 && sx < sn.L * 0.55 && ly > -sn.L * 0.3 && ly < 4);
+    },
     update(dt, t, L) { stepStalks(sn, dt, t); if (extra.tick) extra.tick(dt, t, L); },
     draw(g, t, L) {
       const S = sn.S, bob = Math.sin(t * 0.9 + sn.ph) * 0.8;
