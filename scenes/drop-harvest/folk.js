@@ -78,9 +78,9 @@
     g.restore();
     // rim of sun on the back
     g.save(); g.clip(body);
-    g.lineWidth = 2.6; g.strokeStyle = col.rim;
-    const ra = -Math.PI / 2 - sun * phi * 0.18;
-    g.beginPath(); g.arc(0, cy, R * 1.02, ra - phi * 0.22, ra + phi * 0.22); g.stroke();
+    g.lineWidth = 3.4; g.strokeStyle = col.rim;
+    const ra = -Math.PI / 2 - sun * phi * 0.2;
+    g.beginPath(); g.arc(0, cy, R * 1.02, ra - phi * 0.26, ra + phi * 0.26); g.stroke();
     g.restore();
     g.restore();
     // the head at the front end, tucked away when rolled
@@ -171,9 +171,9 @@
         g.fillStyle = 'rgba(255,214,140,0.45)'; g.fill(circ(x - 1.5, y + 2, 1));
       }
     }
-    g.fillStyle = 'rgba(30,24,44,0.45)'; g.fill(DH.shift(cup, 12, 3));
     g.restore();
-    DH.rim(g, cup, CX, 4);
+    DH.shadeFace(g, cup, CX - RX, CX + RX, 0.55);
+    DH.rim(g, cup, CX, 4.5);
     DH.bounce(g, cup, 4);
     // the lip of the rim seen from below, thick and wet
     g.lineWidth = 5; g.strokeStyle = '#b8a46a'; g.beginPath(); g.ellipse(CX, RIM, RX + 1, 8.5, 0, 0.05, Math.PI - 0.05); g.stroke();
@@ -288,11 +288,11 @@
       ink(g, circ(tx, ty, 3.2), '#a88a5a', 1.4);
       // the thread: windlass → masthead → jib tip → load
       const [lx, ly] = loadPos();
-      g.lineWidth = 1.1; g.strokeStyle = '#e6d6a8';
+      g.lineWidth = 1.6; g.strokeStyle = '#efe0b0';
       g.beginPath(); g.moveTo(WIND.x, WIND.y - 6); g.lineTo(TOP[0] - 3, TOP[1]); g.lineTo(tx, ty); g.lineTo(lx, ly - 10); g.stroke();
       // the sling: a little net bag, with a drop in it if loaded
-      const bag = new Path2D(); bag.moveTo(lx - 12, ly - 10); bag.quadraticCurveTo(lx - 14, ly + 10, lx, ly + 12); bag.quadraticCurveTo(lx + 14, ly + 10, lx + 12, ly - 10); bag.closePath();
-      if (crane.load) DH.glassDrop(g, lx, ly + 1, 11, { flat: 0.4, bright: 0.6 });
+      const bag = new Path2D(); bag.moveTo(lx - 16, ly - 12); bag.quadraticCurveTo(lx - 19, ly + 14, lx, ly + 17); bag.quadraticCurveTo(lx + 19, ly + 14, lx + 16, ly - 12); bag.closePath();
+      if (crane.load) DH.glassDrop(g, lx, ly + 2, 15, { flat: 0.35, bright: 0.8 });
       g.save(); g.clip(bag);
       g.lineWidth = 0.7; g.strokeStyle = 'rgba(230,210,160,0.9)';
       for (let i = -3; i <= 3; i++) { g.beginPath(); g.moveTo(lx + i * 4, ly - 12); g.lineTo(lx + i * 2, ly + 14); g.stroke(); }

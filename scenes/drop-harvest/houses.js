@@ -80,8 +80,8 @@
       g.fillStyle = r() < 0.5 ? '#7a5444' : '#9a6f56';
       g.fill(poly([[sx - s, sy], [sx + s * 0.2, sy - s * 0.6], [sx + s, sy + s * 0.3], [sx, sy + s * 0.5]]));
     }
-    g.fillStyle = 'rgba(40,30,50,0.35)'; g.fill(DH.shift(cap, 12, 6));
     g.restore();
+    DH.shadeFace(g, cap, x - rx, x + rx, 0.78);
     DH.rim(g, cap, x, 5, 'rgba(255,214,140,0.95)');
     // the rim's edge seen from below catches the warm bounce
     g.lineWidth = 1.6; g.strokeStyle = 'rgba(255,200,150,0.55)';
@@ -95,14 +95,15 @@
     // snakeskin chevrons
     g.strokeStyle = 'rgba(110,80,64,0.65)'; g.lineWidth = 1.3;
     for (let y = top + 16; y < base - 50; y += 9 + r() * 4) { g.beginPath(); g.moveTo(x - 12, y); g.lineTo(x - 2, y + 4); g.lineTo(x + 3, y + 1); g.lineTo(x + 12, y + 5); g.stroke(); }
-    g.fillStyle = 'rgba(40,30,50,0.4)'; g.fill(DH.shift(S, 9, 0));
     g.restore();
+    DH.shadeFace(g, S, x - 22, x + 22, 0.72);
     DH.rim(g, S, x, 3.5);
     // the collar (annulus): a thick skirt round the stalk
     const col = new Path2D();
     col.moveTo(x - 14, top + 32); col.quadraticCurveTo(x - 20, top + 44, x - 17, top + 48); col.quadraticCurveTo(x, top + 52, x + 17, top + 48); col.quadraticCurveTo(x + 20, top + 44, x + 14, top + 32); col.closePath();
     ink(g, col, '#efe2c4', 2.4);
     DH.crescent(g, col, '#a88f78', 0, -4);
+    DH.shadeFace(g, col, x - 20, x + 20, 0.5);
     DH.rim(g, col, x, 2.5);
     // porthole with a warm lamp and a curtain
     const wy = top + 74;
@@ -161,8 +162,8 @@
     }
     // weathered blotches
     for (let i = 0; i < 18; i++) { g.fillStyle = `rgba(70,56,60,${0.1 + r() * 0.2})`; g.fill(ell(x + (r() - 0.5) * w * 2, y1 + r() * (y0 - y1), 2 + r() * 5, 1.5 + r() * 3)); }
-    g.fillStyle = 'rgba(40,30,50,0.4)'; g.fill(DH.shift(B, 14, 2));
     g.restore();
+    DH.shadeFace(g, B, x - w * 1.25, x + w * 1.25, 0.6);
     DH.rim(g, B, x, 4);
     // the scalloped lid, seen from below: its overhanging skirt
     const lid = new Path2D(), n = 11, lw2 = w * 1.08;
@@ -172,6 +173,7 @@
     g.lineWidth = 4.6; g.strokeStyle = LINE; g.stroke(lid);
     g.fillStyle = '#8c744e'; g.fill(lid);
     DH.crescent(g, lid, '#5e4a3a', 0, -4);
+    DH.shadeFace(g, lid, x - w * 1.1, x + w * 1.1, 0.5);
     DH.rim(g, lid, x, 3);
     // the starry rays on top just show as ridges on the lid's crown
     g.lineWidth = 1.2; g.strokeStyle = 'rgba(60,44,36,0.8)';
@@ -210,10 +212,9 @@
     for (let i = -5; i <= 5; i++) { g.lineWidth = 1.2 + r(); g.strokeStyle = 'rgba(70,36,24,0.5)'; g.beginPath(); g.moveTo(x + i * 6, cy + R); g.quadraticCurveTo(x + i * 9, cy, x + i * 5, cy - R); g.stroke(); }
     // the pale scar where it hung
     g.fillStyle = '#d8b88a'; g.fill(ell(x - 4, cy + R * 0.72, R * 0.55, R * 0.2));
-    g.fillStyle = 'rgba(40,30,50,0.4)'; g.fill(DH.shift(nut, 10, 2));
-    // gloss
-    g.fillStyle = 'rgba(255,230,190,0.4)'; g.fill(ell(x - R * 0.45, cy - R * 0.35, R * 0.2, R * 0.12, undefined, -0.6));
+    g.fillStyle = 'rgba(255,230,190,0.3)'; g.fill(ell(x - R * 0.45, cy - R * 0.35, R * 0.2, R * 0.12, undefined, -0.6));
     g.restore();
+    DH.shadeFace(g, nut, x - R, x + R, 0.6);
     DH.rim(g, nut, x, 4);
     // the round door hole (chewed), dark inside
     ink(g, ell(x + 3, cy + 2, 11, 10), '#140a12', 2.4);
@@ -231,6 +232,7 @@
     g.lineWidth = 4.6; g.strokeStyle = LINE; g.stroke(H);
     g.fillStyle = '#7c8a44'; g.fill(H);
     DH.crescent(g, H, '#4c5a34', 4, -4);
+    DH.shadeFace(g, H, x - R * 1.3, x + R * 1.3, 0.5);
     DH.rim(g, H, x, 3.4, 'rgba(255,224,130,0.95)');
     g.save(); g.clip(H);
     g.lineWidth = 0.8; g.strokeStyle = 'rgba(40,50,30,0.6)';

@@ -92,7 +92,7 @@
     update(dt, t, L) {
       // across and back, slow as a snail
       boat.x += boat.dir * dt * 4.5;
-      if (boat.x > 790) boat.dir = -1; if (boat.x < 380) boat.dir = 1;
+      if (boat.x > 770) boat.dir = -1; if (boat.x < 400) boat.dir = 1;
       boat.pole += dt * 1.1;
       boat.rock.step(dt);
       boat.bell = Math.max(0, boat.bell - dt * 0.7);

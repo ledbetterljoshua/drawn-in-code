@@ -51,7 +51,7 @@
     // a few broad blades arching over, out of focus and hazed toward the sky
     // [x, height, width, bend]: a hedge of broad far leaves and a couple of tall blades, low on the bank
     // [x, height, width, bend, kind]: far clover on long stalks, and tall blades at the edges
-    const spec = [[-300, 640, 70, 200, 'blade'], [-60, 300, 0, -30, 'clover'], [110, 200, 0, 20, 'clover'], [1110, 170, 0, -20, 'clover'], [1660, 560, 64, -220, 'blade'], [1850, 320, 0, 30, 'clover']];
+    const spec = [[-330, 520, 70, 200, 'blade'], [-80, 120, 0, -20, 'clover'], [90, 90, 0, 14, 'clover'], [460, 70, 0, -10, 'clover'], [1880, 110, 0, 20, 'clover']];
     for (const [x, h, w, bend, kind] of spec) {
       if (x < v.x0 - 400 || x > v.x1 + 400) continue;
       giants.push({ x, h, w: w || 10, bend, kind, ph: x * 0.01, near: clamp(1 - Math.abs(x - SUN.x) / 900, 0, 1) });
@@ -142,7 +142,7 @@
       bokeh.push({ x, y, r: 3 + r() * 11 * (0.4 + near), near, ph: r() * TAU, sp: 0.6 + r() * 1.4 });
     }
   });
-  layer({
+  if (false) layer({
     id: 'bokeh', z: 5,
     draw(g, t) {
       g.save(); g.globalCompositeOperation = 'lighter';

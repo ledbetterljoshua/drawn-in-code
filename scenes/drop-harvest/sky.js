@@ -79,11 +79,11 @@
   // a mass of cloud lit from *below*: dark crown, a gold underside where it faces the rift
   function cloudSprite(seed, w, h, warm) {
     // a long roll of cloud: a bulging crown over a flatter underside, both built of wide ellipses
-    const r = rng(seed), crown = [], belly = [];
+    const r = rng(seed), crown = [], belly = [], tall = r() < 0.35;
     const n = Math.max(3, Math.round(w / (h * 1.1)));
     for (let i = 0; i < n; i++) {
       const u = n === 1 ? 0.5 : i / (n - 1), x = lerp(-w / 2 + h * 0.8, w / 2 - h * 0.8, u);
-      const hump = Math.sin(u * Math.PI);
+      const hump = Math.sin(u * Math.PI) * (tall ? 1.8 : 1);
       crown.push([x + (r() - 0.5) * h * 0.4, -h * (0.12 + hump * 0.22 + r() * 0.12), h * (0.75 + r() * 0.5), h * (0.32 + hump * 0.12 + r() * 0.1)]);
       belly.push([x + (r() - 0.5) * h * 0.6, h * (0.12 + r() * 0.06), h * (1.1 + r() * 0.5), h * (0.18 + r() * 0.06)]);
     }
@@ -99,8 +99,8 @@
       DH.cel(g, U, {
         dark: warm > 0.5 ? '#2a2444' : C.storm0,
         base: warm > 0.5 ? '#3c3456' : C.storm1,
-        lit: warm > 0.7 ? '#b07078' : warm > 0.4 ? '#6e5a78' : C.storm3,
-        dd: [0, h * 0.2], ld: [0, -h * 0.09],
+        lit: warm > 0.7 ? '#b07078' : warm > 0.4 ? '#5e4e6c' : '#3a3554',
+        dd: [0, h * 0.2], ld: [0, -h * (warm > 0.4 ? 0.09 : 0.05)],
       });
       if (warm > 0.7) {
         // a hot hem on the clouds right over the sun
@@ -128,10 +128,9 @@
     const v = st.view, r = rng(7);
     // high masses fill the phone's tall sky; the low row hangs right over the rift
     const rows = [
-      { y: 486, n: 4, w: [520, 820], h: [60, 80], warm: 0.85, sp: 7 },
-      { y: 380, n: 3, w: [700, 1000], h: [80, 100], warm: 0.55, sp: 5 },
-      { y: 230, n: 3, w: [800, 1200], h: [90, 120], warm: 0.3, sp: 4 },
-      { y: 80, n: 3, w: [900, 1300], h: [100, 130], warm: 0.15, sp: 3 },
+      { y: 440, n: 4, w: [500, 900], h: [60, 90], warm: 0.65, sp: 5.5 },
+      { y: 300, n: 3, w: [800, 1300], h: [100, 140], warm: 0.3, sp: 4 },
+      { y: 120, n: 3, w: [1000, 1500], h: [130, 180], warm: 0.12, sp: 3 },
     ];
     for (let y = -90; y > v.y0 - 200; y -= 190) rows.push({ y, n: 2, w: [1000, 1400], h: [110, 150], warm: 0.05, sp: 2.5 });
     let seed = 11;
@@ -139,7 +138,7 @@
       const span = v.x1 - v.x0 + 1400;
       for (let i = 0; i < R.n; i++) {
         const w = lerp(R.w[0], R.w[1], r()), h = lerp(R.h[0], R.h[1], r());
-        masses.push({ sp: cloudSprite(seed++, w, h, R.warm), x: v.x0 - 700 + (i + r() * 0.6) * (span / R.n), y: R.y + (r() - 0.5) * 50, v: R.sp * (0.8 + r() * 0.4), span, w });
+        masses.push({ sp: cloudSprite(seed++, w, h, R.warm), x: v.x0 - 700 + (i + r() * 0.9) * (span / R.n), y: R.y + (r() - 0.5) * h * 1.2, v: R.sp * (0.8 + r() * 0.4), span, w });
       }
     }
     for (let i = 0; i < 6; i++) {

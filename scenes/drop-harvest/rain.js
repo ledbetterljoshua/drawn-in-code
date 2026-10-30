@@ -20,7 +20,7 @@
     back: { n: 260, sp: 1500, len: [16, 34], w: 0.9, y: () => FAR - 4 + Math.random() * 10, list: [] },
     mid: { n: 200, sp: 1350, len: [24, 46], w: 1.15, y: () => FAR + 8 + Math.random() ** 1.6 * 330, list: [] },
     near: { n: 64, sp: 1150, r: [2, 3.6], y: () => SHORE + 10 + Math.random() * 340, list: [] },
-    fore: { n: 9, sp: 1050, r: [5, 8.5], y: () => 1020 + Math.random() * 260, list: [] },
+    fore: { n: 10, sp: 1050, r: [5, 8.5], y: () => 1020 + Math.random() * Math.max(260, st.view.y1 - 1080), list: [] },
   };
 
   function reset(b, d, first) {

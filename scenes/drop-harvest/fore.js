@@ -27,14 +27,14 @@
     for (let x = -900; x < 545; x += 14 + r() * 18) cushions.push([x, bankY(x) + 8 + r() * 8, 14 + r() * 20 * (x > 420 ? 0.6 : 1)]);
   })();
   // the shore curls back under toward the bottom left (the phone sees a lot of it)
-  const shoreX = (y) => (y < 1060 ? 548 : 548 - (y - 1060) * 0.55);
+  const shoreX = (y) => (y < 1060 ? 548 : 548 - (y - 1060) ** 1.25 * 0.9);
   const bankPath = () => {
     const v = st.view, p = new Path2D(), yb = Math.max(v.y1, 1250) + 40;
     for (const [x, y, rr] of cushions) circ(x, y, rr, p);
     p.moveTo(v.x0 - 40, yb); p.lineTo(v.x0 - 40, 1010);
     for (let x = v.x0 - 40; x <= 540; x += 8) p.lineTo(x, bankY(x) + 14);
     for (let y = bankY(540) + 14; y <= yb; y += 20) p.lineTo(shoreX(y), y);
-    p.lineTo(v.x0 - 40, yb); p.closePath();
+    p.lineTo(Math.min(v.x0 - 40, shoreX(yb)), yb); p.closePath();
     return p;
   };
   // points on the silhouette: tops of cushions not buried in a neighbour
@@ -206,7 +206,7 @@
   });
 
   // ------------------------------------------------------------ the wet stone
-  const STONE = { x: 1430, y: 1176, rx: 176, ry: 64 };
+  const STONE = { x: 1440, y: 1112, rx: 132, ry: 52 };
   const stone = { beads: [], run: 0 };
   onLayout(() => {
     stone.beads.length = 0;
@@ -262,7 +262,7 @@
     edge.push({ x: v.x0 + 10, base: v.y1 + 40, top: Math.max(v.y0, -100) + 300, w: 90, bend: 200, ph: 0.3 });
     edge.push({ x: v.x1 - 20, base: v.y1 + 40, top: Math.max(v.y0, -100) + 420, w: 80, bend: -210, ph: 2.4 });
   });
-  layer({
+  if (false) layer({
     id: 'edge-blades', z: 34,
     draw(g, t) {
       for (const E of edge) {

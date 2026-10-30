@@ -13,7 +13,7 @@
   DH.HZ = 700;          // eye level
   DH.FAR = 726;         // the far shore's waterline
   DH.SHORE = 792;       // the island's front waterline
-  DH.SUN = { x: 712, y: 618, r: 30 };
+  DH.SUN = { x: 826, y: 622, r: 28 };
 
   // ink: a deep plum that belongs to the storm
   const LINE = (Drawn.style.line = '#251828');
@@ -58,6 +58,17 @@
     const s = DH.sunSide(x);
     DH.crescent(g, Pth, color, -s * w, w * 0.7, alpha);
   };
+  // a face turned from a sun that's behind it: shade across the whole shape, deepening away from
+  // the sunward edge (x0..x1 is the shape's horizontal extent)
+  DH.shadeFace = function (g, Pth, x0, x1, k = 0.6) {
+    const s = DH.sunSide((x0 + x1) / 2);
+    const a = s > 0 ? x1 : x0, b = s > 0 ? x0 : x1;
+    g.save(); g.clip(Pth);
+    const gr = g.createLinearGradient(a, 0, b, 0);
+    gr.addColorStop(0, `rgba(30,22,50,${k * 0.15})`); gr.addColorStop(0.22, `rgba(30,22,50,${k * 0.75})`); gr.addColorStop(1, `rgba(24,18,42,${k})`);
+    g.fillStyle = gr; g.fillRect(Math.min(a, b) - 2, -1e4, Math.abs(b - a) + 4, 2e4);
+    g.restore();
+  };
   // warm bounce from the water on the underside
   DH.bounce = (g, Pth, w = 4, color = 'rgba(246,165,100,0.35)') => DH.crescent(g, Pth, color, 0, -w);
 
@@ -79,6 +90,17 @@
   DH.glassDrop = function (g, x, y, r, o = {}) {
     const sx = o.sx || 1, sy = o.sy || 1, a = o.alpha == null ? 1 : o.alpha, br = o.bright || 0;
     const side = DH.sunSide(x);
+    if (r * Math.max(sx, sy) < 2.8 && !o.flat) {
+      // too small for refraction to read: a tinted bead, a gold caustic, a glint
+      const rr = r * Math.max(sx, sy);
+      g.globalAlpha = a;
+      g.fillStyle = 'rgba(40,34,70,0.45)'; g.fill(circ(x, y, rr));
+      g.fillStyle = 'rgba(255,214,140,0.9)'; g.fill(circ(x - side * rr * 0.2, y + rr * 0.35, rr * 0.5));
+      g.fillStyle = 'rgba(255,252,242,0.95)'; g.fill(circ(x + side * rr * 0.35, y - rr * 0.4, Math.max(0.45, rr * 0.28)));
+      g.lineWidth = 0.6; g.strokeStyle = 'rgba(37,24,40,0.7)'; g.stroke(circ(x, y, rr));
+      g.globalAlpha = 1;
+      return;
+    }
     g.save();
     g.translate(x, y); g.scale(sx, sy);
     const body = new Path2D();
@@ -131,9 +153,11 @@
   DH.fallingDrop = function (g, x, y, r, vx, vy, glow, a = 1) {
     const sp = Math.hypot(vx, vy) || 1, ux = vx / sp, uy = vy / sp;
     const len = r * 7 + sp * 0.012;
-    g.globalAlpha = a * 0.45;
-    g.strokeStyle = glow > 0.4 ? `rgba(255,${210 + glow * 30 | 0},150,1)` : 'rgba(200,196,228,1)';
-    g.lineWidth = r * 0.9;
+    const sg = g.createLinearGradient(x - ux * len, y - uy * len, x, y);
+    const c = glow > 0.4 ? `255,${210 + glow * 30 | 0},150` : '214,210,240';
+    sg.addColorStop(0, `rgba(${c},0)`); sg.addColorStop(1, `rgba(${c},${0.55 * a})`);
+    g.strokeStyle = sg; g.lineCap = 'round';
+    g.lineWidth = Math.max(0.8, r * 0.38);
     g.beginPath(); g.moveTo(x - ux * len, y - uy * len); g.lineTo(x - ux * r, y - uy * r); g.stroke();
     g.globalAlpha = a;
     g.save(); g.translate(x, y); g.rotate(Math.atan2(uy, ux) - Math.PI / 2);

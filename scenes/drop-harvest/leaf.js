@@ -71,10 +71,10 @@
     g.fillStyle = LF.under; g.fill(blade);
     g.save(); g.clip(blade);
     // light through the leaf: hottest by the tip, where the sun is behind it
-    g.fillStyle = grad(g, 1000, 0, 1800, 0, [[0, '#a4b84e'], [0.4, '#7c9248'], [1, '#4e6440']]);
+    g.fillStyle = grad(g, 1000, 0, 1800, 0, [[0, '#94a04a'], [0.35, '#6c7c44'], [1, '#3c4c3a']]);
     g.fillRect(980, 120, 840, 360);
     g.save(); g.translate(1060, 450); g.scale(1.5, 1);
-    g.fillStyle = radial(g, 0, 0, 0, 360, [[0, 'rgba(244,248,170,0.95)'], [0.3, 'rgba(214,230,110,0.7)'], [0.7, 'rgba(170,196,80,0.25)'], [1, 'rgba(170,196,80,0)']]);
+    g.fillStyle = radial(g, 0, 0, 0, 340, [[0, 'rgba(250,236,150,0.9)'], [0.3, 'rgba(214,206,100,0.55)'], [0.7, 'rgba(170,170,80,0.2)'], [1, 'rgba(170,170,80,0)']]);
     g.fillRect(-360, -360, 720, 720);
     g.restore();
     // the shadowed belly near the stalk, where the blade is thick and turned from the sun
@@ -174,7 +174,7 @@
     },
     update(dt, t, L) {
       const w = Drawn.wind(t, 1400);
-      const target = -0.004 - 0.008 * (w - 0.6) + Math.sin(t * 0.9) * 0.002 - (L.hovered ? 0.05 : 0) - state.pour * 0.01;
+      const target = -0.004 - 0.008 * (w - 0.6) + Math.sin(t * 0.9) * 0.002 - (L.hovered ? 0.085 : 0) - state.pour * 0.015;
       state.v += (-(state.a - target) * 60 - state.v * 5) * dt;
       state.a += state.v * dt;
       state.pour = ease(state.pour, L.hovered && L.since > 0.25 ? 1 : 0, L.hovered ? 3 : 1.5, dt);

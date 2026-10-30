@@ -33,7 +33,16 @@
         g.restore();
       }
       g.globalCompositeOperation = darken ? 'source-atop' : 'source-over';
-      if (darken) { g.fillStyle = 'rgba(16,12,30,0.3)'; g.fillRect(x0, y0, w, h); }
+      if (darken) {
+        g.fillStyle = 'rgba(14,10,28,0.5)'; g.fillRect(x0, y0, w, h);
+        // the rain breaks it into dashes: thin bright and dark streaks across the mirrored shapes
+        const rr = Drawn.rng(17);
+        for (let yy = DH.SHORE; yy < y0 + h; yy += 3 + rr() * 5) {
+          const xx = x0 + rr() * w, L = 20 + rr() * 120;
+          g.fillStyle = rr() < 0.5 ? 'rgba(10,8,24,0.5)' : 'rgba(190,170,210,0.12)';
+          g.fillRect(xx, yy, L, 1 + rr() * 1.5);
+        }
+      }
       g.fillStyle = waterBody(g, v); g.fillRect(x0, y0, w, h);
       g.restore();
     };
@@ -46,16 +55,15 @@
 
   function paintClouds(t) {
     const { g, c, x0, y0, k } = cl, v = st.view;
-    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, c.width, c.height);
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.drawImage(sky.c, 0, 0, c.width, c.height);
     g.setTransform(st.R * k, 0, 0, st.R * k, -x0 * st.R * k, -y0 * st.R * k);
-    g.save(); g.translate(0, 2 * HZ); g.scale(1, -1);
+    g.save();
+    g.beginPath(); g.rect(x0, FAR + 6, cl.w, cl.h); g.clip();
+    g.translate(0, 2 * HZ); g.scale(1, -1);
+    g.globalAlpha = 0.55;
     for (const m of DH.masses) if (2 * HZ - m.y < v.y1 + 300) Drawn.blit(g, m.sp, m.x, m.y);
     g.restore();
-    g.globalCompositeOperation = 'source-atop';
-    g.fillStyle = waterBody(g, v, 1.1); g.fillRect(x0, y0, cl.w, cl.h);
-    g.globalCompositeOperation = 'source-over';
-    // nothing of the sky shows through where the far bank stands
-    g.clearRect(x0, y0, cl.w, FAR + 8 - y0);
   }
 
   // floating things: petals shed by the foxglove, seeds, a few rain bubbles that drift and pop
@@ -63,7 +71,8 @@
   onLayout(() => {
     floats.length = 0;
     const r = Drawn.rng(808), v = st.view;
-    for (let i = 0; i < 7; i++) floats.push({ kind: r() < 0.5 ? 'petal' : 'seed', x: lerp(v.x0, v.x1, r()), y: lerp(FAR + 30, Math.min(v.y1, 1250), r() ** 0.8), a: r() * TAU, s: 0.7 + r() * 0.6, ph: r() * TAU });
+    const nF = 7 + Math.round(Math.max(0, v.y1 - 1250) / 120);
+    for (let i = 0; i < nF; i++) floats.push({ kind: r() < 0.5 ? 'petal' : 'seed', x: lerp(v.x0, v.x1, r()), y: lerp(FAR + 30, v.y1 - 40, r() ** 0.8), a: r() * TAU, s: 0.7 + r() * 0.6, ph: r() * TAU });
   });
   const bubbles = [];
 
@@ -89,7 +98,7 @@
       }
       // heavy rain raises bubbles that ride the surface a while
       if (Math.random() < dt * 3 * DH.storm.I && bubbles.length < 26) {
-        const y = lerp(FAR + 40, Math.min(v.y1, 1250), Math.random() ** 0.7);
+        const y = lerp(FAR + 40, v.y1 - 30, Math.random() ** 0.7);
         let x = lerp(v.x0, v.x1, Math.random());
         if (!(x > 850 && x < 1690 && y < SHORE + 10)) bubbles.push({ x, y, r: (1.6 + Math.random() * 3) * (0.5 + (y - FAR) / 500), age: 0, life: 2 + Math.random() * 5 });
       }
@@ -108,14 +117,13 @@
       let y = FAR;
       while (y < v.y1) {
         const d = y - FAR;
-        const h = 2 + Math.min(6, d * 0.012);
+        const h = 2.4 + Math.min(7, d * 0.014);
         const amp = (0.7 + d * 0.007) * (0.7 + I * 0.4) * (1 + DH.gust.v * 1.5);
         let off = noise(y * 0.21 + t * 2.3) * amp + Math.sin(y * 0.7 + t * 5) * amp * 0.35;
         if (stir.a > 0.01) { const q = Math.exp(-((y - stir.y) ** 2) / 1800); off += Math.sin(y * 0.5 - t * 9) * 6 * stir.a * q; }
         const sy = (y - sky.y0) * R, sh = h * R;
         if (sy + sh > sky.c.height) break;
-        g.drawImage(sky.c, 0, sy, sky.c.width, sh, sky.x0 + off, y, sky.w, h + 0.4);
-        g.drawImage(cl.c, 0, sy * cl.k, cl.c.width, sh * cl.k, cl.x0 + off * 1.2, y, cl.w, h + 0.4);
+        g.drawImage(cl.c, 0, sy * cl.k, cl.c.width, sh * cl.k, cl.x0 + off, y, cl.w, h + 0.4);
         g.drawImage(obj.c, 0, sy, obj.c.width, sh, obj.x0 + off * 1.3, y, obj.w, h + 0.4);
         y += h;
       }
@@ -137,22 +145,22 @@
       const gy0 = 2 * HZ - SUN.y - 8;
       g.save(); g.globalCompositeOperation = 'lighter';
       const sun = 1 + DH.storm.sun * 0.9;
-      for (let i = 0; i < 150; i++) {
-        const u = i / 150, yy = gy0 + u * u * (Math.min(v.y1, 1500) - gy0);
-        const spread = 14 + u * 150 * sun;
-        const seed = Math.floor(t * 6 + i * 3.7);
-        const xx = SUN.x + (hash(seed) - 0.5) * 2 * spread * (0.4 + hash(seed + 1));
-        const len = (6 + hash(seed + 2) * 22) * (0.4 + u);
-        const a = (1 - u) ** 1.2 * 0.85 * (0.4 + hash(seed + 3) * 0.6) * sun;
+      // broken, tapering sparkle: dense and bright near the horizon, scattered and thin toward us
+      for (let i = 0; i < 170; i++) {
+        const u = i / 170, yy = gy0 + u ** 1.6 * (Math.min(v.y1, 1500) - gy0);
+        const spread = 10 + u * 110 * sun;
+        const seed = Math.floor(t * (5 + (i % 3)) + i * 3.7);
+        const xx = SUN.x + (hash(seed) - 0.5) * 2 * spread * (0.3 + hash(seed + 1) * 0.7);
+        if (xx > 852 && yy < 820) continue;
+        const len = (3 + hash(seed + 2) * 16) * (0.5 + u * 0.8) * (1 - u * 0.4);
+        const a = (1 - u) ** 1.6 * 0.9 * (hash(seed + 3) < 0.35 ? 0.15 : 0.5 + hash(seed + 3) * 0.5) * sun;
         g.fillStyle = `rgba(255,${210 + hash(i) * 40 | 0},150,${a})`;
-        g.fillRect(xx - len / 2, yy, len, 1 + u * 2.2);
+        g.fillRect(xx - len / 2, yy, len, 0.8 + u * 1.6);
       }
       // a warm swell of the reflected rift right under the far bank
       g.fillStyle = radial(g, SUN.x, gy0, 0, 300, [[0, `rgba(255,214,150,${0.3 * sun})`], [1, 'rgba(255,190,120,0)']]);
       g.save(); g.translate(SUN.x, gy0); g.scale(2.6, 0.5); g.translate(-SUN.x, -gy0); g.fill(circ(SUN.x, gy0, 300)); g.restore();
-      // the column of the sun's reflection, soft, down toward us
-      g.fillStyle = grad(g, 0, gy0, 0, Math.min(v.y1, 1400), [[0, `rgba(255,200,130,${0.22 * sun})`], [1, 'rgba(255,180,120,0)']]);
-      g.save(); g.translate(SUN.x, 0); g.scale(1, 1); g.fill(poly([[-30, gy0], [30, gy0], [150, Math.min(v.y1, 1400)], [-150, Math.min(v.y1, 1400)]])); g.restore();
+
       g.restore();
 
       // rings from the rain

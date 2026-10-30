@@ -82,3 +82,28 @@ Five worst things now:
 4. **Far "leaves" float as translucent surfboards,** and bokeh sits in front of the island like soap
    bubbles. → darker, attached silhouettes; bokeh only low by the far bank near the sun, fainter.
 5. **The heap's drops are flat-bottomed domes** that read as onions. → rounder, more varied sizes.
+
+## Round 4 — first critic (fresh eyes, screenshots only)
+
+The critic's ten, worst first: (1) the light contradicts itself — sun behind, but leaf, cap and moss lit
+flat from the front; (2) the island is an ant-farm cutaway on a ruler-straight waterline, mirrored at
+full value; (3) a symmetric gate round an empty centre, sun dead centre, the glitter a hard trapezoid,
+a grey dome tangent to the bottom edge; (4) the phone has a black wedge, an empty bottom 40%, edge blades
+across the island; (5) the harvest story can't be read — workers tiny and soil-coloured, hovers barely
+change anything; (6) clouds are repeating stripes with the same pale hem; (7) every plane has the same
+line and contrast, the edge blades read as smudges on glass; (8) near drops read as cigarettes, bokeh is
+a lens effect pasted into a flat illustration; (9) clone-stamp bells, a constant-width pipe of a stem, a
+perfect web; (10) the brightest, most saturated thing is the lime leaf in the corner.
+
+Done this round: sun moved off-axis (x 712 → 826) so the jetty, crane and cistern stand against the
+hottest sky and the glitter leads to them; `DH.shadeFace` puts every house and the cup into backlight
+(shade across, deepening away from the sunward edge, rim only on the sun side); the island's face is
+now moss down to a band of wet soil at the waterline, coves in the shore, sedge along it, stones in the
+shallows; the object reflection is darker and broken into dashes; glitter is broken tapering sparkle (no
+trapezoid); the stone is fully in frame; no bokeh, no edge blades; streaks are thin fading gradients;
+clouds vary in size and only low ones get a warm hem; leaf knocked down to olive with a warmer glow;
+foxglove spike graduated to closed buds at the top, uneven spacing, one bell drooping; phone bank curls
+away, fore drops and floats fill the phone's lower water.
+
+Still to do from the critique: (5) hero action and hover payoffs; (7) plane separation by line weight
+and haze; (9) web and blade irregularity.

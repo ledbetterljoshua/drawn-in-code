@@ -14,7 +14,9 @@
   const M = C.moss, S = C.soil;
 
   // the front waterline, gently wavering in toward us at the middle
-  const shoreY = (x) => SHORE + 6 * Math.sin((x - 858) / 822 * Math.PI) + 2 * noise(x * 0.05);
+  // the front waterline: wavering in toward us at the middle, with a couple of little coves
+  const shoreY = (x) => SHORE + 6 * Math.sin((x - 858) / 822 * Math.PI) + 4 * noise(x * 0.03) + 2 * noise(x * 0.11)
+    - 7 * Math.exp(-(((x - 1258) / 40) ** 2)) - 5 * Math.exp(-(((x - 1470) / 30) ** 2));
   DH.shoreY = shoreY;
   DH.groundAt = (x) => (x > 870 && x < 1670 ? DH.ridgeY(x) : SHORE + 40 + Math.random() * 200);
 
@@ -27,114 +29,111 @@
     return p;
   }
 
+  // where the moss gives way to bare wet soil, partway down the face
+  const mossFoot = (x) => { const top = DH.ridgeY(x), bot = shoreY(x); return top + (bot - top) * (0.62 + 0.14 * noise(x * 0.02 + 5)) + 6 * Math.abs(noise(x * 0.09)); };
+
   function paintIsland(g) {
     const B = bodyPath();
     const r = rng(101);
-    // the face is in shade (the sun is behind the island): cool and dark, wetter toward the water,
-    // a warm bounce off the bright water only low down on the sun's side
-    g.fillStyle = grad(g, 0, 620, 0, SHORE, [[0, '#2c1e2c'], [0.55, '#231824'], [1, '#150d17']]);
+    // under the moss, a band of wet soil at the waterline: dark, cool, a warm bounce off the water
+    g.fillStyle = grad(g, 0, 640, 0, SHORE, [[0, '#24182a'], [1, '#120a14']]);
     g.fill(B);
     g.save(); g.clip(B);
-    g.fillStyle = radial(g, 880, SHORE + 10, 0, 300, [[0, 'rgba(240,150,100,0.42)'], [0.5, 'rgba(200,110,100,0.15)'], [1, 'rgba(200,110,100,0)']]);
+    g.fillStyle = radial(g, SUN.x + 40, SHORE + 10, 0, 340, [[0, 'rgba(240,150,100,0.45)'], [0.5, 'rgba(200,110,100,0.14)'], [1, 'rgba(200,110,100,0)']]);
     g.fillRect(850, 560, 600, 260);
-    g.fillStyle = grad(g, 0, SHORE - 50, 0, SHORE, [[0, 'rgba(160,110,140,0)'], [1, 'rgba(160,110,140,0.22)']]);
-    g.fillRect(850, SHORE - 50, 840, 50);
-    // clods of humus: soft darker and lighter lumps, no stripes
-    for (let i = 0; i < 70; i++) {
-      const x = 870 + r() * 800, top = DH.ridgeY(x) + 30, y = top + r() * Math.max(4, shoreY(x) - top - 10);
-      const rr = 6 + r() * 16;
-      g.fillStyle = r() < 0.55 ? 'rgba(12,6,14,0.18)' : 'rgba(90,60,76,0.1)';
-      g.fill(DH.blob(x, y, rr * 1.4, rr * 0.8, 7, 0.4, i));
-    }
-    // grit
-    for (let i = 0; i < 220; i++) {
-      const x = 860 + r() * 820, y = DH.ridgeY(x) + 24 + r() * (shoreY(x) - DH.ridgeY(x) - 24);
-      g.fillStyle = r() < 0.5 ? 'rgba(130,92,100,0.4)' : 'rgba(8,4,10,0.45)';
+    for (let i = 0; i < 140; i++) {
+      const x = 860 + r() * 820, y = mossFoot(x) + r() * (shoreY(x) - mossFoot(x));
+      g.fillStyle = r() < 0.5 ? 'rgba(130,92,100,0.35)' : 'rgba(6,3,8,0.4)';
       g.fill(circ(x, y, 0.5 + r() * 1.3));
     }
-    // a few stones bedded in the face, mostly half-buried, and a cluster at the waterline
-    const stones = [[968, 744, 9], [1150, 706, 7], [1452, 690, 8], [905, 786, 11], [930, 790, 7], [1092, 788, 14], [1120, 792, 8], [1340, 788, 12], [1372, 792, 7], [1560, 784, 13], [1594, 790, 8], [1470, 790, 6]];
-    for (const [x, y, sz] of stones) {
-      const tone = r();
-      const p = DH.blob(x, y, sz * 1.3, sz * 0.82, 9, 0.22, x);
-      g.fillStyle = 'rgba(6,4,10,0.5)'; g.fill(DH.blob(x + 1, y + 3, sz * 1.4, sz * 0.9, 9, 0.22, x));
-      ink(g, p, tone < 0.5 ? '#3e3850' : '#4a3e44', 1.4);
-      DH.crescent(g, p, tone < 0.5 ? '#2a2438' : '#2f262c', 0, -sz * 0.35);
-      DH.crescent(g, p, y > 770 ? 'rgba(255,170,120,0.55)' : 'rgba(200,140,150,0.35)', 0, -2.2);
-      DH.crescent(g, p, 'rgba(255,200,140,0.5)', -DH.sunSide(x) * 2, 1.5);
-    }
-    // little bracket fungi on the face, rimmed in gold
-    for (const [x, y, s2] of [[1196, 724, 1], [1210, 736, 0.7], [1528, 724, 0.9], [1010, 728, 0.6]]) {
-      const sh = new Path2D(); sh.moveTo(x - 11 * s2, y); sh.quadraticCurveTo(x, y - 9 * s2, x + 11 * s2, y); sh.quadraticCurveTo(x, y + 3 * s2, x - 11 * s2, y); sh.closePath();
-      g.fillStyle = 'rgba(6,4,10,0.45)'; g.fill(ell(x, y + 4 * s2, 10 * s2, 2.5 * s2));
-      ink(g, sh, '#c07040', 1.3);
-      DH.crescent(g, sh, '#7a3a2a', 0, -2.5 * s2);
-      g.lineWidth = 1.2; g.strokeStyle = '#f0c080'; g.beginPath(); g.moveTo(x - 10 * s2, y - 0.5); g.quadraticCurveTo(x, y - 8 * s2, x + 10 * s2, y - 0.5); g.stroke();
-    }
-    // root tangles hanging from under the moss, some reaching into the water
+    // roots hanging out of the moss over the soil, into the water
     g.lineCap = 'round';
-    for (const cx of [890, 1060, 1236, 1400, 1630]) {
-      const y0 = DH.ridgeY(cx) + 22;
-      const n = 5 + (r() * 4 | 0);
+    for (const cx of [900, 1080, 1200, 1390, 1560, 1640]) {
+      const n = 3 + (r() * 4 | 0);
       for (let i = 0; i < n; i++) {
-        const x = cx + (r() - 0.5) * 50, len = (shoreY(x) - y0) * (0.4 + r() * 0.7);
-        const pts = [[x, y0 + r() * 8]];
+        const x = cx + (r() - 0.5) * 40, y0 = mossFoot(x) - 4, len = (shoreY(x) - y0) * (0.7 + r() * 0.7);
+        const pts = [[x, y0]];
         let px = x, py = y0;
-        for (let k = 0; k < 6; k++) { py += len / 6; px += (r() - 0.5) * 14 + (k > 3 ? (r() - 0.5) * 10 : 0); pts.push([px, py]); }
+        for (let k = 0; k < 4; k++) { py += len / 4; px += (r() - 0.5) * 10; pts.push([px, py]); }
         const p = curve(pts, false);
-        g.lineWidth = 2.6 + r() * 1.4; g.strokeStyle = 'rgba(8,4,10,0.6)'; g.stroke(p);
-        g.lineWidth = 1 + r() * 1.4; g.strokeStyle = r() < 0.5 ? '#7a5a5a' : '#6a4a52'; g.stroke(p);
-        g.lineWidth = 0.6; g.strokeStyle = 'rgba(255,180,140,0.35)'; g.save(); g.translate(-0.6, -0.4); g.stroke(p); g.restore();
-        const [tx, ty] = pts[pts.length - 1];
-        if (ty < shoreY(tx) - 6 && r() < 0.5) DH.glassDrop(g, tx, ty + 2.5, 1.6 + r());
+        g.lineWidth = 2.4; g.strokeStyle = 'rgba(6,3,8,0.6)'; g.stroke(p);
+        g.lineWidth = 1.1; g.strokeStyle = '#6a4a52'; g.stroke(p);
       }
     }
-    // the wet band at the waterline, and the meniscus where the soil meets the water
-    g.fillStyle = grad(g, 0, SHORE - 26, 0, SHORE + 6, [[0, 'rgba(8,4,14,0)'], [1, 'rgba(8,4,14,0.65)']]);
-    g.fillRect(850, SHORE - 30, 840, 50);
+    // the moss: a thick mat covering most of the face, in shade toward us
+    const mat = new Path2D();
+    mat.moveTo(864, DH.ridgeY(864) - 2);
+    for (let x = 864; x <= 1676; x += 5) mat.lineTo(x, DH.ridgeY(x) - 2 - Math.abs(noise(x * 0.11)) * 5);
+    for (let x = 1676; x >= 864; x -= 6) mat.lineTo(x, mossFoot(x));
+    mat.closePath();
+    g.lineWidth = 3.6; g.strokeStyle = LINE; g.stroke(mat);
+    g.fillStyle = grad(g, 0, 620, 0, SHORE, [[0, '#2a3c2a'], [0.6, '#1d2a20'], [1, '#18201a']]); g.fill(mat);
+    g.save(); g.clip(mat);
+    // cushions within the mat: soft lumps, a little lighter on their sun-facing shoulders
+    for (let i = 0; i < 90; i++) {
+      const x = 866 + r() * 810, top = DH.ridgeY(x), y = top + 8 + r() * (mossFoot(x) - top - 6), rr = 8 + r() * 16;
+      const c = circ(x, y, rr);
+      g.fillStyle = 'rgba(8,14,10,0.3)'; g.fill(ell(x + 2, y + rr * 0.6, rr, rr * 0.4));
+      g.fillStyle = r() < 0.5 ? 'rgba(46,64,40,0.22)' : 'rgba(30,44,32,0.22)'; g.fill(c);
+    }
+    // stipple of shoots
+    for (let i = 0; i < 700; i++) {
+      const x = 866 + r() * 810, top = DH.ridgeY(x), y = top + 4 + r() * (mossFoot(x) - top);
+      g.fillStyle = r() < 0.5 ? 'rgba(120,150,80,0.3)' : 'rgba(8,14,8,0.4)'; g.fillRect(x, y, 1.2, 1.8);
+    }
+    // a warm bounce on the mat's lower lip from the bright water
+    g.fillStyle = grad(g, 0, SHORE - 70, 0, SHORE, [[0, 'rgba(240,150,110,0)'], [1, 'rgba(240,150,110,0.18)']]);
+    g.fillRect(850, SHORE - 70, 840, 70);
     g.restore();
-    g.lineWidth = 2.8; g.strokeStyle = LINE; g.stroke(B);
+    // beards of moss hanging off the mat's lip
+    for (let x = 874; x < 1670; x += 8 + r() * 22) {
+      const y = mossFoot(x) - 2, L = 6 + r() * 20;
+      g.lineWidth = 2.6; g.strokeStyle = LINE; g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + 3, y + L * 0.6, x - 1, y + L); g.stroke();
+      g.lineWidth = 1.4; g.strokeStyle = '#2e4430'; g.stroke();
+      if (r() < 0.35) DH.glassDrop(g, x - 1, y + L + 2, 1.5);
+    }
+    // little bracket fungi on the moss, rimmed in gold
+    for (const [x, y, s2] of [[1196, 704, 1], [1212, 714, 0.7], [1540, 700, 0.9]]) {
+      const sh = new Path2D(); sh.moveTo(x - 11 * s2, y); sh.quadraticCurveTo(x, y - 9 * s2, x + 11 * s2, y); sh.quadraticCurveTo(x, y + 3 * s2, x - 11 * s2, y); sh.closePath();
+      g.fillStyle = 'rgba(6,4,10,0.45)'; g.fill(ell(x, y + 4 * s2, 10 * s2, 2.5 * s2));
+      ink(g, sh, '#a05a38', 1.2);
+      DH.crescent(g, sh, '#5a2a22', 0, -2.5 * s2);
+      g.lineWidth = 1.1; g.strokeStyle = '#f0c080'; g.beginPath(); g.moveTo(x - 10 * s2, y - 0.5); g.quadraticCurveTo(x, y - 8 * s2, x + 10 * s2, y - 0.5); g.stroke();
+    }
+    // stones in the shallows at the waterline
+    for (const [x, sz] of [[905, 11], [928, 7], [1092, 14], [1118, 8], [1340, 12], [1368, 7], [1560, 13], [1590, 8], [1470, 6]]) {
+      const y = shoreY(x) - sz * 0.25;
+      const p = DH.blob(x, y, sz * 1.3, sz * 0.75, 9, 0.22, x);
+      ink(g, p, '#3a3448', 1.4);
+      DH.crescent(g, p, '#241f30', 0, -sz * 0.35);
+      DH.crescent(g, p, 'rgba(255,190,140,0.5)', -DH.sunSide(x) * 2, 1.6);
+    }
+    g.restore();
+    g.lineWidth = 2.4; g.strokeStyle = LINE; g.stroke(B);
+    // sedge and grass at the waterline: thin blades, rimmed
+    for (let x = 870; x < 1670; x += 4 + r() * 14) {
+      if (Math.abs(x - 1258) < 26) continue;
+      const y = shoreY(x) - 1, h = 8 + r() * 22, lean = (r() - 0.4) * 10;
+      g.lineWidth = 2.4; g.strokeStyle = LINE; g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + lean * 0.3, y - h * 0.6, x + lean, y - h); g.stroke();
+      g.lineWidth = 1.2; g.strokeStyle = '#4a5c36'; g.stroke();
+      g.lineWidth = 0.7; g.strokeStyle = 'rgba(255,200,140,0.7)'; g.beginPath(); g.moveTo(x - 0.6, y - h * 0.4); g.quadraticCurveTo(x + lean * 0.3 - 0.6, y - h * 0.6, x + lean - 0.6, y - h); g.stroke();
+    }
+    // the meniscus where it meets the water
     const men = new Path2D();
     for (let x = 858; x <= 1676; x += 8) x === 858 ? men.moveTo(x, shoreY(x) - 1) : men.lineTo(x, shoreY(x) - 1);
-    g.lineWidth = 1.6; g.strokeStyle = 'rgba(255,214,170,0.55)'; g.stroke(men);
-
-    // the moss cap along the ridge: a thick mat overhanging the face, its lumpy lower edge in
-    // shade, its upper fringe lit from behind
-    const mat = new Path2D(), r2 = rng(202);
-    mat.moveTo(864, DH.ridgeY(864));
-    for (let x = 864; x <= 1676; x += 5) mat.lineTo(x, DH.ridgeY(x) - 2 - Math.abs(noise(x * 0.11)) * 5);
-    for (let x = 1676; x >= 864; x -= 7) mat.lineTo(x, DH.ridgeY(x) + 18 + Math.abs(noise(x * 0.035 + 3)) * 26 + (r2() < 0.18 ? 9 + r2() * 12 : 0));
-    mat.closePath();
-    g.lineWidth = 4.6; g.strokeStyle = LINE; g.stroke(mat);
-    g.fillStyle = M.shade; g.fill(mat);
-    // beards of moss hanging off the mat's lip
-    for (let x = 874; x < 1670; x += 10 + r2() * 26) {
-      const y = DH.ridgeY(x) + 22 + Math.abs(noise(x * 0.035 + 3)) * 22, L = 8 + r2() * 26;
-      g.lineWidth = 3; g.strokeStyle = LINE; g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + 3, y + L * 0.6, x - 1, y + L); g.stroke();
-      g.lineWidth = 1.6; g.strokeStyle = '#3c5a34'; g.stroke();
-      if (r2() < 0.4) DH.glassDrop(g, x - 1, y + L + 2, 1.5);
-    }
-    g.save(); g.clip(mat);
-    // lower lumps darker, then the body, then the lit fringe
-    for (let x = 866; x <= 1676; x += 7 + r2() * 6) {
-      const y = DH.ridgeY(x) + 10 + r2() * 12, rr = 6 + r2() * 9;
-      g.fillStyle = r2() < 0.5 ? M.base : '#435f36'; g.fill(circ(x, y - rr * 0.4, rr));
-      g.fillStyle = M.deep; g.fill(ell(x, y + rr * 0.7, rr, rr * 0.45));
-    }
-    g.restore();
-    // fronds: little star sprigs along the top, tips catching gold
+    g.lineWidth = 1.4; g.strokeStyle = 'rgba(255,214,170,0.45)'; g.stroke(men);
+    // the rim of light along the whole ridge, and shoots standing up off it
+    const r2 = rng(202);
     for (let x = 866; x <= 1676; x += 3 + r2() * 4) {
-      const y = DH.ridgeY(x) - 1, near = DH.sunNear(x, y), h = 4 + r2() * 8;
-      const lean = (r2() - 0.5) * 4;
-      g.lineWidth = 1.4; g.strokeStyle = r2() < 0.5 ? M.base : M.lit;
-      g.beginPath(); g.moveTo(x, y + 4); g.lineTo(x + lean, y - h); g.stroke();
-      g.strokeStyle = `rgba(255,${200 + near * 40 | 0},120,${0.35 + near * 0.6})`;
-      g.lineWidth = 1.1; g.beginPath(); g.moveTo(x + lean * 0.7, y - h * 0.6); g.lineTo(x + lean, y - h); g.stroke();
+      const y = DH.ridgeY(x) - 2, near = DH.sunNear(x, y), h = 3 + r2() * 7, lean = (r2() - 0.5) * 4;
+      g.lineWidth = 1.5; g.strokeStyle = '#2a3c2a';
+      g.beginPath(); g.moveTo(x, y + 3); g.lineTo(x + lean, y - h); g.stroke();
+      g.strokeStyle = `rgba(255,${196 + near * 44 | 0},120,${0.4 + near * 0.55})`;
+      g.lineWidth = 1.1; g.beginPath(); g.moveTo(x + lean * 0.6, y - h * 0.5); g.lineTo(x + lean, y - h); g.stroke();
     }
-    // the rim of light along the whole ridge
     const rimP = new Path2D();
     for (let x = 864; x <= 1676; x += 5) { const y = DH.ridgeY(x) - 2 - Math.abs(noise(x * 0.11)) * 5; x === 864 ? rimP.moveTo(x, y) : rimP.lineTo(x, y); }
-    g.lineWidth = 2.2; g.strokeStyle = 'rgba(255,214,130,0.75)'; g.stroke(rimP);
+    g.lineWidth = 2.2; g.strokeStyle = 'rgba(255,210,130,0.8)'; g.stroke(rimP);
   }
   DH.paintIsland = paintIsland;
 

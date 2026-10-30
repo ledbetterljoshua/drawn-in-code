@@ -28,10 +28,11 @@
     bells.length = 0;
     const r = rng(61);
     // biggest at the bottom, buds at the top; they hang off the sun side of the stem
+    let u = 0.42;
     for (let i = 0; i < 11; i++) {
-      const u = 0.42 + i * 0.05;
-      const s = lerp(1.05, 0.35, i / 10) * (0.9 + r() * 0.2);
-      bells.push({ u, s, side: [1, 1, -1, 1, -1, 1, 1, -1, 1, -1, 1][i], ph: r() * TAU, wet: r(), a: 0, v: 0 });
+      u += i ? 0.036 + r() * 0.03 - i * 0.0015 : 0;
+      const s = lerp(1.08, 0.3, (i / 10) ** 0.8) * (0.88 + r() * 0.24);
+      bells.push({ u, s, side: [1, 1, -1, 1, -1, 1, 1, -1, 1, -1, 1][i], ph: r() * TAU, wet: r(), a: 0, v: 0, bud: i >= 8, droop: i === 2 ? 0.35 : (r() - 0.5) * 0.18 });
     }
   });
   function bellPath(s) {
@@ -47,7 +48,17 @@
     return p;
   }
   function drawBell(g, b, x, y, t) {
-    g.save(); g.translate(x, y); g.rotate(b.side * 0.5 + b.a - 0.08); g.scale(b.side, 1);
+    if (b.bud) {
+      // a closed bud: a plump teardrop, green flushing pink
+      g.save(); g.translate(x, y); g.rotate(b.side * 0.7 + b.a);
+      const bp = new Path2D(); bp.moveTo(0, 0); bp.bezierCurveTo(-12 * b.s, 10 * b.s, -10 * b.s, 46 * b.s, 0, 52 * b.s); bp.bezierCurveTo(10 * b.s, 46 * b.s, 12 * b.s, 10 * b.s, 0, 0);
+      ink(g, bp, '#8a5a6a', 1.8);
+      g.fillStyle = grad(g, 0, 0, 0, 52 * b.s, ['#5a7a46', '#a8607e']); g.fill(bp);
+      DH.crescent(g, bp, 'rgba(255,214,190,0.8)', -2, 0);
+      g.restore();
+      return;
+    }
+    g.save(); g.translate(x, y); g.rotate(b.side * (0.5 + b.droop) + b.a - 0.08); g.scale(b.side, 1);
     const s2 = b.s, L = 78 * s2, W = 30 * s2;
     const P0 = bellPath(s2);
     g.lineWidth = 2.4; g.strokeStyle = LINE; g.stroke(P0);
