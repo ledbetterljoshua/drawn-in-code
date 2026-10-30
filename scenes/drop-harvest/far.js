@@ -1,12 +1,12 @@
 /* far.js — the far side of the puddle, a hand's breadth away and so, at this scale, huge and out
-   of focus: a low bank of moss, giant grass blades leaning into the storm, and bokeh — far drops
-   on far grass catching the sun. Nothing here has an ink line; it's all soft and hazed toward the
-   sky. The giant blades sway with the shared wind; the bokeh shimmers when they do.
+   of focus: a low bank of moss rimmed gold where the sun is behind it, and a tall blade or two of
+   far grass at the edges. Nothing here has an ink line; it's soft and hazed toward the sky. The
+   blades sway with the shared wind.
 
-   Hover the far grass: a gust. It leans, the rain curtains sweep sideways, the whole scene
-   gets windy for a moment.
+   Hover the far bank or its grass: a gust. It leans, the rain slants, the water ruffles in cat's-paws,
+   the whole scene gets windy for a moment.
 
-   far-bank z4 (still) · giants z4.5 · bokeh z5 */
+   far-bank z4 (still) · giants z4.5 */
 (function () {
   const { TAU, clamp, lerp, ease, rng, noise, circ, ell, poly, curve, grad, radial, st, P, layer, onLayout } = Drawn;
   const { C, SUN, HZ, FAR } = DH;
@@ -129,33 +129,6 @@
     },
   });
   DH.gust = gust;
-
-  // ------------------------------------------------------------ bokeh
-  const bokeh = [];
-  onLayout(() => {
-    bokeh.length = 0;
-    const r = rng(77), v = st.view;
-    for (let i = 0; i < 40; i++) {
-      const x = lerp(SUN.x - 700, SUN.x + 500, r()), y = 640 + r() * 80;
-      const near = clamp(1 - Math.hypot(x - SUN.x, (y - SUN.y) * 2) / 800, 0, 1);
-      if (near < 0.1) continue;
-      bokeh.push({ x, y, r: 3 + r() * 11 * (0.4 + near), near, ph: r() * TAU, sp: 0.6 + r() * 1.4 });
-    }
-  });
-  if (false) layer({
-    id: 'bokeh', z: 5,
-    draw(g, t) {
-      g.save(); g.globalCompositeOperation = 'lighter';
-      for (const b of bokeh) {
-        const tw = 0.55 + 0.45 * Math.sin(t * b.sp + b.ph + gust.v * 6);
-        const a = (0.04 + b.near * 0.14) * tw * (1 + DH.storm.sun * 0.8);
-        g.fillStyle = `rgba(255,${lerp(170, 220, b.near) | 0},${lerp(120, 160, b.near) | 0},${a})`;
-        g.fill(circ(b.x, b.y, b.r));
-        g.lineWidth = 1.2; g.strokeStyle = `rgba(255,230,180,${a * 1.2})`; g.stroke(circ(b.x, b.y, b.r * 0.95));
-      }
-      g.restore();
-    },
-  });
 
   DH.bankTop = bankTop;
 })();

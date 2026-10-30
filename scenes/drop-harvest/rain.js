@@ -63,8 +63,9 @@
     const hx = cx + Math.cos(a) * R, hy = cy + Math.sin(a) * R;
     UMB.glow = Math.min(1, UMB.glow + 0.22);
     UMB.hits.push({ a, age: 0 });
-    for (let i = 0; i < 3 + d.r; i++) {
-      const sa = a + (Math.random() - 0.5) * 1.4, sp = 80 + Math.random() * 120;
+    DH.spawn({ kind: 'crown', x: hx, y: hy, r: d.r * 0.8, life: 0.22, g: 0, z: d.band === 'fore' ? 'fore' : 'mid' });
+    for (let i = 0; i < 4 + d.r; i++) {
+      const sa = a + (Math.random() - 0.5) * 1.4, sp = 90 + Math.random() * 140;
       DH.spawn({ kind: 'spray', x: hx, y: hy, vx: Math.cos(sa) * sp + d.vy * DH.slant(st.t) * 0.1, vy: Math.sin(sa) * sp - 40, r: 0.7 + Math.random() * d.r * 0.2, life: 0.4, g: 1100, z: d.band === 'fore' ? 'fore' : 'mid' });
     }
     if (Math.random() < 0.6) DH.spawn({ kind: 'runner', a, side: Math.sign(dx) || 1, va: 0, r: 1.4 + d.r * 0.25, life: 3, g: 0, z: 'mid' });
@@ -214,7 +215,7 @@
       step(bands.near, 'near', dt, t);
       step(bands.fore, 'fore', dt, t);
       // the umbrella always has rain on it: extra drops aimed at the dome
-      if (UMB.on && Math.random() < dt * 9 * DH.storm.I) {
+      if (UMB.on && Math.random() < dt * 16 * DH.storm.I) {
         const d = { band: 'near', x: UMB.x + (Math.random() - 0.5) * UMB.r * 1.7, y: UMB.y - UMB.r - 30, vy: 1100, vx: 0, r: 2.4 + Math.random() * 1.4 };
         umbrellaHit({ ...d, y: UMB.y + 6 - Math.sqrt(Math.max(0, UMB.r ** 2 - (d.x - UMB.x) ** 2)) + 1 }, dt);
       }
@@ -241,8 +242,8 @@
       // the umbrella: a dome you only see where the rain hits it
       if (UMB.on) {
         const cx = UMB.x, cy = UMB.y + 6, R = UMB.r;
-        if (true) {
-          const gl = 0.25 + UMB.glow * 0.75;
+        if (UMB.glow > 0.02) {
+          const gl = UMB.glow * 0.6;
           g.save();
           g.lineCap = 'round';
           g.lineWidth = 1.6; g.strokeStyle = `rgba(236,232,255,${gl * 0.32})`;

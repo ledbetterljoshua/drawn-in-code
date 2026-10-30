@@ -170,7 +170,13 @@
       DH.storm.thunder = Math.max(0, DH.storm.thunder - dt * 0.25);
     },
     draw(g, t) {
-      for (const m of masses) blit(g, m.sp, m.x, m.y);
+      for (const m of masses) {
+        // the low rows thin out over the sun, leaving it a break to shine through
+        const near = m.y > 360 ? clamp(1 - Math.abs(m.x - SUN.x) / 420, 0, 1) : 0;
+        if (near > 0) g.globalAlpha = 1 - near * 0.75;
+        blit(g, m.sp, m.x, m.y);
+        g.globalAlpha = 1;
+      }
     },
   });
 

@@ -1,20 +1,23 @@
 /* folk.js — the drop harvesters: pill-bug folk working the left shoulder of the island in the
    rain, out from under the leaf.
      · the cistern: an acorn cup heaped with caught drops, each a glass ball holding a tiny
-       upside-down sunset; the leaf tip drips into it;
-     · two haulers rolling a drop up the bark path to it on a grass rope, heave by heave, then
-       tipping it onto the heap and trudging back down for the next;
-     · the netter on the twig jetty, holding a woven net up into the rain on a long stem;
+       upside-down sunset;
+     · the catcher, standing on top of the heap, holding a net up under the leaf's tip to catch its
+       pendant drop and tip it onto the heap;
+     · the crane: a forked twig mast with a hinged jib; two winders crank a windlass, the sling rises
+       from the jetty, the jib swings up and over and lowers the drop onto the heap;
+     · the netter on the twig jetty, holding a woven net up into the rain on a long stem; what he
+       catches waits on the jetty for the crane;
      · the tally-keeper on a pebble by the cup, notching a grass blade for every drop.
    A pill-bug rig (DH.bug) is shared by everyone in the village: domed plates, an elbowed pair of
    antennae, a busy fringe of legs; it can curl into a ball.
 
-   Hover the haulers: they curl up into balls (as pill-bugs do), the drop rolls back a little, then
-   they uncurl and start again. Hover the netter: he lunges and nets a drop out of the air. Hover
-   the heap: every drop wobbles like jelly. Hover the tally-keeper: he holds his tally up to show
-   you how many.
+   Hover the winders: they curl up into balls (as pill-bugs do), the sling slips back, then they
+   uncurl and start again. Hover the netter: he lunges and nets a drop out of the air. Hover the
+   heap: every drop wobbles like jelly. Hover the catcher: he tips his net onto the heap. Hover the
+   tally-keeper: he holds his tally up to show you how many.
 
-   cistern z12 · haulers z13 · netter z13.5 · tally z12.2 */
+   cup + jetty z10.6 (still) · cistern z12 · catcher z12.1 · tally z12.2 · crane z13 · netter z13.5 */
 (function () {
   const { TAU, clamp, lerp, ease, rng, noise, circ, ell, poly, curve, grad, radial, ink: inkFar, st, P, layer, onLayout } = Drawn;
   const { C, SUN, SHORE } = DH;
@@ -174,7 +177,7 @@
       }
     }
     g.restore();
-    DH.shadeFace(g, cup, CX - RX, CX + RX, 0.55);
+    DH.shadeFace(g, cup, CX - RX, CX + RX, 0.75);
     DH.rim(g, cup, CX, 4.5);
     DH.bounce(g, cup, 4);
     // the lip of the rim seen from below, thick and wet
@@ -184,19 +187,6 @@
     // a grass-stem spout for the overflow, dripping toward the water
     g.lineWidth = 5; g.strokeStyle = LINE; g.beginPath(); g.moveTo(CX - RX + 4, RIM + 8); g.quadraticCurveTo(CX - RX - 14, RIM + 14, CX - RX - 24, RIM + 30); g.stroke();
     g.lineWidth = 3; g.strokeStyle = '#a8a05a'; g.stroke();
-  }
-  // the bark path up the slope, under the haulers
-  function paintPath(g) {
-    const p = new Path2D(), q = [];
-    for (let x = 872; x <= 962; x += 6) q.push([x, DH.ridgeY(x) - 2]);
-    q.forEach(([x, y], i) => (i ? p.lineTo(x, y) : p.moveTo(x, y)));
-    for (let i = q.length - 1; i >= 0; i--) p.lineTo(q[i][0] + 3, q[i][1] + 7);
-    p.closePath();
-    ink(g, p, '#6a4a3a', 1.8);
-    g.lineWidth = 1; g.strokeStyle = 'rgba(30,16,20,0.6)';
-    for (let x = 878; x < 958; x += 9) { const y = DH.ridgeY(x); g.beginPath(); g.moveTo(x, y - 2); g.lineTo(x + 3, y + 5); g.stroke(); }
-    g.lineWidth = 1.6; g.strokeStyle = 'rgba(255,200,140,0.6)';
-    g.beginPath(); q.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.stroke();
   }
   layer({ id: 'cup', z: 10.6, still: true, draw(g) { paintCup(g); } });
   DH.mirror(SHORE + 2, (g) => { paintCup(g); });

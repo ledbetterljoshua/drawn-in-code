@@ -73,10 +73,10 @@
     g.fillStyle = LF.under; g.fill(blade);
     g.save(); g.clip(blade);
     // light through the leaf: hottest by the tip, where the sun is behind it
-    g.fillStyle = grad(g, 1000, 0, 1800, 0, [[0, '#7c8a42'], [0.3, '#56663c'], [1, '#2e3a32']]);
+    g.fillStyle = grad(g, 1000, 0, 1800, 0, [[0, '#6e7646'], [0.3, '#4c5640'], [1, '#2c3434']]);
     g.fillRect(980, 120, 840, 360);
     g.save(); g.translate(1060, 450); g.scale(1.5, 1);
-    g.fillStyle = radial(g, 0, 0, 0, 340, [[0, 'rgba(252,236,150,0.92)'], [0.25, 'rgba(220,206,100,0.55)'], [0.6, 'rgba(160,160,80,0.15)'], [1, 'rgba(160,160,80,0)']]);
+    g.fillStyle = radial(g, 0, 0, 0, 340, [[0, 'rgba(250,224,150,0.78)'], [0.22, 'rgba(210,190,110,0.42)'], [0.55, 'rgba(150,146,90,0.12)'], [1, 'rgba(150,146,90,0)']]);
     g.fillRect(-360, -360, 720, 720);
     g.restore();
     // the shadowed belly near the stalk, where the blade is thick and turned from the sun

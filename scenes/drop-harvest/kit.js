@@ -114,15 +114,15 @@
     } else body.arc(0, 0, r, 0, TAU);
     g.globalAlpha = a;
     // mostly clear: a faint cool tint over whatever is behind
-    g.fillStyle = 'rgba(60,54,96,0.22)'; g.fill(body);
+    g.fillStyle = 'rgba(60,54,96,0.14)'; g.fill(body);
     g.save(); g.clip(body);
     // the refracted world, upside down: the storm pooled in the bottom, a thin band of the gold
     // rift high up, the dark ring where the glass turns away
     const gr = g.createLinearGradient(0, -r, 0, r);
     gr.addColorStop(0, 'rgba(40,34,70,0.5)');
     gr.addColorStop(0.2, 'rgba(40,34,70,0.1)');
-    gr.addColorStop(0.3, `rgba(255,${200 + br * 30},${130 + br * 50},${0.5 + br * 0.3})`);
-    gr.addColorStop(0.4, 'rgba(240,150,110,0.25)');
+    gr.addColorStop(0.3, `rgba(255,${206 + br * 30},${150 + br * 40},${0.3 + br * 0.2})`);
+    gr.addColorStop(0.38, 'rgba(240,150,110,0.08)');
     gr.addColorStop(0.55, 'rgba(50,44,80,0.05)');
     gr.addColorStop(1, 'rgba(30,26,56,0.55)');
     g.fillStyle = gr; g.fillRect(-r, -r * 1.4, r * 2, r * 2.8);

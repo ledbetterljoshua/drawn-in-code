@@ -36,6 +36,11 @@
       if (darken) {
         // mirrored things lose their contrast to the water: a veil of the water's own violet
         g.fillStyle = 'rgba(54,46,84,0.55)'; g.fillRect(x0, y0, w, h);
+        // and it fades out with depth below the shore, into the water
+        g.globalCompositeOperation = 'destination-out';
+        g.fillStyle = grad(g, 0, DH.SHORE, 0, DH.SHORE + 420, [[0, 'rgba(0,0,0,0.25)'], [1, 'rgba(0,0,0,0.85)']]);
+        g.fillRect(x0, DH.SHORE, w, h);
+        g.globalCompositeOperation = 'source-atop';
         // the rain breaks it into dashes: thin bright and dark streaks across the mirrored shapes
         const rr = Drawn.rng(17);
         for (let yy = DH.SHORE; yy < y0 + h; yy += 3 + rr() * 5) {
@@ -126,7 +131,7 @@
         const sy = (y - sky.y0) * R, sh = h * R;
         if (sy + sh > sky.c.height) break;
         g.drawImage(cl.c, 0, sy * cl.k, cl.c.width, sh * cl.k, cl.x0 + off, y, cl.w, h + 0.4);
-        g.drawImage(obj.c, 0, sy, obj.c.width, sh, obj.x0 + off * 1.3, y, obj.w, h + 0.4);
+        g.drawImage(obj.c, 0, sy, obj.c.width, sh, obj.x0 + off * 0.9, y, obj.w, h + 0.4);
         y += h;
       }
       // cat's-paws: gusts ruffling dark patches across the water

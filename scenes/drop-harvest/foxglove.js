@@ -32,7 +32,7 @@
     for (let i = 0; i < 11; i++) {
       u += i ? 0.036 + r() * 0.03 - i * 0.0015 : 0;
       const s = lerp(1.08, 0.3, (i / 10) ** 0.8) * (0.88 + r() * 0.24);
-      bells.push({ u, s, side: [1, 1, -1, 1, -1, 1, 1, -1, 1, -1, 1][i], ph: r() * TAU, wet: r(), a: 0, v: 0, bud: i >= 8, droop: i === 2 ? 0.35 : (r() - 0.5) * 0.18 });
+      bells.push({ u, s, side: [1, 1, -1, 1, -1, 1, 1, -1, 1, -1, 1][i], ph: r() * TAU, wet: r(), a: 0, v: 0, bud: i >= 8, droop: i === 2 ? 0.4 : (r() - 0.5) * 0.4 });
     }
   });
   function bellPath(s) {
@@ -288,7 +288,14 @@
       g.lineCap = 'round';
       // frame threads
       g.lineWidth = 0.9; g.strokeStyle = 'rgba(255,236,200,0.55)';
-      g.beginPath(); geo.anchors.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.closePath(); g.stroke();
+      // frame threads sag between their anchors under the weight of the beads
+      g.beginPath();
+      for (let i = 0; i < 4; i++) {
+        const [x1, y1] = geo.anchors[i], [x2, y2] = geo.anchors[(i + 1) % 4];
+        if (i === 0) g.moveTo(x1, y1);
+        g.quadraticCurveTo((x1 + x2) / 2 + (i === 1 ? -14 : 0), (y1 + y2) / 2 + [10, 6, 26, 8][i], x2, y2);
+      }
+      g.stroke();
       // spokes
       const ends = [];
       for (let i = 0; i < n; i++) { const a = (i / n) * TAU, L = spokeEnd(geo, i, n); ends.push(L); g.beginPath(); g.moveTo(hx, hy); g.lineTo(hx + Math.cos(a) * L, hy + Math.sin(a) * L); g.stroke(); }
@@ -307,8 +314,8 @@
             if (broken && pen) { g.lineTo(x - Math.cos(a) * 2, y + 9); }
             g.moveTo(x, y); pen = true; continue;
           }
-          const pa = ((k - 0.5) / n) * TAU, pl = ends[k] * ring * (0.95 - Drawn.hash(ri + k) * 0.03);
-          g.quadraticCurveTo(hx + Math.cos(pa) * pl, hy + Math.sin(pa) * pl + 5 * ring, x, y);
+          const pa = ((k - 0.5) / n) * TAU, pl = ends[k] * ring * (0.93 - Drawn.hash(ri + k) * 0.06);
+          g.quadraticCurveTo(hx + Math.cos(pa) * pl, hy + Math.sin(pa) * pl + (6 + 8 * Math.max(0, Math.sin(pa))) * ring, x, y);
         }
         g.stroke();
       }

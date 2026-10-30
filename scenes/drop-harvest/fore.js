@@ -1,15 +1,16 @@
 /* fore.js — the near shore and what's right in front of the camera.
-     · the mossy near bank, bottom left, rimmed gold, where the ferry's next passenger waits: a
-       ladybird holding a clover leaf over her head for an umbrella;
+     · the mossy near bank, bottom left, a backlit mass of cushions with a fuzzy gold silhouette,
+       fairy-bonnet mushrooms and washed pebbles; the ferry's next passenger waits on it, a ladybird
+       holding a clover leaf over her head for an umbrella;
      · an earthworm come up out of the soaked ground (they do, in rain), swaying;
-     · a wet stone half in the water at the bottom right, glossy with the sky, beaded with rain;
-     · out-of-focus blades of grass at both edges, dark and soft, framing the picture.
+     · a fallen oak leaf afloat at the bottom right, rim curled, beaded, rocking on the rings;
+     · on tall (phone) screens, a bramble cane hanging into the top of the frame, dripping.
 
    Hover the ladybird: she twirls her clover and flings a ring of water off it.
    Hover the worm: it stretches up to taste the rain, then sinks back.
-   Hover the stone: the beads on it gather and run off into the puddle.
+   Hover the oak leaf: it rocks and its beads roll to the low side and off into the puddle.
 
-   near-bank z24 (still) · ladybird z25 · worm z24.5 · stone z23 · edge-blades z34 */
+   near-bank z24 (still) · oak z23 · worm z24.5 · ladybird z25 · canopy z33 */
 (function () {
   const { TAU, clamp, lerp, ease, rng, noise, circ, ell, poly, curve, grad, radial, ink, st, P, layer, onLayout } = Drawn;
   const { C, SUN, LINE, SHORE } = DH;
@@ -111,7 +112,7 @@
       }
     }
     // pebbles washed together at its waterline, wet on top
-    for (let y = bankY(540) + 30, i = 0; y < Math.min(v.y1, 1900); y += 22 + (i * 7) % 15, i++) {
+    for (let y = 1250, i = 0; y < Math.min(v.y1, 1900); y += 60 + (i * 17) % 40, i++) {
       const x = shoreX(y) - 4 - (i % 3) * 6, sz = 5 + (i * 13) % 7;
       const p = DH.blob(x, y, sz * 1.3, sz * 0.75, 8, 0.2, i + 7);
       ink(g, p, '#3a3448', 1.4); DH.crescent(g, p, '#221d2c', 0, -sz * 0.4); DH.crescent(g, p, 'rgba(255,200,150,0.5)', 0, 1.6);
@@ -363,31 +364,6 @@
         g.restore();
         const tx = c.x + Math.sin(a) * c.len, ty = c.y + Math.cos(a) * c.len;
         DH.glassDrop(g, tx, ty + 2 + c.drip * 4, 2 + c.drip * 2.5, { sy: 1 + c.drip * 0.3 });
-      }
-    },
-  });
-
-  // ------------------------------------------------------------ out-of-focus blades at the edges
-  const edge = [];
-  onLayout(() => {
-    edge.length = 0;
-    const v = st.view;
-    edge.push({ x: v.x0 + 10, base: v.y1 + 40, top: Math.max(v.y0, -100) + 300, w: 90, bend: 200, ph: 0.3 });
-    edge.push({ x: v.x1 - 20, base: v.y1 + 40, top: Math.max(v.y0, -100) + 420, w: 80, bend: -210, ph: 2.4 });
-  });
-  if (false) layer({
-    id: 'edge-blades', z: 34,
-    draw(g, t) {
-      for (const E of edge) {
-        const sway = (Drawn.wind(t, E.x) - 0.6) * 18 + Math.sin(t * 0.5 + E.ph) * 5;
-        const pts = [], n = 8;
-        for (let i = 0; i <= n; i++) { const u = i / n; pts.push([E.x + u * u * (E.bend + sway) - E.w * (1 - u * 0.9) / 2, lerp(E.base, E.top, u)]); }
-        for (let i = n; i >= 0; i--) { const u = i / n; pts.push([E.x + u * u * (E.bend + sway) + E.w * (1 - u * 0.9) / 2, lerp(E.base, E.top, u)]); }
-        const p = curve(pts);
-        // out of focus: widening translucent skins, no line, a smear of rim
-        for (const [w, a] of [[34, 0.08], [22, 0.12], [12, 0.18], [5, 0.3]]) { g.lineWidth = w; g.strokeStyle = `rgba(22,26,30,${a})`; g.stroke(p); }
-        g.fillStyle = 'rgba(22,28,30,0.72)'; g.fill(p);
-        DH.crescent(g, p, 'rgba(255,200,130,0.16)', E.bend > 0 ? -10 : 10, 0);
       }
     },
   });

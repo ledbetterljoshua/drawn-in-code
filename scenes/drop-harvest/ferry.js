@@ -13,8 +13,8 @@
   const { TAU, clamp, lerp, ease, rng, noise, circ, ell, poly, curve, grad, radial, ink, st, P, layer } = Drawn;
   const { C, SUN, LINE, FAR, SHORE } = DH;
 
-  const boat = { x: 430, dir: 1, rock: DH.spring(40, 2.5), bell: 0, eyes: 1, pole: 0, blink: Drawn.blinker(), blinkP: Drawn.blinker() };
-  const BY = 930;
+  const boat = { x: 520, dir: 1, rock: DH.spring(40, 2.5), bell: 0, eyes: 1, pole: 0, blink: Drawn.blinker(), blinkP: Drawn.blinker() };
+  const BY = 884;
   const SNAIL = { shell: '#f1dcb0', band: '#6a3a2e', body: '#b49a86', bodyShade: '#7e6a60' };
 
   function drawBoat(g, t, x, y, refl) {
@@ -92,7 +92,7 @@
     update(dt, t, L) {
       // across and back, slow as a snail
       boat.x += boat.dir * dt * 4.5;
-      if (boat.x > 770) boat.dir = -1; if (boat.x < 400) boat.dir = 1;
+      if (boat.x > 780) boat.dir = -1; if (boat.x < 470) boat.dir = 1;
       boat.pole += dt * 1.1;
       boat.rock.step(dt);
       boat.bell = Math.max(0, boat.bell - dt * 0.7);

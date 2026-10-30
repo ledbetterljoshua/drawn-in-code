@@ -173,3 +173,38 @@ the frame with dripping leaves.
 3. Its slope was a staircase of spiky balls. → a gentler slope.
 4. Foxglove buds stuck out sideways like grey discs. → they hang.
 5. Quiet sky between the web and the leaf: kept as negative space; the squall and the rain carry it.
+
+## Round 9 — hover sweep and the third critic
+
+Checked every reaction's hit target programmatically (26 points, no page errors); the lantern thread
+was stealing the Pod House's hover, so the pod now wins inside its own outline. Removed dead code
+(bokeh, edge blades, the bark path) and refreshed every part's header.
+
+The third critic's ten, worst first: (1) the island's reflection is a second island hanging below —
+opaque, crisp, stair-stepped; (2) the phone is a crop, not a composition; (3) still front-lit under a
+sun that's behind; (4) the eye level doesn't hold — we see the island's top and the bank's top as planes
+from a waterline camera, and the ferry seemed to sit on the bank; (5) clouds still procedural ribbons
+with no designed break; (6) the leaf competes with the sun; (7) foxglove cones and a perfect web with a
+ruler bottom edge; (8) the near bank a slab with a bead border of pebbles; (9) same line weight and
+density everywhere; (10) drops read as tan buns, the umbrella as a UI selection ring.
+
+## Round 10
+
+Reflection of the island: a violet veil, then faded out with depth below the shore (destination-out
+gradient on its sprite), wavering less than the sky's — it now dissolves into the water instead of
+hanging there. Houses and cup pushed further into backlight (shade 0.8–0.9). Leaf greyer, its glow only
+by the tip. Drops clearer: the refracted gold band thinner, the tint lighter, glints unchanged. The
+umbrella is no longer drawn as a ring at all; it shows itself by splash crowns along its curve (drops
+aimed at it twice as often) and the calm pocket in the water under it. The low cloud rows thin out over
+the sun, so the rift has a designed break. The web's frame threads sag between anchors and the spiral
+sags more on the lower side. Bells droop more variously. The pebble column down the near bank's edge is
+gone. The ferry crosses farther out (y 884) so it's plainly on water behind the bank.
+
+Still wrong (for whoever picks this up):
+- **The phone frame is a crop of the desktop,** not its own composition: the island runs off the right
+  edge and the lower third is mostly empty water. It wants a portrait layout (shift the world for tall
+  screens, or a canopy/foreground designed for it).
+- **The eye level is ambiguous.** A waterline camera shouldn't see the island's mossy top or the near
+  bank's top as planes; either raise the horizon or flatten those tops to profile.
+- **The sky's rolls are still more procedural than designed:** two or three big hand-placed masses with
+  varied edges would beat rows of generated ones.

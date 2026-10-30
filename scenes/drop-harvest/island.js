@@ -1,6 +1,7 @@
 /* island.js — the mossy island in the puddle. We're at the waterline looking up at it, so its
-   front is a bank of soil in shade (roots, pebbles, strata, a burrow door at the waterline), its
-   top is a silhouette of moss rimmed gold by the sun behind, and moss capsules on thin stalks
+   front is a moss-covered bank in shade, drifts of tufts following the hill, beards hanging off its
+   lip over a band of wet soil at the water (roots, stones in the shallows, sedge, a burrow door);
+   its top is a silhouette of moss rimmed gold by the sun behind, and moss capsules on thin stalks
    stand up along the ridge like little lamps, each holding a bead of rain.
 
    Hover the moss: it squelches, a few bubbles rise at the waterline and the capsules shiver.
