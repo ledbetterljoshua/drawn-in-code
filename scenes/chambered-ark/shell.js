@@ -101,23 +101,31 @@ function paintFace(g) {
   g.lineWidth = 0.9; g.strokeStyle = 'rgba(120, 92, 96, 0.55)'; g.stroke(skin);
   // septa: the nacre walls, each cut edge inked, lit on the sun side
   for (const s of A.septa) {
-    // a thick pearly slice: lit along its sun side, the nacre's layers showing on the far side
+    // a pearly slice: thin across the middle, flaring where it grows from the walls, lit along its
+    // sun side with the nacre's layers showing on the far side
     const w = Math.max(1.6, A.R(s.th) * 0.034), lw = clamp(A.R(s.th) * 0.007, 0.7, 2.4);
-    A.stroke(g, s.pts, w + lw, mixLine(A.R(s.th)));
-    A.stroke(g, s.pts, w, '#efe4e6');
-    A.stroke(g, s.pts.map(([x, y]) => [x + w * 0.2, y + w * 0.22]), w * 0.35, '#cbbfd2');
-    A.stroke(g, s.pts.map(([x, y]) => [x - w * 0.2, y - w * 0.24]), w * 0.3, '#ffffff');
+    const n = s.pts.length, Ls = [], Rs = [];
+    for (let i = 0; i < n; i++) {
+      const p = s.pts[Math.max(0, i - 1)], q = s.pts[Math.min(n - 1, i + 1)], dx = q[0] - p[0], dy = q[1] - p[1], d = Math.hypot(dx, dy) || 1;
+      const u = i / (n - 1), hw = (w / 2) * (0.72 + 0.6 * Math.pow(2 * u - 1, 4));
+      Ls.push([s.pts[i][0] - (dy / d) * hw, s.pts[i][1] + (dx / d) * hw]); Rs.push([s.pts[i][0] + (dy / d) * hw, s.pts[i][1] - (dx / d) * hw]);
+    }
+    const band = A.toPath([...Ls, ...Rs.reverse()]);
+    g.fillStyle = '#efe4e6'; g.fill(band);
+    g.save(); g.clip(band);
+    A.stroke(g, s.pts.map(([x, y]) => [x + w * 0.3, y + w * 0.32]), w * 0.45, '#cbbfd2');
+    A.stroke(g, s.pts.map(([x, y]) => [x - w * 0.24, y - w * 0.26]), w * 0.3, '#ffffff');
+    g.restore();
+    g.lineWidth = lw; g.strokeStyle = mixLine(A.R(s.th)); g.stroke(band);
   }
   for (const ch of A.chambers) { g.lineWidth = clamp(ch.size * 0.009, 0.5, 1.4); g.strokeStyle = 'rgba(51, 33, 58, 0.7)'; g.stroke(ch.path); }
   // the siphuncle: a pearl tube, cut open, collared where it passes each septum
-  // drawn in short pieces so it thins toward its start, where it disappears into the older wall
-  const sp = A.siphPts;
-  for (let i = 0; i < sp.length - 1; i++) {
-    const f = i / sp.length, seg = [sp[i], sp[i + 1]];
-    g.globalAlpha = clamp(f * 2.2, 0, 1);
-    A.stroke(g, seg, 3 + f * 5, LINE); A.stroke(g, seg, 1.8 + f * 4, '#e9d6c6'); A.stroke(g, seg, 0.8 + f * 1.8, '#9a7f88');
-  }
-  g.globalAlpha = 1;
+  // a slim pearl tube, quiet against the walls; it fades out where it enters the older coil
+  const sp = A.siphPts, mid = Math.floor(sp.length * 0.45);
+  g.save();
+  g.globalAlpha = 0.45; A.stroke(g, sp.slice(0, mid + 1), 4, LINE); A.stroke(g, sp.slice(0, mid + 1), 2.4, '#e9d6c6');
+  g.globalAlpha = 0.85; A.stroke(g, sp.slice(mid), 5.6, LINE); A.stroke(g, sp.slice(mid), 3.6, '#ecdccc'); A.stroke(g, sp.slice(mid), 1.2, '#a88f96');
+  g.restore();
   for (const s of A.septa) {
     if (s.th < th0 - A.dTh * 9 || s.th > th0 + 0.05) continue;
     const [x, y] = A.pt(s.th, A.siphR(s.th)), w = Math.max(1.6, A.R(s.th) * 0.02), hgt = Math.min(11, 4 + A.R(s.th) * 0.03);

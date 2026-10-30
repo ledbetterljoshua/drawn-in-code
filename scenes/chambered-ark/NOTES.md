@@ -156,3 +156,14 @@ Worst five:
    each with its own lean.
 4. The chin was a right-angled jaw → a rounder underside to the head, the funnel tucked beneath.
 5. (kept) the turtle and the school both sit in the upper-left quadrant; the lower left is kelp and rock.
+
+## Round 8
+Close-ups of every room at the new scale.
+1. The siphuncle, drawn in short capped pieces to fade it, became a beaded chain looping round the
+   second whorl (a ring again) → one slim continuous tube, faint where it enters the older coil.
+2. Septa were uniform white tubes ("hamster tubes") → each is a pearly band thin across the middle and
+   flaring where it grows from the walls, lit on the sun side, the nacre showing on the far side.
+3. (checked) wheelhouse, galley, pump room, library, garden, bunks, band, lamps and the inner rooms
+   draw cleanly at 2×; the warm pools now carry the hero rooms.
+4. (kept) the telescope on the roof reads as a stick at full frame.
+5. (kept) the eel colony is small at desktop size.
