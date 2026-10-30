@@ -50,11 +50,11 @@ layer({
 const focal = OW.focalDrawer;
 focal.flip = 1;
 const PORTERS = [
-  { name: 'feather', rail: 2, u: focal.u1 + 0.05, rung: 0.34, face: -1, item: 'feather', lamp: 'hook' },
-  { name: 'tag', rail: 3, u: 0.64, rung: 0.4, face: 1, item: 'tag', lamp: 'hook' },
-  { name: 'bottle', rail: 1, u: 0.8, rung: 0.38, face: -1, item: 'bottle', lamp: 'hook' },
-  { name: 'music', rail: 0, u: 0.66, rung: 0.42, face: 1, item: 'music', lamp: 'hook' },
-  { name: 'lamp', rail: 3, u: 0.16, rung: 0.18, face: -1, item: 'lamp', lamp: 'hand' },
+  { name: 'feather', rail: 2, u: focal.u1 + 0.05, rung: 0.34, face: -1, item: 'feather', lamp: 'hook', lean: -0.16 },
+  { name: 'tag', rail: 3, u: 0.64, rung: 0.22, face: 1, item: 'tag', lamp: 'hook', lean: 0.1 },
+  { name: 'bottle', rail: 1, u: 0.8, rung: 0.5, face: -1, item: 'bottle', lamp: 'hook', lean: -0.05 },
+  { name: 'music', rail: 0, u: 0.66, rung: 0.42, face: 1, item: 'music', lamp: 'hook', lean: 0.04 },
+  { name: 'lamp', rail: 3, u: 0.16, rung: 0.18, face: -1, item: 'lamp', lamp: 'hand', lean: 0.12 },
 ];
 OW.porters = PORTERS;
 for (const p of PORTERS) {
@@ -106,7 +106,7 @@ function stoat(g, x, y, s, o) {
   const E = C.ermine;
   const blueSide = o.lampSide || 0;
   const fill = mix(E.base, E.blue, 0.25), shade = mix(E.shade, '#9aa6e0', 0.2);
-  g.save(); g.translate(x, y); g.scale(s * f, s);
+  g.save(); g.translate(x, y); g.scale(s * f, s); g.rotate((o.lean || 0) * (1 - o.freeze));
   const stiff = o.freeze;
   // tail: hangs below the rung, its tip black
   const tail = curve([[-4, -10], [-10, -6], [-13, 2 + Math.sin(o.t * 1.3) * 1.5 * (1 - stiff)], [-12, 10 + Math.sin(o.t * 1.3 + 0.6) * 2 * (1 - stiff)]], false);
@@ -223,7 +223,10 @@ for (const p of PORTERS) {
       if (!p.busy && !p.act && !frozen && (p.wait -= dt) < 0) { const a = ACTS[Math.floor(Math.random() * ACTS.length)]; p.act = a[0]; p.adur = a[1]; p.au = 0; p.side = Math.random() < 0.5 ? -1 : 1; }
       if (p.act) { p.au += dt / p.adur; if (p.au >= 1) { p.act = null; p.wait = 3 + Math.random() * 7; } }
       const A = (n) => (p.act === n ? bump(p.au) : 0);
-      p.look = ease(p.look, A('look') * p.side + (p.glare > 0.2 ? 1 : 0), 3, dt);
+      // eyes follow the pointer when it comes near, otherwise idle glances
+      const near = p.L && P.inside && Math.hypot(P.x - p.L.tx, P.y - p.L.ty - 40) < 180 ? clamp((P.x - p.L.tx) * p.face / 80, -1, 1) : null;
+      p.look = ease(p.look, near != null ? near : A('look') * p.side + (p.glare > 0.2 ? 1 : 0), 3, dt);
+      if (p.item === 'feather') OW.tickle = L.hovered ? 1 : 0;
       if (p.act === 'ride' && p.au < 0.05) { const rr = OW.rails[p.rail]; p.target = clamp(p.home + p.side * 0.05, rr.u0 + 0.03, rr.u1 - 0.03); }
       if (!p.act && !p.busy) p.target = p.home;
       p.rungOff = ease(p.rungOff, A('climb') * -0.12, 3, dt);
@@ -281,7 +284,7 @@ for (const p of PORTERS) {
         OW.hushLamp(g, la[0], la[1] + 6 * G.s, G.s * 1.5, fl);
         g.restore();
       }
-      stoat(g, fx, fy, s, { face: p.face, t, grip, hand, blink: p.blink(t), look: p.look, capLift: p.tip, freeze: sstep(0.15, 0.4, p.freeze), shh: p.shh > 0.3, glare: p.glare, yawn, lampSide: p.face });
+      stoat(g, fx, fy, s, { face: p.face, t, grip, hand, blink: p.blink(t), look: p.look, capLift: p.tip, freeze: sstep(0.15, 0.4, p.freeze), shh: p.shh > 0.3, glare: p.glare, yawn, lampSide: p.face, lean: p.lean });
       // what's in the hand (drawn over the paw)
       if (!frozen && p.shh < 0.3) {
         if (p.item === 'feather') feather(g, hand[0], hand[1], s * 0.85, t, 1);

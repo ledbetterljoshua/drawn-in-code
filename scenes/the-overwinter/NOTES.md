@@ -114,3 +114,16 @@ Five worst:
 4. **Sea dashes ruled like a ledger.** → half as many, fainter.
 5. **Lichen as even noise.** → nine colonies along the seams.
 Perf: 60 fps desktop.
+
+## Round 4
+
+Five worst (mine):
+1. **Hover the bare rock and nothing happens** — the header promised it. → rock-shed layer: hovering
+   the rock knocks a little snow and a chip of stone off the seam above the pointer.
+2. **The focal moment has no payoff.** → hover the feather porter: it shushes you, and the dormouse's
+   nose twitches… twitches… and it sneezes (a breath puff; the head jerks back).
+3. **Porters are one pose, and nobody notices the pointer.** → each porter has its own lean and rung;
+   their eyes follow the pointer when it comes within reach.
+4. **Steel cabinets are the same gradient as card.** → a cold sheen streak down the pressed panel and
+   a dent catching it.
+5. **The sleeping dormouse's face is tucked out of sight** under the cap. → less tucked.

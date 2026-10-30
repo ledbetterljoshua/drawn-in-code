@@ -112,6 +112,9 @@ layer({
         g.fillRect(2.4 * p.s, -9 * p.s, 1 * p.s, 9 * p.s);
         if (p.two) { ink(g, ell(6 * p.s, -2 * p.s, 3 * p.s, 2.2 * p.s, undefined, -0.4), '#f4e8c8', 0.9); g.fillRect(8.4 * p.s, -11 * p.s, 1 * p.s, 9 * p.s); g.fillRect(2.4 * p.s, -10 * p.s, 7 * p.s, 1.6 * p.s); }
         g.restore(); g.globalAlpha = 1;
+      } else if (p.kind === 'pebble') {
+        p.vy += 500 / 60; g.globalAlpha = 1 - u * u;
+        ink(g, ell(p.x, p.y, p.s * 1.3, p.s, undefined, p.age * 6), '#4a4058', 0.8); g.globalAlpha = 1;
       } else if (p.kind === 'snowclump') {
         g.globalAlpha = 1 - u; g.fillStyle = C.snow; g.fill(circ(p.x, p.y, p.s));
         p.vy += 380 * (1 / 60); g.globalAlpha = 1;
@@ -191,7 +194,7 @@ function dormouse(g, s, a, d) {
   // head: tucked into the ball asleep, lifted and turned to us awake
   g.save();
   const hx = lerp(6, 1, rise) * s + a.roll * 3 * s, hy = by + lerp(-2, -10, rise) * s;
-  g.translate(hx, hy); g.rotate(lerp(0.5, 0, rise) - y * 0.3 + a.roll * 0.12);
+  g.translate(hx, hy); g.rotate(lerp(0.22, 0, rise) - y * 0.3 + a.roll * 0.12);
   const head = ell(0, 0, 7.2 * s, 6.4 * s);
   ink(g, ell(-4.6 * s, -4.6 * s, 2.4 * s, 2.8 * s, undefined, -0.4), base, lw * 0.8);
   g.fillStyle = '#d8908a'; g.fill(ell(-4.6 * s, -4.4 * s, 1.2 * s, 1.6 * s, undefined, -0.4));
@@ -613,6 +616,17 @@ for (const d of D) {
         }
         if (w0 > 4.6) { d.state = 'sleep'; d.immune = t + 7; d.snoreAt = 3 + Math.random() * 6; }
         if (d.guest === 'bat') anim.spin = Math.sin(w0 * 3) * 0.15 * (w0 < 3 ? 1 : 0);
+      }
+      if (d.focal) {
+        // the feather: hover its porter and the nose twitches… twitches… and it sneezes
+        const k = OW.tickle || 0;
+        d.tick = k > 0 ? (d.tick || 0) + dt : 0;
+        anim.look = 0;
+        if (d.tick > 1.4 && !d.sneezed) { d.sneezed = true; d.sneezeT = 0; OW.spawn({ kind: 'puff', x: d.cx + d.w * 0.25, y: d.y0 - 10, vx: 30, vy: -6, life: 1.2, s: 1.6 }); OW.emit('sneeze'); }
+        if (d.sneezed) { d.sneezeT += dt; if (d.sneezeT > 3) d.sneezed = false; }
+        const pre = clamp((d.tick || 0) / 1.4, 0, 1);
+        anim.yawn = d.state === 'sleep' ? Math.max(anim.yawn, pre * 0.35 * (0.6 + 0.4 * Math.sin(t * 30))) : anim.yawn;
+        anim.roll = d.state === 'sleep' ? (d.sneezed && d.sneezeT < 0.5 ? -0.8 * (1 - d.sneezeT / 0.5) : anim.roll) : anim.roll;
       }
       if (d.guest === 'bat') {
         // bats all turn together when any of them is hovered, like closed umbrellas in a draught;
