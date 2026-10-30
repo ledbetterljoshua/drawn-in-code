@@ -1,0 +1,210 @@
+# The Drop Harvest
+
+## Finding the world
+
+Three worlds, weather first:
+
+1. **Fog harvest.** A cliff village of moths that net the sea fog at dawn; nets drip into cisterns, a
+   fogbow stands over the bay. Lovely, but fog flattens value: hard to make bold, and it is mostly grey.
+2. **Supercell over the rye.** A lone farmstead of hares battening down as a shelf cloud arrives; the
+   eerie gold-green light under a black anvil. Dramatic, but the cloud is the only idea; the inhabitants
+   would be generic "hurrying" and lightning wants to flash (loud).
+3. **The drop harvest (picked).** A summer cloudburst seen at the scale of the things that live in a
+   puddle. A raindrop here is a wobbling glass ball the size of a body, so the pill-bug folk of a mossy
+   island go out in the storm with woven slings to *catch drops whole* and roll them into an acorn-cup
+   cistern before the sun comes back. Strangest of the three, and every surface is water to draw.
+
+- **Who, doing what right now:** pill-bug haulers rolling a caught drop up a bark ramp into the acorn
+  cistern; a ladybird under a clover umbrella waiting for the ferry; a snail poling a leaf-boat across
+  the puddle; a bumblebee sheltering in a foxglove bell; a spider guarding a web strung with drops; a
+  moth wrapped in its wings under the leaf; an earthworm surfacing because it rains.
+- **When, what weather:** late summer afternoon, a cloudburst with the sun breaking under the storm
+  (a sunshower). Slate-violet sky, the low sun *behind* the island, so every drop and leaf edge is
+  backlit gold and every front face is in cool shade.
+- **Eye path:** the drip tip of the Great Leaf and the haulers beneath it, rimmed against the sun (focal,
+  ~0.6 across) → the gold glitter path in the puddle down to the snail ferry → the jewelled web and the
+  foxglove bee upper left → the sheltered houses under the leaf on the right.
+- **Idle motion:** the rain (three depths, gusting in curtains), splash crowns and rings, the leaf
+  jolting under hits, drops sliding off tips, ripples bending the reflection, everyone breathing,
+  blinking and working. **The thing people tell a friend:** your pointer is an umbrella. Rain splashes
+  off an invisible dome over it, and whoever is under it looks up.
+- **Only this world:** drops as cargo. Raindrops are falling buns (flattened, not teardrops), stored
+  drops are glass melons each holding a tiny upside-down sunset, and the architecture is
+  mushroom caps seen from below (gills), acorn cups, woven grass gutters and a stem waterwheel.
+
+Viewpoint: eye level at the water (horizon y≈700 on a 1600×1200 board). We look *up* at the island
+top, so houses stand on its ridge and mushroom caps show their gills; puddle ripples flatten toward
+the horizon.
+
+## Round 1 — first full pass
+
+All parts in: sky, far bank, four depths of rain, puddle with reflections, leaf, island, three houses,
+haulers/netter/tally, foxglove + bee + web, ferry + strider, near bank, ladybird, worm, stone, grade.
+The rift and the island-against-the-sun read at once. Five worst things:
+
+1. **Clouds are chains of rings.** `crescent()` fills even-odd, and a union of circles XORs itself, so
+   every lump outline shows. Storm decks are long flat rolls lit underneath, not bubbles. → paint
+   unions with clip-intersections (cel: dark crown, base, lit belly), long flat ellipse lumps, no seams.
+2. **The far grass reads as a forest of poles,** and the tall near blade bisects the rift. → five
+   broad blades that arc over and lean, hazed toward the sky; bend the near blade over the web.
+3. **The island is a light-brown loaf** with polka-dot pebbles and comb-tooth roots, too warm for a
+   backlit mass, and its mirror image doubles the weight. → darker face, lower and lumpier profile,
+   moss overhanging the face, pebbles clustered at the waterline, roots in hanging tangles; a darker,
+   streakier reflection.
+4. **The focal group is specks.** Cistern, haulers, netter are 20 px on the desktop frame; the village
+   under the leaf is tiny on a huge mound. → scale the island's props ~1.35×, cistern bigger, gentler
+   slope for the haulers.
+5. **The leaf is a flat lime cutout on a pole,** zigzag teeth, faint veins. → olive underside with the
+   glow concentrated by the tip, a darker vein network, wavy (not toothed) margin, a thick curved stalk.
+
+Also: the deck's lit belly is drawn in 11 px columns (stepped); the near bank is a flat lawn tile with
+a vertical cut edge on the phone; edge blades are black slashes; rain is too faint to be the star.
+
+## Round 2
+
+Fixed: cloud unions now cel-shaded by clip intersection (`DH.cel`), long flat rolls with a lit hem;
+deck belly stroked along its edge with a horizontal gradient (no columns); island face dark and cool
+with root tangles, bracket fungi, stones clustered at the waterline; props on the island 1.35×; glass
+drops mostly clear (tinted, thin gold band, caustic, sharp window highlight); pill-bug plates are bands
+across the back, not a fan; the leaf hangs 56 lower on a thick grooved stalk, olive with the glow
+pooled at the tip and a dark vein net. The hauling up a 50° slope was unreadable, so it became a
+**twig crane**: the netter's catch waits on the jetty, two winders hoist it in a sling, the jib swings
+up and over and lowers it onto the heap, the tally gets a notch. Rain density up by half.
+
+Five worst things now:
+1. **The puddle is dead**: half the frame is flat violet. It mirrors only the sky gradient (the moving
+   clouds aren't in the reflection), the glitter is thin, nothing floats. → mirror the cloud rolls
+   live, widen the reflected rift, add floating petals and seeds, gust cat's-paws.
+2. **The near bank's moss is a row of peas with cactus spines.** → overlapping irregular cushions shaded
+   as one union, a fuzzy silhouette of shoots, no per-cushion outlines; on the phone it's a vertical slab.
+3. **Foxglove bells are flat paper cones** stacked like a ladder. → cylindrical shading, a dark open
+   throat seen as an ellipse, bells turning round the stem, a curve in the stem.
+4. **Far "leaves" float as translucent surfboards,** and bokeh sits in front of the island like soap
+   bubbles. → darker, attached silhouettes; bokeh only low by the far bank near the sun, fainter.
+5. **The heap's drops are flat-bottomed domes** that read as onions. → rounder, more varied sizes.
+
+## Round 4 — first critic (fresh eyes, screenshots only)
+
+The critic's ten, worst first: (1) the light contradicts itself — sun behind, but leaf, cap and moss lit
+flat from the front; (2) the island is an ant-farm cutaway on a ruler-straight waterline, mirrored at
+full value; (3) a symmetric gate round an empty centre, sun dead centre, the glitter a hard trapezoid,
+a grey dome tangent to the bottom edge; (4) the phone has a black wedge, an empty bottom 40%, edge blades
+across the island; (5) the harvest story can't be read — workers tiny and soil-coloured, hovers barely
+change anything; (6) clouds are repeating stripes with the same pale hem; (7) every plane has the same
+line and contrast, the edge blades read as smudges on glass; (8) near drops read as cigarettes, bokeh is
+a lens effect pasted into a flat illustration; (9) clone-stamp bells, a constant-width pipe of a stem, a
+perfect web; (10) the brightest, most saturated thing is the lime leaf in the corner.
+
+Done this round: sun moved off-axis (x 712 → 826) so the jetty, crane and cistern stand against the
+hottest sky and the glitter leads to them; `DH.shadeFace` puts every house and the cup into backlight
+(shade across, deepening away from the sunward edge, rim only on the sun side); the island's face is
+now moss down to a band of wet soil at the waterline, coves in the shore, sedge along it, stones in the
+shallows; the object reflection is darker and broken into dashes; glitter is broken tapering sparkle (no
+trapezoid); the stone is fully in frame; no bokeh, no edge blades; streaks are thin fading gradients;
+clouds vary in size and only low ones get a warm hem; leaf knocked down to olive with a warmer glow;
+foxglove spike graduated to closed buds at the top, uneven spacing, one bell drooping; phone bank curls
+away, fore drops and floats fill the phone's lower water.
+
+Still to do from the critique: (5) hero action and hover payoffs; (7) plane separation by line weight
+and haze; (9) web and blade irregularity.
+
+## Round 5
+
+The story pass. The crane is bigger (jib 112, mast a bent forked twig with a strut and a snapped side
+shoot, the jib cocked up and swinging *over the top* to the heap instead of a goalpost); the sling
+drop is r15 and catches the sun; workers are a lighter lilac with a thicker gold rim so they read
+against the moss. Hovering the leaf now visibly sags it and pours a thick glassy rope onto the heap
+with a churn of spray. House and cup outlines lighter than the foreground's (the island is a plane
+back). The web has broken strands hanging loose; the arching blade tapers and pinches where it twists
+to show its paler back. The stone in the bottom-right (a helmet) became a floating oak leaf, curled at
+the rim, rocking on the rings, beads rolling to its low side and off. The near bank has root and beard
+clusters, creeping moss and two huddles of fairy-bonnet mushrooms. Far clover removed (saucers on
+sticks).
+
+Five worst now:
+1. The upper-left quarter is empty storm; nothing leads the eye there except the web.
+2. Reflections step visibly (strip jaggies) in the bottom right.
+3. The leaf has no undulation along its lower margin — a smooth arc against the sky.
+4. The snail ferry and ladybird are still tiny at full frame.
+5. The island's right end and the Nut House get little light or story.
+
+## Round 6
+
+The weather gets an event in the empty upper left: a **squall curtain** hung from the deck to the far
+bank, slanting with the wind, streaked inside, darkening the sky behind the web so its beads glow. A
+maple key comes spinning down out of it every half minute, lands with a ring and floats off with the
+petals (hover it in the air and it catches your umbrella's wind). The reflection's strips are shorter
+and the waver grows slower toward us (fewer stair-steps). The Great Leaf's margin undulates. Ferry and
+ladybird 1.3×. The oak leaf less foreshortened (it read as a mustard splat). Moss blobs on the near
+bank's soil removed (lily pads).
+
+## Round 7 — second critic
+
+The critic's ten: (1) the left edge looks broken — a dark see-through slab with a ruler edge and
+circles (the far grass with its blurry beads), and the squall a pale rectangle; (2) backlight still not
+committed — leaf brightest green, island top lit from the front; (3) a gate round empty water, the blade
+rising from nowhere, the web the highest-contrast thing; phone top 40% dead cloud; (4) the reflection is
+a murky drowned object with full outlines, the floating leaf a gold sticker in its shadow; (5) the sky
+is a procedure — a repeating scallop and a straight lighter band; (6) the umbrella barely reads; (7)
+stamped textures — polka-dot moss, noisy square scales on the cap; (8) no change with distance in line
+or contrast; (9) the harvest isn't staged as one clear action; (10) the near bank is a cutaway with roots
+dangling into water, the foxglove clones.
+
+Done: the far grass at the left edge is gone; the squall is built of wide soft slanted strokes that
+fade top and bottom (no edges). The leaf is darker olive, glowing only by its tip. Mirrored objects get a
+veil of the water's violet so they lose contrast; the oak leaf is in the water's browns. The umbrella
+dome always shows faintly, always has drops landing on it (extra drops aimed at it), and the water
+beneath it goes calm — a dry pocket. Moss is drifts of tufts following the slope of the hill with
+hollows under them; the parasol's scales sit in rings round the crown. The island plane is inked in
+a lighter, coloured line (`DH.LINE_MID`) than the foreground. **The catcher**: a pill-bug standing on top
+of the heap holds a net up right under the leaf's tip; the pendant drop lets go into it, the net sags,
+he tips it onto the heap, the tally notches; when you make the leaf pour he ducks. That's the one clear
+action at the focal point: leaf → net → heap. The near bank lost its dangling roots and stones, gained
+moss down its face and washed pebbles at its waterline. On a phone, a bramble cane hangs into the top of
+the frame with dripping leaves.
+
+## Round 8 — 2× sweep of every quadrant
+
+1. Small falling drops read as nails (a pale cap on a dark bun). → under r 4 they're a soft bright bead
+   at the head of the streak; only the big near-camera drops keep the bun shape.
+2. The near bank's foot pulled back under itself, leaving a strip of water beneath it (it floated). →
+   its foot widens toward us below the desktop frame (the arching blade is now rooted in it) and only
+   curls away further down, for the phone.
+3. Its slope was a staircase of spiky balls. → a gentler slope.
+4. Foxglove buds stuck out sideways like grey discs. → they hang.
+5. Quiet sky between the web and the leaf: kept as negative space; the squall and the rain carry it.
+
+## Round 9 — hover sweep and the third critic
+
+Checked every reaction's hit target programmatically (26 points, no page errors); the lantern thread
+was stealing the Pod House's hover, so the pod now wins inside its own outline. Removed dead code
+(bokeh, edge blades, the bark path) and refreshed every part's header.
+
+The third critic's ten, worst first: (1) the island's reflection is a second island hanging below —
+opaque, crisp, stair-stepped; (2) the phone is a crop, not a composition; (3) still front-lit under a
+sun that's behind; (4) the eye level doesn't hold — we see the island's top and the bank's top as planes
+from a waterline camera, and the ferry seemed to sit on the bank; (5) clouds still procedural ribbons
+with no designed break; (6) the leaf competes with the sun; (7) foxglove cones and a perfect web with a
+ruler bottom edge; (8) the near bank a slab with a bead border of pebbles; (9) same line weight and
+density everywhere; (10) drops read as tan buns, the umbrella as a UI selection ring.
+
+## Round 10
+
+Reflection of the island: a violet veil, then faded out with depth below the shore (destination-out
+gradient on its sprite), wavering less than the sky's — it now dissolves into the water instead of
+hanging there. Houses and cup pushed further into backlight (shade 0.8–0.9). Leaf greyer, its glow only
+by the tip. Drops clearer: the refracted gold band thinner, the tint lighter, glints unchanged. The
+umbrella is no longer drawn as a ring at all; it shows itself by splash crowns along its curve (drops
+aimed at it twice as often) and the calm pocket in the water under it. The low cloud rows thin out over
+the sun, so the rift has a designed break. The web's frame threads sag between anchors and the spiral
+sags more on the lower side. Bells droop more variously. The pebble column down the near bank's edge is
+gone. The ferry crosses farther out (y 884) so it's plainly on water behind the bank.
+
+Still wrong (for whoever picks this up):
+- **The phone frame is a crop of the desktop,** not its own composition: the island runs off the right
+  edge and the lower third is mostly empty water. It wants a portrait layout (shift the world for tall
+  screens, or a canopy/foreground designed for it).
+- **The eye level is ambiguous.** A waterline camera shouldn't see the island's mossy top or the near
+  bank's top as planes; either raise the horizon or flatten those tops to profile.
+- **The sky's rolls are still more procedural than designed:** two or three big hand-placed masses with
+  varied edges would beat rows of generated ones.
