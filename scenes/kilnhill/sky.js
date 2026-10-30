@@ -14,15 +14,15 @@
     id: 'sky', z: 0, still: true,
     draw(g) {
       const v = view();
-      g.fillStyle = grad(g, 0, v.y0, 0, 900, [[0, '#050409'], [0.55, '#0a0812'], [0.86, '#140e1c'], [1, '#1e1420']]);
+      g.fillStyle = grad(g, 0, Math.min(v.y0, -200), 0, 900, [[0, '#04050c'], [0.5, '#080a18'], [0.85, '#0f1226'], [1, '#161830']]);
       g.fillRect(v.x0 - 10, v.y0 - 10, v.x1 - v.x0 + 20, v.y1 - v.y0 + 20);
       // haze at the horizon, warm where the far kiln towns are
-      for (const [x, r, a] of [[1240, 520, 0.16], [1660, 380, 0.12], [-260, 420, 0.1]]) {
-        g.fillStyle = radial(g, x, 812, 0, r, [[0, `rgba(150,70,40,${a})`], [0.5, `rgba(90,40,40,${a * 0.4})`], [1, 'rgba(60,30,40,0)']]);
+      for (const [x, r, a] of [[1240, 360, 0.08], [1660, 280, 0.06]]) {
+        g.fillStyle = radial(g, x, 812, 0, r, [[0, `rgba(130,60,50,${a})`], [0.5, `rgba(70,36,50,${a * 0.4})`], [1, 'rgba(40,24,50,0)']]);
         g.fillRect(x - r, 812 - r, r * 2, r * 2);
       }
       // the whole town lights the air above it a little
-      g.fillStyle = radial(g, 700, 760, 0, 900, [[0, 'rgba(120,48,26,0.22)'], [0.45, 'rgba(70,30,30,0.1)'], [1, 'rgba(40,20,30,0)']]);
+      g.fillStyle = radial(g, 600, 820, 0, 620, [[0, 'rgba(110,44,24,0.2)'], [0.45, 'rgba(60,26,30,0.08)'], [1, 'rgba(30,20,40,0)']]);
       g.fillRect(v.x0, v.y0, v.x1 - v.x0, v.y1 - v.y0);
     },
   });
@@ -37,10 +37,16 @@
     const U = new Path2D(), Mid = new Path2D(), Low = new Path2D();
     for (const [x, y, r] of circles) { circ(x, y, r, U); circ(x + r * 0.04, y + r * 0.26, r * 0.9, Mid); circ(x + r * 0.06, y + r * 0.52, r * 0.62, Low); }
     const rg = (list) => radial(g, CH[0], CH[1], 0, reach, list);
-    g.fillStyle = rg([[0, K.mixc('#141015', '#3a1a16', 0.7 * warm)], [0.5, '#110d14'], [1, '#0c0a10']]); g.fill(U);
+    g.fillStyle = rg([[0, K.mixc('#141218', '#3a1a16', 0.7 * warm)], [0.45, '#0e0e1c'], [1, '#0a0b18']]); g.fill(U);
     g.save(); g.clip(U);
-    g.fillStyle = rg([[0, K.mixc('#1a1418', '#6a2c18', 0.8 * warm)], [0.35, K.mixc('#16111a', '#3a1c18', 0.6 * warm)], [1, '#100d14']]); g.fill(Mid);
-    g.fillStyle = rg([[0, K.mixc('#2a1a1a', '#b04c1e', 0.85 * warm, 0.95)], [0.3, K.mixc('#1a1418', '#5a2618', 0.7 * warm, 0.7)], [0.7, 'rgba(20,14,20,0.2)'], [1, 'rgba(20,14,20,0)']]); g.fill(Low);
+    g.fillStyle = rg([[0, K.mixc('#1a1418', '#6a2c18', 0.8 * warm)], [0.3, K.mixc('#14131e', '#3a1c1a', 0.5 * warm)], [0.7, '#10101e'], [1, '#0d0e1a']]); g.fill(Mid);
+    g.fillStyle = rg([[0, K.mixc('#2a1a1a', '#b04c1e', 0.85 * warm, 0.95)], [0.22, K.mixc('#1a1418', '#5a2618', 0.7 * warm, 0.7)], [0.55, 'rgba(26,24,40,0.35)'], [1, 'rgba(26,24,40,0.15)']]); g.fill(Low);
+    // rolling volume: a few curling lit edges inside the mass
+    if (o.curls) for (const [x, y, r] of o.curls) {
+      const d = Math.hypot(x - CH[0], y - CH[1]), k = clamp(1 - d / reach, 0, 1);
+      g.lineWidth = 1.6 + r * 0.02; g.strokeStyle = K.mixc('#1a1a2a', '#c0582a', k * k * warm, 0.18 + 0.4 * k);
+      g.beginPath(); g.arc(x, y, r, Math.PI * 0.15, Math.PI * 0.85); g.stroke();
+    }
     g.restore();
   }
   // the plume: up off the lip, leaning right with the breeze, flattening into a long drift
@@ -65,9 +71,9 @@
   layer({
     id: 'canopy', z: 2, still: true,
     draw(g) {
-      smokeMass(g, ceiling, { warm: 0.35, reach: 1400 });
+      smokeMass(g, ceiling, { warm: 0.3, reach: 1200 });
       // far end first, so nearer banks overlap it
-      for (let i = plumeBanks.length - 1; i >= 0; i--) smokeMass(g, plumeBanks[i], { warm: 1, reach: 900, edge: i > 2 });
+      for (let i = plumeBanks.length - 1; i >= 0; i--) smokeMass(g, plumeBanks[i], { warm: 1, reach: 620, curls: plumeBanks[i].filter((c, k) => k % 3 === 1).map(([x, y, r]) => [x, y - r * 0.2, r * 0.55]) });
     },
   });
 
@@ -88,10 +94,10 @@
     },
     draw(g, t, L) {
       // the warm haze the far towns raise behind their hills, then the hills dark against it
-      g.fillStyle = grad(g, 0, 730, 0, 820, [[0, 'rgba(70,30,30,0)'], [0.7, 'rgba(110,46,34,0.35)'], [1, 'rgba(140,60,40,0.45)']]);
+      g.fillStyle = grad(g, 0, 750, 0, 820, [[0, 'rgba(50,30,50,0)'], [0.75, 'rgba(70,40,60,0.3)'], [1, 'rgba(90,50,60,0.4)']]);
       g.fillRect(760, 730, 1500, 90);
       g.fillStyle = '#0a080e'; g.fill(farPath);
-      g.lineWidth = 1.4; g.strokeStyle = 'rgba(170,80,50,0.4)'; g.stroke(curve([[880, 812], [1000, 800], [1120, 806], [1240, 786], [1380, 800], [1520, 784], [1660, 804], [1780, 796], [1900, 810], [2200, 820]], false));
+      g.lineWidth = 1.2; g.strokeStyle = 'rgba(120,70,90,0.35)'; g.stroke(curve([[880, 812], [1000, 800], [1120, 806], [1240, 786], [1380, 800], [1520, 784], [1660, 804], [1780, 796], [1900, 810], [2200, 820]], false));
       g.globalCompositeOperation = 'lighter';
       for (const T of towns) {
         const r = rng(T.seed * 31);

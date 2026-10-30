@@ -142,7 +142,7 @@
       // the pots: glaze lit by their own dull heat and the bench light
       for (const p of cooling) {
         const path = coolPath(p);
-        const c = K.lit(p.glaze, p.x, BY - p.h / 2, [0, 0, 1], 0.3);
+        const c = K.lit(p.glaze, p.x, BY - p.h / 2, [0, 0, 1]);
         g.fillStyle = 'rgba(8,4,10,0.5)'; g.fill(ell(p.x + 2, BY, p.w, 3));
         g.fillStyle = grad(g, p.x - p.w, 0, p.x + p.w, 0, [[0, K.css(K.mix(c, [0.9, 0.5, 0.3], 0.3))], [0.5, K.css(c)], [1, K.css(K.mul(c, 0.45))]]); g.fill(path);
         g.lineWidth = 1.8; g.strokeStyle = K.inkAt(p.x, BY, 0.6); g.stroke(path);
@@ -180,7 +180,7 @@
       for (const p of cooling) {
         // residual heat: the pot walls glow faintly from within, breathing
         const hot = 0.3 + 0.08 * Math.sin(t * 0.8 + p.x);
-        K.glow(g, p.x, BY - p.h * 0.5, p.w * 1.5, '#ff3a10', hot * 0.35, 1.1);
+        K.glow(g, p.x, BY - p.h * 0.5, p.w * 1.4, '#ff3a10', hot * 0.22, 1.1);
       }
       for (const c of crackles) for (const l of c.lines) {
         const a = clamp(1 - l.age / 2.6, 0, 1);
@@ -205,44 +205,78 @@
   const zs = [];
   layer({
     id: 'sleeper', z: 56, roll: 0,
-    hit: (x, y) => x > 1460 && x < 1540 && y > 1086 && y < 1150,
-    onEnter() { this.zT = 0; },
+    hit: (x, y) => x > 1468 && x < 1548 && y > 1080 && y < 1150,
     update(dt, t, L) {
       this.roll = ease(this.roll, L.hovered ? 1 : 0, 2, dt);
-      if (Math.random() < dt * (L.hovered ? 1.6 : 0.35)) zs.push({ x: 1500, y: 1092, age: 0, s: 0.6 + Math.random() * 0.4 });
+      if (Math.random() < dt * (L.hovered ? 1.6 : 0.35)) zs.push({ x: 1516, y: 1092, age: 0, s: 0.6 + Math.random() * 0.4 });
       for (const z of zs) { z.age += dt; z.y -= dt * 14; z.x += Math.sin(z.age * 2) * dt * 8; }
       while (zs.length && zs[0].age > 3) zs.shift();
     },
     draw(g, t, L) {
-      const x = 1500, y = 1140, br = Math.sin(t * 1.3) * 0.5 + 0.5, roll = K.smooth(this.roll);
-      // curled up on its side: a soft lump of fur, head tucked, hands under the cheek
-      const key = K.keyAt(x, y - 20), I = clamp(key.I * 0.5, 0, 1.4);
-      const fur = K.lit(M.fur, x, y - 20, [key.dx, key.dy, 0.4]);
-      g.save(); g.translate(x, y);
-      { const c = Math.cos(roll * Math.PI); g.scale(Math.sign(c || 1) * Math.max(0.2, Math.abs(c)), 1); }
-      const sx = 1 + br * 0.025;
-      g.scale(sx, 1);
-      g.fillStyle = 'rgba(8,4,10,0.45)'; g.fill(ell(0, 0, 34, 5));
-      const body = curve([[-30, -2], [-30, -18], [-16, -30 - br], [6, -31 - br], [24, -24], [30, -10], [26, -1]]);
-      g.lineWidth = 3.4; g.strokeStyle = K.inkAt(x, y, 0.6); g.stroke(body);
-      g.fillStyle = grad(g, 30, -30, -30, 0, [[0, K.css(K.mix(fur, [1, 0.6, 0.35], clamp(I * 0.6, 0, 0.8)))], [0.4, K.css(fur)], [1, K.css(K.mul(fur, 0.5))]]); g.fill(body);
-      // the blanket: an apron pulled over
-      const bl = curve([[-28, -4], [-24, -20], [-6, -24], [10, -20], [16, -6], [8, -1]]);
-      g.fillStyle = K.litc(M.clothRed, x, y - 10, [0.5, 0, 0.8]); g.fill(bl); g.lineWidth = 1.4; g.strokeStyle = K.LINE; g.stroke(bl);
-      g.lineWidth = 0.8; g.beginPath(); g.moveTo(-18, -18); g.lineTo(-14, -4); g.moveTo(-6, -20); g.lineTo(-2, -4); g.stroke();
-      // snout and hands at the front
-      g.fillStyle = K.litc(M.skin, x + 26, y - 14); g.fill(curve([[20, -20], [34, -16], [36, -12], [30, -9], [20, -11]]));
-      g.lineWidth = 1.4; g.strokeStyle = K.LINE; g.stroke(curve([[20, -20], [34, -16], [36, -12], [30, -9], [20, -11]]));
-      g.fillStyle = '#c05a64'; g.fill(circ(35, -13.5, 1.6));
-      g.fill(ell(22, -6, 6, 3.5));
-      g.lineWidth = 1; g.strokeStyle = K.LINE; g.beginPath(); g.moveTo(14, -21); g.quadraticCurveTo(17, -19 + roll, 20, -21); g.stroke();
-      if (roll > 0.4) { g.beginPath(); g.moveTo(22, -13); g.quadraticCurveTo(25, -10, 28, -12); g.stroke(); }
-      g.restore();
+      // slumped back against the warm brick leg of the bench, hands folded, a cloth over its knees
+      const br = Math.sin(t * 1.3) * 0.5 + 0.5, roll = K.smooth(this.roll);
+      const scratch = L.hovered && L.since > 1.8 ? K.bell(Math.min(1, (L.since - 1.8) / 1.4)) : 0;
+      K.mole(g, 1500, 1146, 1.15, {
+        lean: -0.32 - roll * 0.12, sleep: true, smile: 1 + roll * 1.4, breathe: br,
+        hands: scratch > 0.1 ? { f: [20, -32 + Math.sin(t * 16) * 1.5], b: [-2, -12] } : { f: [8, -13], b: [-2, -12] },
+        snout: scratch * Math.sin(t * 16) * 0.8, scarf: '#6a4a6a', lx: 1480, ly: 1110,
+      });
+      const cl = curve([[1484, 1146], [1490, 1126], [1508, 1120], [1524, 1128], [1530, 1146]]);
+      g.fillStyle = K.litc(M.clothRed, 1500, 1134, [-0.4, -0.3, 0.9]); g.fill(cl); g.lineWidth = 1.5; g.strokeStyle = K.inkAt(1500, 1140, 0.6); g.stroke(cl);
+      g.lineWidth = 0.8; g.beginPath(); g.moveTo(1500, 1124); g.lineTo(1496, 1144); g.moveTo(1514, 1124); g.lineTo(1516, 1144); g.stroke();
       for (const z of zs) {
         const a = Math.min(1, z.age * 2) * (1 - z.age / 3);
         g.font = `italic ${10 * z.s + z.age * 3}px Georgia, serif`;
         g.fillStyle = `rgba(255,220,180,${0.7 * a})`; g.fillText('z', z.x, z.y);
       }
+    },
+  });
+
+  // ------------------------------------------------------------------ the watchers
+  // a mole and its pup up late at the foot of the path, watching the firing: the nearest figures
+  // in the picture, dark against the glow with the kiln's light on their rims.
+  // Hover: the pup hops and points, the parent lifts its mug; linger and it puts an arm round the pup
+  const blinkA = Drawn.blinker(2.5, 4), blinkB = Drawn.blinker(1.6, 3);
+  const mugSteam = [];
+  layer({
+    id: 'watchers', z: 64, hop: 0,
+    hit: (x, y) => x > 770 && x < 950 && y > 1060 && y < 1176,
+    onEnter() { this.hop = 1; },
+    update(dt, t, L) {
+      this.hop = Math.max(0, this.hop - dt * 1.4);
+      if (Math.random() < dt * 3) mugSteam.push({ x: 0, y: 0, age: 0, sd: Math.random() * 9 });
+      for (const m of mugSteam) m.age += dt;
+      while (mugSteam.length && mugSteam[0].age > 2) mugSteam.shift();
+    },
+    draw(g, t, L) {
+      g.fillStyle = 'rgba(8,4,10,0.45)'; g.fill(ell(860, 1174, 90, 8));
+      const hug = L.hovered && L.since > 1.4 ? K.smooth((L.since - 1.4) / 0.6) : 0;
+      const hopY = -Math.abs(Math.sin(this.hop * Math.PI * 3)) * 10 * this.hop;
+      const sip = L.hovered ? K.smooth(Math.min(1, L.since / 0.5)) * (1 - hug) : 0;
+      const br = Math.sin(t * 1.6) * 0.5 + 0.5;
+      // the parent, mug in hand
+      const ph = K.mole(g, 910, 1172, 2.1, {
+        flip: true, apron: '#5a4a3a', scarf: '#5a6a8a', open: blinkA(t), look: [0.6, -0.6], breathe: br, smile: 1,
+        hands: hug > 0 ? { f: [26 - hug * 4, -30 + hug * 4], b: [6, -18] } : { f: [14, -22 - sip * 10], b: [-8, -16] },
+        lean: -0.04 * hug, lx: 890, ly: 1120,
+      });
+      if (!hug) {
+        const [mx, my] = ph.f;
+        const mug = K.rrect(mx - 9, my - 16, 14, 16, 3);
+        g.fillStyle = K.litc(M.glazeTeal, mx - 4, my - 8, [-0.6, -0.3, 0.7]); g.fill(mug); g.lineWidth = 1.8; g.strokeStyle = K.inkAt(mx, my, 0.6); g.stroke(mug);
+        g.beginPath(); g.arc(mx + 6, my - 8, 4, -Math.PI / 2, Math.PI / 2); g.stroke();
+        for (const m of mugSteam) {
+          const u = m.age / 2;
+          g.strokeStyle = `rgba(200,190,190,${0.3 * (1 - u)})`; g.lineWidth = 1.2;
+          g.beginPath(); g.moveTo(mx - 2, my - 18 - u * 26); g.quadraticCurveTo(mx + 4 * Math.sin(m.sd + u * 6), my - 24 - u * 30, mx - 2, my - 30 - u * 34); g.stroke();
+        }
+      }
+      // the pup, pointing at the fire
+      const point = 0.5 + 0.5 * Math.max(this.hop, Math.sin(t * 0.4) > 0.7 ? 1 : 0);
+      K.mole(g, 806, 1172 + hopY, 1.35, {
+        flip: true, scarf: '#a84438', open: blinkB(t), look: [0.6, -1], breathe: br, smile: 1.8, mouth: this.hop > 0.2 ? 0.5 : 0,
+        hands: { f: [22, -42 - point * 10], b: [-10, -16] }, lx: 806, ly: 1130,
+      });
     },
   });
 

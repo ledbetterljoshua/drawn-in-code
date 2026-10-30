@@ -27,7 +27,7 @@
   const bankPath = curve([[-760, 896], [140, 900], [260, 934], [420, 948], [600, 952], [800, 948], [960, 926], [1100, 960], [1400, 990], [2360, 990], [2360, 1060], [-760, 1060]], true);
   const terracePath = curve([[880, 870], [1000, 852], [1200, 858], [1320, 840], [1420, 800], [1540, 784], [1640, 812], [1760, 846], [2360, 860], [2360, 910], [1600, 912], [1200, 906], [960, 912]], true);
   const wallTop = 906, wallBot = 1000;
-  const frontEdge = [[-760, 1010], [-400, 1004], [0, 1000], [300, 1006], [520, 1012], [700, 1004], [900, 1012], [1200, 1004], [1500, 1010], [1900, 1004], [2360, 1008]];
+  const frontEdge = [[-760, 1016], [-460, 998], [-200, 1010], [60, 992], [300, 1008], [520, 1016], [700, 1000], [900, 1018], [1120, 996], [1360, 1012], [1600, 994], [1900, 1012], [2360, 1000]];
   const frontPath = () => { const v = view(); return curve([...frontEdge, [2360, v.y1 + 50], [-760, v.y1 + 50]], true); };
 
   K.ground = { crestTop, lip, yardBack, wallTop, wallBot, frontEdge };
@@ -38,9 +38,10 @@
     const r = rng(seed), n = o.n || 3, h = o.h || 14;
     for (let i = 0; i < pts.length - 1; i++) {
       const [x0, y0] = pts[i], [x1, y1] = pts[i + 1], len = Math.hypot(x1 - x0, y1 - y0);
-      const cnt = Math.round(len / 40 * n);
+      const cnt = Math.round(len / 40 * n * 1.6);
       for (let k = 0; k < cnt; k++) {
         const u = r(), x = lerp(x0, x1, u), y = lerp(y0, y1, u) + 2;
+        if (noise(x * 0.012 + seed) < -0.05) continue;
         const hh = h * (0.5 + r()), blades = 3 + (r() * 4 | 0);
         for (let b = 0; b < blades; b++) {
           const lean = (r() - 0.35) * 0.9, bx = x + (b - blades / 2) * 2.2;
@@ -104,11 +105,10 @@
     for (const [x, y, s = 1] of pts) {
       const a = (r() - 0.5) * 0.6;
       g.save(); g.translate(x, y); g.rotate(a); g.scale(s, s);
-      g.fillStyle = 'rgba(40,22,26,0.28)'; g.fill(ell(0, 0, 24, 13));
-      g.fillStyle = 'rgba(255,230,200,0.12)'; g.fill(ell(0, -4, 22, 6));
+      g.fillStyle = 'rgba(40,22,26,0.2)'; g.fill(ell(0, 0, 24, 13));
       for (let k = 0; k < 4; k++) {
         g.beginPath(); g.moveTo(-18 + k * 3, -6 + k * 4); g.quadraticCurveTo(0, 4 + k * 3, 18 - k * 2, -6 + k * 4);
-        g.lineWidth = 1.4; g.strokeStyle = 'rgba(40,22,26,0.55)'; g.stroke();
+        g.lineWidth = 1.2; g.strokeStyle = 'rgba(40,22,26,0.35)'; g.stroke();
         g.beginPath(); g.moveTo(-17 + k * 3, -7.5 + k * 4); g.quadraticCurveTo(0, 2.5 + k * 3, 17 - k * 2, -7.5 + k * 4);
         g.lineWidth = 0.8; g.strokeStyle = 'rgba(255,220,190,0.25)'; g.stroke();
       }
@@ -181,7 +181,7 @@
       thornTree(g, 1500, 776, 0.55, 8);
       K.applyLight(g, p);
       // the silhouette line against the smoke
-      g.lineWidth = 2.4; g.strokeStyle = K.LINE; g.stroke(curve(crestTop, false));
+      g.lineWidth = 1.6; g.strokeStyle = 'rgba(6,6,14,0.8)'; g.stroke(curve(crestTop, false));
     },
   });
 
@@ -196,7 +196,7 @@
       g.save(); g.clip(f);
       g.fillStyle = grad(g, 0, 590, 0, 660, [[0, 'rgba(20,10,20,0.55)'], [1, 'rgba(20,10,20,0)']]); g.fillRect(-800, 580, 1300, 90);
       g.restore();
-      scoops(g, f, [[-60, 700, 1], [20, 760, 0.9], [210, 680, 1.1], [300, 760, 0.8], [-220, 690, 0.9], [-300, 790, 1], [170, 820, 0.8], [360, 700, 0.7]], 5);
+      scoops(g, f, [[20, 760, 0.9], [210, 690, 1.1], [-240, 700, 0.8], [330, 790, 0.7]], 5);
       stones(g, f, [-700, 620, 1150, 240], 26, 7, M.stone, 5);
       burrowMouth(g, 96, 646, 26, 20, 3);
       // roots hanging off the lip
@@ -414,23 +414,23 @@
         g.fill(ell(-700 + r() * 3000, y, (8 + r() * 26) * s, (2 + r() * 4) * s));
       }
       // the path: packed clay, worn pale, widening toward us
-      const path = curve([[600, 1012], [640, 1012], [700, 1060], [760, 1130], [800, 1220], [860, 1400], [940, v.y1 + 40], [600, v.y1 + 40], [600, 1400], [620, 1220], [600, 1130], [590, 1060]], true);
+      const path = curve([[598, 1014], [642, 1014], [690, 1052], [718, 1110], [706, 1180], [690, 1260], [736, 1400], [840, v.y1 + 40], [580, v.y1 + 40], [552, 1400], [556, 1260], [590, 1180], [610, 1110], [592, 1060]], true);
       g.fillStyle = '#9a8270'; g.fill(path);
       g.save(); g.clip(path);
       for (let i = 0; i < 80; i++) { const y = 1010 + r() * (v.y1 - 1000); g.fillStyle = r() < 0.5 ? 'rgba(255,240,220,0.25)' : 'rgba(90,60,50,0.3)'; g.fill(ell(560 + r() * 400, y, 4 + r() * 10, 1.5 + r() * 2)); }
       // broken brick and sherds pressed into it
-      for (let i = 0; i < 26; i++) { const y = 1020 + r() * 500, x = 610 + (y - 1000) * 0.18 + r() * 120; g.fillStyle = r() < 0.5 ? M.brick2 : M.terracotta; g.fill(poly([[x, y], [x + 7, y - 2], [x + 9, y + 3], [x + 2, y + 4]])); }
+      for (let i = 0; i < 26; i++) { const y = 1020 + r() * 500, x = 600 + Math.sin((y - 1000) / 140) * 26 + r() * 90; g.fillStyle = r() < 0.5 ? M.brick2 : M.terracotta; g.fill(poly([[x, y], [x + 7, y - 2], [x + 9, y + 3], [x + 2, y + 4]])); }
       g.restore();
       // footprints: mole feet, five toes, going both ways
       for (let i = 0; i < 22; i++) {
-        const y = 1030 + i * 26 + r() * 8, side = i % 2 ? 1 : -1, x = 640 + (y - 1000) * 0.22 + side * 12 + r() * 4, s = 1 + (y - 1000) / 500;
+        const y = 1030 + i * 26 + r() * 8, side = i % 2 ? 1 : -1, x = 640 + Math.sin((y - 1000) / 140) * 26 + side * 12 + r() * 4, s = 1 + (y - 1000) / 500;
         g.fillStyle = 'rgba(60,40,36,0.35)'; g.fill(ell(x, y, 3.2 * s, 1.6 * s));
         for (let k = 0; k < 4; k++) g.fill(ell(x - 3 * s + k * 2 * s, y - 2.6 * s, 0.8 * s, 0.6 * s));
       }
       g.restore();
       // grass creeping over the path's edges so it isn't a hard strip
-      tufts(g, [[596, 1060], [604, 1140], [622, 1240], [604, 1420], [610, 1700]], 66, { n: 7, h: 10 });
-      tufts(g, [[690, 1050], [760, 1140], [810, 1240], [866, 1420], [930, 1700]], 67, { n: 7, h: 10 });
+      tufts(g, [[592, 1060], [610, 1110], [590, 1180], [556, 1260], [552, 1400], [580, 1700]], 66, { n: 7, h: 10 });
+      tufts(g, [[690, 1052], [718, 1110], [706, 1180], [690, 1260], [736, 1400], [840, 1700]], 67, { n: 7, h: 10 });
       stones(g, p, [-700, 1030, 3000, Math.max(200, v.y1 - 1030)], 26, 63, M.stone, 10);
       burrowMouth(g, 140, 1196, 32, 22, 12);
       tufts(g, frontEdge, 64, { n: 3, h: 14 });
@@ -439,8 +439,10 @@
       const clumps = [];
       for (let i = 0; i < 40; i++) clumps.push([[-700 + rr() * 3000, 1180 + rr() * Math.max(80, v.y1 - 1180)]]);
       for (const [[x, y]] of clumps) { if (x > 560 && x < 980) continue; tufts(g, [[x - 30, y], [x + 30, y]], x | 0, { n: 6, h: 20 + (y - 1100) * 0.05 }); }
+      // the near ground's lip: a soft shadowed crest rather than an inked line
+      g.save(); g.clip(p); g.lineWidth = 10; g.strokeStyle = 'rgba(20,10,14,0.35)'; g.stroke(curve(frontEdge.map(([x, y]) => [x, y + 6]), false)); g.restore();
       K.applyLight(g, p);
-      g.lineWidth = 2.4; g.strokeStyle = K.LINE; g.stroke(curve(frontEdge, false));
+      g.lineWidth = 1.2; g.strokeStyle = 'rgba(12,6,12,0.5)'; g.stroke(curve(frontEdge, false));
     },
   });
 

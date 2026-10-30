@@ -83,3 +83,26 @@ irregular (sagging courses, round saggars end-on), heat pipe thickened and propp
    ground door in a mound with steps going down into light and boots left outside.
 5. **Kiln brickwork was mechanically even.** Salt crust speckling the shoulder and arches (three
    nights of salt glazing), a patch of newer bricks where a crack was mended.
+
+## Round 3 — fresh-eyes critique
+A critic who saw only screenshots named ten things. The ones that mattered, and what changed:
+1. **"Values sit in one muddy band."** True: sky, smoke, hill and ground were all dark maroon. The
+   sky is now a cool deep indigo (still no moon or stars; it's just the colour of the dark), the
+   town's warm haze on it is much smaller, and the main firemouth light has a steeper falloff
+   (exponent 4.6 instead of 2) over a longer reach, so there's a hot pool at the kiln's foot that
+   dies quickly instead of a warm wash over everything. Minor lamps shrank by ~25%.
+2. **"Smoke is stacked flat discs."** Smoke colour now cools to blue-grey with distance from the
+   chimney, with a few curling lit edges inside each bank to show it rolling.
+3. **"Empty bottom third, no hero figures."** Added the nearest figures in the picture: a mole
+   and its pup up late by the lantern post, watching the firing, the parent with a steaming mug,
+   the pup pointing. They're 2× the scale of the stoker, so the picture has a near layer.
+4. **"A ruler line runs across the foreground."** The near ground's edge undulates and has a soft
+   shadowed crest instead of an inked line; grass now clusters (noise-gated) instead of stamping.
+5. **"Every house wears the same star pattern."** Each house has its own piercing language now:
+   teapot stars and moons, jug slots and drops, lantern pot a dense spiral of dots, bowl house
+   crescents and triangles, jar stack diamonds; lamp colours differ slightly per house.
+Also: the path is an S-curve, logs are oval and split and varied, the sleeper is a proper mole
+slumped against the bench leg (it read as a slug), the far jar stack has lighter lines.
+Rejected: "add a cool moonlight fill" and "stars through gaps": the lane is light from within only.
+Disagreed: "brick rows run dead straight" — they follow the viewpoint ellipses; near eye level
+they're nearly straight, which is correct.

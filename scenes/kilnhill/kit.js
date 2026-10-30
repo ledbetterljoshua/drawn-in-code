@@ -33,7 +33,7 @@
   // these are the steady values the still layers are painted with.
   K.AMB = [0.13, 0.135, 0.27];
   K.lights = [];
-  K.addLight = (o) => { const L = Object.assign({ x: 0, y: 0, z: 70, r: 300, col: [1.4, 0.7, 0.3], k: 1, id: '' }, o); K.lights.push(L); return L; };
+  K.addLight = (o) => { const L = Object.assign({ x: 0, y: 0, z: 70, r: 300, p: 2, col: [1.4, 0.7, 0.3], k: 1, id: '' }, o); K.lights.push(L); return L; };
   // the sum of fire light at a point. n = [nx, ny, nz] is the surface normal in screen space
   // (nz toward the viewer); with it, faces turned away from a fire fall dark. A light's z is how
   // far in front of the surfaces around it the flame sits.
@@ -43,7 +43,7 @@
       if (L === skip || L.k <= 0) continue;
       const dx = L.x - x, dy = L.y - y, d = Math.hypot(dx, dy);
       if (d > L.r) continue;
-      let f = 1 - d / L.r; f *= f * L.k;
+      let f = Math.pow(1 - d / L.r, L.p) * L.k;
       if (n) { const d3 = Math.hypot(dx, dy, L.z) || 1; f *= 0.18 + 0.82 * Math.max(0, (n[0] * dx + n[1] * dy + (n[2] || 0) * L.z) / d3); }
       r += L.col[0] * f; g += L.col[1] * f; b += L.col[2] * f;
     }
@@ -73,7 +73,7 @@
     brick: '#b45a3c', brick2: '#9c4a34', brick3: '#c4704a', brickBurnt: '#5e3a34', mortar: '#a89a88',
     iron: '#3a3a44', soot: '#1a1418',
     clay: '#c89a74', clayPale: '#e2c7a4', clayDark: '#8e6248', terracotta: '#c86a44', slip: '#b8a088',
-    glazeTeal: '#3e8c8a', glazeCream: '#e8dcc0', glazeOx: '#8a3a2a', glazeHoney: '#c8902e', glazeBlue: '#3a5a9a',
+    glazeTeal: '#3e8c8a', glazeCream: '#e8dcc0', glazeOx: '#7a3a30', glazeHoney: '#c8902e', glazeBlue: '#3a5a9a',
     earth: '#6a4a3a', earthDark: '#3e2c26', grass: '#4c6a3a', grassDry: '#8a7a4a', stone: '#8a8290',
     wood: '#8a5a3a', woodDark: '#5a3a28', woodPale: '#b08860', rope: '#a48a60',
     cloth: '#c8b48c', clothRed: '#a84438', clothBlue: '#4a5a8a', clothGreen: '#5a7a4a',

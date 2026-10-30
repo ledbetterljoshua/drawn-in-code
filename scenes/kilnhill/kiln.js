@@ -54,7 +54,7 @@
       if (skipK.has(l)) continue;
       const dx = l.x - x, dy = l.y - y, d = Math.hypot(dx, dy);
       if (d > l.r) continue;
-      let f = (1 - d / l.r) ** 2 * l.k;
+      let f = Math.pow(1 - d / l.r, l.p) * l.k;
       const d3 = Math.hypot(dx, dy, l.z);
       f *= 0.18 + 0.82 * Math.max(0, (n[0] * dx + n[1] * dy + n[2] * l.z) / d3);
       L[0] += l.col[0] * f; L[1] += l.col[1] * f; L[2] += l.col[2] * f;
@@ -86,17 +86,18 @@
       g.fillStyle = 'rgba(8,4,10,0.5)'; g.fill(ell(310, 874, 110, 10));
       for (const [x0, y, n] of rows) {
         for (let i = 0; i < n; i++) {
-          const x = x0 + i * 25 + (r() - 0.5) * 4, rr = 10.5 + r() * 2.5, yy = y + (r() - 0.5) * 3;
-          const end = ell(x, yy, rr, rr * 0.95);
+          const x = x0 + i * 25 + (r() - 0.5) * 5, rr = 9 + r() * 4.5, yy = y + (r() - 0.5) * 4, sq = 0.8 + r() * 0.3, half = r() < 0.25;
+          const end = half ? (() => { const p = new Path2D(); p.moveTo(x - rr, yy + 2); p.ellipse(x, yy + 2, rr, rr * sq, 0, Math.PI, 0); p.closePath(); return p; })() : ell(x, yy, rr, rr * sq, undefined, (r() - 0.5) * 0.4);
           const bark = K.litc(M.woodDark, x + 6, yy, [0.6, 0, 0.8]);
-          g.fillStyle = bark; g.fill(ell(x - 4, yy, rr, rr * 0.95));
+          g.fillStyle = bark; g.fill(ell(x - 4, yy, rr, rr * sq));
           g.fillStyle = K.litc('#c89a68', x, yy, [0.5, 0, 0.86]); g.fill(end);
           // growth rings and a split
           g.lineWidth = 0.7; g.strokeStyle = K.css(K.lit('#7a5434', x, yy), 0.9);
-          for (let k = 1; k < 4; k++) g.stroke(ell(x + 0.8 * k, yy + 0.3 * k, rr * (1 - k * 0.24), rr * 0.95 * (1 - k * 0.24)));
+          if (!half) for (let k = 1; k < 4; k++) g.stroke(ell(x + 0.8 * k, yy + 0.3 * k, rr * (1 - k * 0.24), rr * sq * (1 - k * 0.24)));
           if (r() < 0.5) { g.beginPath(); g.moveTo(x, yy); g.lineTo(x + rr * 0.8, yy - rr * 0.5); g.stroke(); }
           g.lineWidth = 1.5; g.strokeStyle = K.inkAt(x, yy); g.stroke(end);
-          g.beginPath(); g.ellipse(x - 4, yy, rr, rr * 0.95, 0, Math.PI * 0.5, Math.PI * 1.5); g.stroke();
+          g.beginPath(); g.ellipse(x - 4, yy, rr, rr * sq, 0, Math.PI * 0.5, Math.PI * 1.5); g.stroke();
+          if (r() < 0.3) { g.lineWidth = 1; g.beginPath(); g.moveTo(x - rr * 0.3, yy - rr * 0.6); g.lineTo(x + rr * 0.1, yy + rr * 0.1); g.lineTo(x - rr * 0.1, yy + rr * 0.7); g.stroke(); }
         }
       }
       // a chopping block with the axe left in it
@@ -276,7 +277,7 @@
       for (let i = 0; i < 3; i++) this.roar[i] = ease(this.roar[i], L.hovered && this.which === i ? 0.7 : 0, 1.5, dt);
       // the fire breathes: a slow swell and a quick flicker, shared by every flame and glow
       K.fire.level = 1 + 0.08 * noise(t * 0.7) + 0.05 * noise(t * 5.3 + 3);
-      K.fire.salt = ease(K.fire.salt, 0, 0.9, dt);
+      K.fire.salt = ease(K.fire.salt, 0, K.fire.saltT < 1.2 ? 0.15 : 0.9, dt);
       K.fire.saltT += dt;
     },
     draw(g, t, L) {
@@ -457,7 +458,7 @@
           for (let i = 0; i < 3; i++) {
             const bend = cones[i].x, x0 = lx - 10 + i * 10, y0 = ly + 10;
             g.save(); g.translate(x0, y0); g.rotate(bend * 1.25);
-            g.fillStyle = K.css(K.fireAt(0.78 - i * 0.04)); g.fill(poly([[-3, 0], [3, 0], [0.5, -15]]));
+            g.fillStyle = K.css(K.fireAt(0.5 - i * 0.04)); g.fill(poly([[-3, 0], [3, 0], [0.5, -15]]));
             g.lineWidth = 0.8; g.strokeStyle = 'rgba(120,40,10,0.8)'; g.stroke(poly([[-3, 0], [3, 0], [0.5, -15]]));
             g.restore();
           }

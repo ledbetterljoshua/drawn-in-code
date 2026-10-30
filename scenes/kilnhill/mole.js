@@ -18,7 +18,7 @@
     for (const L of K.lights) {
       const dx = L.x - x, dy = L.y - y, d = Math.hypot(dx, dy);
       if (d > L.r || d < 1) continue;
-      const f = (1 - d / L.r) ** 2 * L.k * (L.col[0] + L.col[1]);
+      const f = Math.pow(1 - d / L.r, L.p) * L.k * (L.col[0] + L.col[1]);
       sx += (dx / d) * f; sy += (dy / d) * f; tot += f;
     }
     const m = Math.hypot(sx, sy) || 1;

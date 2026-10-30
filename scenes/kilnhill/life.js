@@ -95,7 +95,7 @@
     },
     draw(g, t, L) {
       // the dug alcove in the face, and the heap of clay beside it
-      g.fillStyle = 'rgba(20,8,10,0.55)'; g.fill(curve([[14, 884], [16, 836], [30, 818], [50, 816], [58, 840], [60, 884]]));
+      { const al = curve([[12, 886], [14, 838], [28, 818], [50, 814], [62, 838], [64, 886]]); g.fillStyle = '#1c0e0c'; g.fill(al); g.lineWidth = 1.6; g.strokeStyle = K.LINE; g.stroke(al); g.lineWidth = 2; g.strokeStyle = K.litc(M.clayPale, 40, 830); g.beginPath(); g.moveTo(30, 820); g.quadraticCurveTo(50, 812, 62, 838); g.stroke(); }
       Drawn.lumps(g, [[148, 880, 10], [160, 878, 12], [172, 881, 8], [156, 868, 9], [166, 870, 7]], { line: K.LINE, lw: 1.2, shade: K.litc(M.clayDark, 160, 874), base: K.litc(M.clay, 160, 874), lit: K.litc(M.clayPale, 150, 866) });
       // his lantern on the ground
       const f = 0.9 + 0.1 * noise(t * 5);
@@ -162,15 +162,21 @@
   function basketY(t, lift) { return lerp(760 + Math.sin(t * 0.9) * 3, 622, K.smooth(lift)); }
 
   // ------------------------------------------------------------------ puddle
-  const PU = { x: 486, y: 1072, rx: 78, ry: 11 };
+  const PU = { x: 470, y: 1074, rx: 96, ry: 14 };
   const puddle = curve([[PU.x - PU.rx, PU.y], [PU.x - PU.rx * 0.6, PU.y - PU.ry], [PU.x + PU.rx * 0.3, PU.y - PU.ry * 1.1], [PU.x + PU.rx, PU.y - 2], [PU.x + PU.rx * 0.7, PU.y + PU.ry], [PU.x - PU.rx * 0.4, PU.y + PU.ry * 0.9]]);
   layer({
     id: 'puddle', z: 50.5, still: true,
     draw(g) {
       // the slip puddle mirrors the dark above it, and the kiln's glow at its far edge
-      g.fillStyle = grad(g, 0, PU.y - PU.ry, 0, PU.y + PU.ry, [[0, '#6a2a12'], [0.35, '#2a1410'], [1, '#0e0a10']]); g.fill(puddle);
-      g.lineWidth = 3; g.strokeStyle = K.litc('#c8b098', PU.x, PU.y, [0, -1, 0.5]); g.stroke(puddle);
-      g.lineWidth = 1.2; g.strokeStyle = 'rgba(20,10,14,0.8)'; g.stroke(puddle);
+      // a muddy rim first, trodden wet clay
+      g.fillStyle = K.litc(M.clayDark, PU.x, PU.y); g.fill(ell(PU.x + 4, PU.y + 2, PU.rx * 1.08, PU.ry * 1.5));
+      g.fillStyle = grad(g, 0, PU.y - PU.ry, 0, PU.y + PU.ry, [[0, '#a8501e'], [0.3, '#4a2216'], [0.7, '#1a1014'], [1, '#0e0a10']]); g.fill(puddle);
+      // the kiln's silhouette upside down at the far edge, dark against the glow
+      g.save(); g.clip(puddle);
+      g.fillStyle = 'rgba(14,8,12,0.75)'; g.fill(poly([[PU.x + 20, PU.y - PU.ry], [PU.x + 120, PU.y - PU.ry], [PU.x + 96, PU.y + 2], [PU.x + 70, PU.y + 10], [PU.x + 50, PU.y + 2]]));
+      g.restore();
+      g.lineWidth = 1.6; g.strokeStyle = 'rgba(20,10,14,0.9)'; g.stroke(puddle);
+      g.lineWidth = 1; g.strokeStyle = K.css(K.lit('#e0c8a8', PU.x, PU.y), 0.6); g.beginPath(); g.ellipse(PU.x, PU.y + 1, PU.rx * 0.98, PU.ry, 0, 0.2, Math.PI - 0.2); g.stroke();
     },
   });
   const rings = [];
@@ -188,7 +194,7 @@
       // shivering streaks of the firemouths' reflection
       for (let i = 0; i < 9; i++) {
         const y = PU.y - PU.ry + 2 + i * 2.2, w = (14 + noise(t * 2 + i * 3) * 10) * (1 - i / 12);
-        const x = 528 + noise(t * 1.5 + i * 7) * 6 + (i % 3 - 1) * 8;
+        const x = PU.x + 40 + noise(t * 1.5 + i * 7) * 6 + (i % 3 - 1) * 10;
         g.fillStyle = `rgba(255,${140 + i * 6},60,${0.32 * (1 - i / 10) * K.fire.level})`;
         g.fillRect(x - w, y, w * 2, 1.2);
       }
@@ -205,7 +211,7 @@
   layer({
     id: 'barrow', z: 52.5, still: true,
     draw(g) {
-      const x = 1000, y = 1160;
+      const x = 380, y = 1186;
       g.fillStyle = 'rgba(8,4,10,0.5)'; g.fill(ell(x + 10, y + 4, 70, 8));
       // handles back to the right, legs, the tray, the wheel at the front (left)
       Drawn.tube(g, Drawn.seg(x - 30, y - 30, x + 78, y - 52), K.litc(M.wood, x + 30, y - 40), 4, 1.4);

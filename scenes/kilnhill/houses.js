@@ -103,6 +103,8 @@
         else if (sh === 'star') { for (let j = 0; j < 8; j++) { const a = (j / 8) * TAU - Math.PI / 2, rr = j % 2 ? 0.38 : 1; const px = x + Math.cos(a) * sx * rr * 1.2, py = yy + Math.sin(a) * sy * rr * 1.2; j ? p.lineTo(px, py) : p.moveTo(px, py); } p.closePath(); }
         else if (sh === 'moon') { p.ellipse(x, yy, sx, sy, 0, -Math.PI / 2, Math.PI / 2, false); p.ellipse(x - sx * 0.45, yy, sx * 0.55, sy, 0, Math.PI / 2, -Math.PI / 2, true); p.closePath(); }
         else if (sh === 'slot') { p.ellipse(x, yy, sx * 0.4, sy * 1.6, 0, 0, TAU); }
+        else if (sh === 'diamond') { p.moveTo(x, yy - sy * 1.3); p.lineTo(x + sx, yy); p.lineTo(x, yy + sy * 1.3); p.lineTo(x - sx, yy); p.closePath(); }
+        else if (sh === 'tri') { p.moveTo(x, yy + sy); p.lineTo(x + sx, yy - sy * 0.7); p.lineTo(x - sx, yy - sy * 0.7); p.closePath(); }
         else if (sh === 'drop') { p.moveTo(x, yy - sy * 1.4); p.quadraticCurveTo(x + sx, yy, x, yy + sy); p.quadraticCurveTo(x - sx, yy, x, yy - sy * 1.4); }
         out.push({ path: p, x, y: yy, k, th });
       }
@@ -145,8 +147,8 @@
   // ------------------------------------------------------------------ upper terrace: jug tower
   const jug = K.lathe(128, [[30, 330], [24, 340], [21, 352], [22, 392], [34, 420], [58, 452], [72, 500], [74, 556], [66, 590], [62, 600]]);
   const jugHoles = piercings(jug, [
-    { y: 476, n: 9, size: 3.2, shape: 'star' }, { y: 500, n: 11, size: 2.4, shape: 'dot', off: 0.5 },
-    { y: 522, n: 9, size: 3, shape: 'moon' }, { y: 544, n: 11, size: 2.2, shape: 'dot', off: 0.5 },
+    { y: 486, n: 11, size: 2.6, shape: 'slot' }, { y: 516, n: 13, size: 2.4, shape: 'drop', off: 0.5 },
+    { y: 546, n: 11, size: 2.6, shape: 'slot' },
   ]);
   const jugWin = surfArch(jug, Math.PI / 2 - 0.1, 22, 30, 412);
   const jugDoor = surfArch(jug, Math.PI / 2 + 0.25, 30, 44, 600);
@@ -173,7 +175,7 @@
     hit: (x, y) => Math.abs(x - 128) < 70 && y > 330 && y < 600,
     draw(g, t, L) {
       const f = lampFlicker(t, 1) * (1 + L.hover * 0.2) * (K.pulse ? 1 + K.pulse.jug : 1);
-      holesLive(g, jugHoles, f * 0.95, [1, 0.8, 0.45], t, 1);
+      holesLive(g, jugHoles, f * 0.95, [1, 0.9, 0.62], t, 1);
       // the window: lamplight, a shutter that swings open on hover, and a mole leaning out
       g.save(); g.clip(jugWin.path);
       g.fillStyle = K.css(K.fireAt(0.72 * f)); g.fill(jugWin.path);
@@ -200,8 +202,9 @@
   // ------------------------------------------------------------------ upper terrace: lantern pot
   const lant = K.lathe(298, [[16, 470], [26, 476], [42, 492], [56, 520], [62, 556], [58, 592], [52, 610]]);
   const lantHoles = piercings(lant, [
-    { y: 492, n: 6, size: 3, shape: 'dot' }, { y: 516, n: 8, size: 4.6, shape: 'star', off: 0.5 },
-    { y: 542, n: 9, size: 3.4, shape: 'moon' }, { y: 566, n: 8, size: 4.4, shape: 'star', off: 0.5 }, { y: 588, n: 9, size: 2.6, shape: 'dot' },
+    { y: 490, n: 8, size: 1.8, shape: 'dot' }, { y: 502, n: 10, size: 2, shape: 'dot', off: 0.25 }, { y: 516, n: 12, size: 2.2, shape: 'dot', off: 0.5 },
+    { y: 531, n: 13, size: 2.3, shape: 'dot', off: 0.75 }, { y: 546, n: 14, size: 2.4, shape: 'dot' }, { y: 561, n: 14, size: 2.4, shape: 'dot', off: 0.25 },
+    { y: 576, n: 13, size: 2.2, shape: 'dot', off: 0.5 }, { y: 590, n: 11, size: 2, shape: 'dot', off: 0.75 },
   ]);
   layer({
     id: 'lantern', z: 14.2, still: true,
@@ -220,7 +223,7 @@
     update(dt, t, L) { this.sp = ease(this.sp, L.hovered ? 1.6 : 0.12, 1.5, dt); this.spin += this.sp * dt; },
     draw(g, t, L) {
       const f = lampFlicker(t, 2) * (1 + L.hover * 0.3) * (K.pulse ? 1 + K.pulse.lantern : 1);
-      holesLive(g, lantHoles, f, [1, 0.82, 0.5], t, 2);
+      holesLive(g, lantHoles, f, [1, 0.7, 0.42], t, 2);
       // its pattern thrown on the clay face beside it, crawling as the lamp inside turns
       g.globalCompositeOperation = 'lighter';
       for (let i = 0; i < 18; i++) {
@@ -344,7 +347,7 @@
   // ------------------------------------------------------------------ the bowl house
   const BX = 1352, BB = 912;
   const bowl = K.lathe(BX, [[34, 812], [40, 816], [52, 822], [84, 840], [110, 866], [124, 892], [128, 906], [126, BB]]);
-  const bowlHoles = piercings(bowl, [{ y: 850, n: 9, size: 3, shape: 'dot', from: 0.4, to: Math.PI - 0.4 }, { y: 872, n: 11, size: 4.2, shape: 'star', off: 0.5 }]);
+  const bowlHoles = piercings(bowl, [{ y: 848, n: 9, size: 3.6, shape: 'moon', from: 0.4, to: Math.PI - 0.4 }, { y: 874, n: 12, size: 3.4, shape: 'tri', off: 0.5 }]);
   const bowlDoor = surfArch(bowl, Math.PI / 2 - 0.12, 34, 52, BB);
   layer({
     id: 'bowl', z: 40, still: true,
@@ -372,7 +375,7 @@
     update(dt, t, L) { for (const p of line) K.swing(p, dt, t, L); },
     draw(g, t, L) {
       const f = lampFlicker(t, 4) * (K.pulse ? 1 + K.pulse.bowl : 1);
-      holesLive(g, bowlHoles, f, [1, 0.8, 0.46], t, 4);
+      holesLive(g, bowlHoles, f, [0.98, 0.9, 0.66], t, 4);
       const h = K.smooth(L.hover);
       g.save(); g.clip(bowlDoor.path);
       g.fillStyle = K.css(K.fireAt(0.66 * f)); g.fill(bowlDoor.path);
@@ -406,11 +409,11 @@
   const JX = 1470;
   const jarLo = K.lathe(JX, [[26, 690], [30, 696], [46, 716], [54, 744], [52, 770], [44, 788]]);
   const jarHi = K.lathe(JX, [[16, 630], [19, 634], [30, 648], [36, 668], [32, 684], [26, 692]]);
-  const jarHolesLo = piercings(jarLo, [{ y: 730, n: 7, size: 3.2, shape: 'star' }, { y: 756, n: 8, size: 2.4, shape: 'dot', off: 0.5 }]);
-  const jarHolesHi = piercings(jarHi, [{ y: 662, n: 6, size: 2.6, shape: 'moon' }]);
+  const jarHolesLo = piercings(jarLo, [{ y: 730, n: 8, size: 2.8, shape: 'diamond' }, { y: 756, n: 9, size: 2.6, shape: 'diamond', off: 0.5 }]);
+  const jarHolesHi = piercings(jarHi, [{ y: 662, n: 7, size: 2.4, shape: 'diamond' }]);
   const wob = K.spring({ k: 50, d: 3.2 });
-  const jarLoS = potSprite(jarLo, { skip: K.L.jar, clay: M.clay, glaze: { col: M.glazeOx, edge: 728, seed: 31 }, seed: 32 }, (g) => holesStill(g, jarHolesLo));
-  const jarHiS = potSprite(jarHi, { skip: K.L.jar, clay: M.clay, glaze: { col: M.glazeCream, edge: 676, seed: 33 }, seed: 34, lw: 2 }, (g) => { rim(g, jarHi, M.clay, 1.8); holesStill(g, jarHolesHi); });
+  const jarLoS = potSprite(jarLo, { skip: K.L.jar, clay: M.clay, glaze: { col: M.glazeOx, edge: 728, seed: 31 }, seed: 32, lw: 1.7, ambK: 1.3 }, (g) => holesStill(g, jarHolesLo));
+  const jarHiS = potSprite(jarHi, { skip: K.L.jar, clay: M.clay, glaze: { col: M.glazeCream, edge: 676, seed: 33 }, seed: 34, lw: 1.5, ambK: 1.3 }, (g) => { rim(g, jarHi, M.clay, 1.8); holesStill(g, jarHolesHi); });
   layer({
     id: 'jarLive', z: 36,
     hit: (x, y) => Math.abs(x - JX) < 60 && y > 610 && y < 792,
