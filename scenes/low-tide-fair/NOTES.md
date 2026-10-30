@@ -213,3 +213,30 @@ which found the scene's worst remaining kind of bug: things you can't see or can
 4. **The grandmother's neck had a dark smear** for a core shadow and two tubes for lower
    tentacles. Softer, wider core shadow; shorter, thinner feelers.
 5. **The headland's foot fog** cut the cliffs in half. Thinner and lower.
+
+## Round 8
+
+**Critic, third pass (fresh eyes):** (1) ghostly half-transparent shapes in the wet sand; (2) milky
+values, no dark anchor; (3) the sky says golden hour but the tower casts no long shadow; (4) stalls
+and crate in flat front elevation with no top plane; (5) the tower's horn chimneys and a pole
+sticking out of its silhouette read as construction errors, and the snail's head is putty;
+(6) characters copy-paste; (7) dead foreground band, unreadable corner props; (8) materials;
+(9) procedural scatter; (10) no legible sea, so the low-tide premise is lost.
+
+The five I took:
+
+1. **Ghosts in the sand.** Every snail's reflection was mirrored into *any* water below it, so the
+   tower's lower whorls turned up as a mauve stain in a puddle 150 px away. *Fixed:* reflections are
+   clipped to a band just under each snail, and pool edges no longer ring.
+2. **No sea.** *Fixed:* a deeper blue band of sea on the right horizon with the far cumulus sitting on
+   its far edge, and a bright surf line where it meets the flats.
+3. **Construction errors on the tower.** *Fixed:* chimneys are copper pots seated on the ledges, the
+   laundry pole is inside the silhouette.
+4. **The shadow.** *Fixed:* a longer shear (1.15) and a darker shadow for the tower so it rakes across
+   the sand to the right.
+5. **Flat stalls.** *Fixed:* counters and the band's crate show their top planes; the crabs stand on
+   the top.
+Plus a light canvas grade (saturate 1.12, contrast 1.07) to lift the values out of the milk.
+
+Not taken, and why: a full re-pose of the folk (three-quarter views, seen-from-behind) needs a
+second rig; that's the biggest thing left (see "still wrong").

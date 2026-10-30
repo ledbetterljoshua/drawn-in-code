@@ -119,14 +119,14 @@ layer({
   draw(g) {
     const v = st.view;
     // the sea, out past the headland's point: a bright band, with the tide's lines in it
-    g.fillStyle = grad(g, 0, HZ - 16, 0, HZ + 6, ['#c9d8da', '#e9e8da', '#f8ecd2']);
-    g.fillRect(1300, HZ - 14, v.x1 - 1300 + 10, 22);
+    g.fillStyle = grad(g, 0, HZ - 24, 0, HZ + 6, ['#9fb6c6', '#bccbd0', '#e3e2d6']);
+    g.fillRect(1300, HZ - 22, v.x1 - 1300 + 10, 28);
     g.strokeStyle = 'rgba(140,160,180,0.45)'; g.lineWidth = 0.8;
     const r = rng(81);
     for (let i = 0; i < 26; i++) { const y = HZ - 12 + r() * 14, x = 1350 + r() * (v.x1 - 1350); g.beginPath(); g.moveTo(x, y); g.lineTo(x + 20 + r() * 60, y); g.stroke(); }
 
-    // far cumulus over the sea (behind the headland's point)
-    const towers = [[1700, HZ - 12, 240, 70, 41], [2000, HZ - 10, 300, 92, 43], [1450, HZ - 10, 150, 40, 47], [2250, HZ - 8, 200, 60, 53]];
+    // far cumulus out over the sea, sitting on its far edge
+    const towers = [[1700, HZ - 22, 240, 70, 41], [2000, HZ - 22, 300, 92, 43], [1450, HZ - 22, 150, 40, 47], [2250, HZ - 22, 200, 60, 53]];
     for (const [x, y, w, h, s] of towers) {
       const rr = rng(s), cs = [];
       const n = Math.round(w / 26);
@@ -196,6 +196,9 @@ layer({
     g.fillStyle = '#ffe9a8'; g.fillRect(lx - 2.6, ly - 38, 5.2, 4);
     g.fillStyle = '#c4645a'; g.fill(poly([[lx - 4.5, ly - 38], [lx, ly - 43], [lx + 4.5, ly - 38]]));
 
+    // the surf line where the sea meets the flats: the tide is out here, but on its way back
+    g.fillStyle = 'rgba(255,255,248,0.9)'; g.fillRect(1290, HZ + 3, v.x1 - 1280, 1.6);
+    g.fillStyle = 'rgba(120,140,160,0.35)'; g.fillRect(1290, HZ + 4.6, v.x1 - 1280, 1.4);
     // the far flats: pale, glassy, mirroring the sky in long bands
     g.fillStyle = grad(g, 0, HZ, 0, HZ + 90, ['#eadcd0', '#e1cdbd']);
     g.fillRect(v.x0 - 10, HZ, v.x1 - v.x0 + 20, 90);
@@ -219,9 +222,9 @@ layer({
   draw(g, t) {
     const v = st.view;
     g.save();
-    g.beginPath(); g.rect(1300, HZ - 14, v.x1 - 1290, 18); g.clip();
+    g.beginPath(); g.rect(1300, HZ - 22, v.x1 - 1290, 28); g.clip();
     for (let i = 0; i < 30; i++) {
-      const x = 1320 + ((i * 137.3 + t * (6 + (i % 3) * 3)) % (v.x1 - 1300 + 40)), y = HZ - 11 + (i * 7.3) % 12;
+      const x = 1320 + ((i * 137.3 + t * (6 + (i % 3) * 3)) % (v.x1 - 1300 + 40)), y = HZ - 19 + (i * 7.3) % 22;
       const a = 0.5 + 0.5 * Math.sin(t * (1.2 + (i % 5) * 0.4) + i);
       g.fillStyle = `rgba(255,252,236,${0.75 * a})`; g.fillRect(x, y, 6 + (i % 4) * 5, 1);
     }

@@ -21,7 +21,7 @@ F.far = (y) => clamp(1 - (y - F.HZ) / 330, 0, 1) ** 1.6;
 
 // the sun is low on the left and a little in front of us; shadows run right and slightly away
 F.SUN = { x: -900, y: 120 };
-F.SHX = 0.95; F.SHY = 0.12;
+F.SHX = 1.15; F.SHY = 0.13;
 
 const LINE = (D.style.line = '#3b2433');
 F.LINE = LINE;

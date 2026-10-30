@@ -305,20 +305,20 @@ function granTown(g) {
       D.lumps(g, [[px, py - ps * 2.4, ps * 0.9], [px - ps * 0.7, py - ps * 1.9, ps * 0.7], [px + ps * 0.7, py - ps * 2, ps * 0.6]], { line: LINE, lw: 0.6, shade: '#4f6e48', base: '#6f9452', lit: '#9cbb62' });
     }
   }
-  // chimneys: hollow spines pulled out of the shell, capped with a tin hood
-  for (const [i, a] of [[2, 1.2], [4, -1.15]]) {
-    const w = ws[i];
-    const [x, y] = F.bandAt(w, a, 0.6);
-    const s = clamp(w.h * 0.2, 6, 16), dirx = a > 0 ? 1 : -1;
-    const horn = curve([[x - s * 0.5, y + s * 0.4], [x + dirx * s * 0.6, y - s * 0.8], [x + dirx * s * 0.9, y - s * 2.2], [x + dirx * s * 1.3, y - s * 2.1], [x + dirx * s * 1.2, y - s * 0.8], [x + s * 0.5, y + s * 0.4]]);
-    ink(g, horn, SHELL_GRAN.base, 1.4);
-    g.save(); g.clip(horn); g.fillStyle = SHELL_GRAN.shade; g.fill(ell(x + s, y - s, s * 0.7, s * 2)); g.fillStyle = SHELL_GRAN.band; g.globalAlpha = 0.6; g.fillRect(x - s, y - s * 1.2, s * 3, s * 0.3); g.restore();
-    ink(g, poly([[x + dirx * s * 0.6, y - s * 2.3], [x + dirx * s * 1.6, y - s * 2.3], [x + dirx * s * 1.1, y - s * 2.8]]), '#7c7890', 1);
-    (gran.chimneys = gran.chimneys || []).push([x + dirx * s * 1.1, y - s * 2.8]);
+  // chimneys: copper pots set into the ledges, with tin hoods
+  for (const [i, a] of [[2, 0.7], [4, -0.55]]) {
+    const w = ws[i], up = ws[i + 1];
+    const x = w.cx + Math.sin(a) * w.rt * 0.9, y = F.bandBottom(up, x) - 2;
+    const s = clamp(w.h * 0.16, 5, 13);
+    ink(g, poly([[x - s * 0.45, y], [x - s * 0.4, y - s * 1.8], [x + s * 0.4, y - s * 1.8], [x + s * 0.45, y]]), '#c07a4c', 1.2);
+    g.fillStyle = '#e8a46a'; g.fillRect(x - s * 0.36, y - s * 1.75, s * 0.22, s * 1.7);
+    g.fillStyle = '#8a5236'; g.fillRect(x + s * 0.1, y - s * 1.75, s * 0.28, s * 1.7);
+    ink(g, poly([[x - s * 0.7, y - s * 1.85], [x + s * 0.7, y - s * 1.85], [x, y - s * 2.5]]), '#7c7890', 1);
+    gran.chimneys.push([x, y - s * 2.5]);
   }
   // laundry poles on the third whorl (the line itself flutters live)
   const wl = ws[3];
-  const la = [wl.cx - wl.rt * 1.15, F.bandBottom(ws[4], wl.cx - wl.rt * 0.9) - 14], lb = [wl.cx + wl.rt * 0.1, F.bandBottom(ws[4], wl.cx + wl.rt * 0.1) - 18];
+  const la = [wl.cx - wl.rt * 0.8, F.bandBottom(ws[4], wl.cx - wl.rt * 0.8) - 14], lb = [wl.cx + wl.rt * 0.1, F.bandBottom(ws[4], wl.cx + wl.rt * 0.1) - 18];
   F.post(g, la[0], la[1], la[1] + 16, 2.4); F.post(g, lb[0], lb[1], lb[1] + 18, 2.4);
   gran.laundry = [la, lb];
   // the cupola on the apex: four posts and a little roof over the bell
@@ -557,7 +557,7 @@ onLayout(() => {
 layer({
   id: 'snail-shadows', z: 5.2, still: true,
   draw(g) {
-    for (const sn of F.SNAILS) drawShadow(g, sn, sn === gran ? 0.62 : 0.52);
+    for (const sn of F.SNAILS) drawShadow(g, sn, sn === gran ? 0.78 : 0.55);
   },
 });
 layer({
@@ -566,8 +566,10 @@ layer({
     g.save(); g.clip(F.water);
     for (const sn of [gran, tea, young, book]) {
       // mirrored about the line where it stands, faint, and a touch bluer than the real thing
-      g.save(); g.translate(0, sn.y * 2 + 2); g.scale(1, -1);
-      g.globalAlpha = 0.32; blit(g, sn.shell);
+      // only the water right under it holds a readable reflection
+      g.save(); g.beginPath(); g.rect(sn.x - 600, sn.y - 4, 1200, 110 * sn.S); g.clip();
+      g.translate(0, sn.y * 2 + 2); g.scale(1, -1);
+      g.globalAlpha = 0.3; blit(g, sn.shell);
       g.restore();
     }
     g.restore();

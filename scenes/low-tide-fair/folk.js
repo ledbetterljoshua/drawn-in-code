@@ -102,14 +102,15 @@ layer({
     grounded(g, band.x, band.y, 22 * s, 90 * s, (g) => {
       const cw = 45 * s, ch = 22 * s;
       ink(g, poly([[band.x - cw, band.y], [band.x - cw, band.y - ch], [band.x + cw, band.y - ch], [band.x + cw, band.y]]), F.WOOD.base, 1.4);
-      g.fillStyle = F.WOOD.lit; g.fillRect(band.x - cw, band.y - ch, cw * 2, ch * 0.22);
+      const top = ch * 0.9 * flat(band.y) * 2;
+      ink(g, poly([[band.x - cw, band.y - ch], [band.x + cw, band.y - ch], [band.x + cw - 3 * s, band.y - ch - top], [band.x - cw + 3 * s, band.y - ch - top]]), F.WOOD.lit, 1.2);
       g.fillStyle = F.WOOD.shade; g.fillRect(band.x + cw * 0.55, band.y - ch, cw * 0.45, ch);
       g.strokeStyle = F.WOOD.deep; g.lineWidth = 0.8;
       for (let k = 1; k < 3; k++) { g.beginPath(); g.moveTo(band.x - cw, band.y - ch + (k * ch) / 3); g.lineTo(band.x + cw, band.y - ch + (k * ch) / 3); g.stroke(); }
       g.fillStyle = '#5a3a3a'; g.font = `italic 700 ${Math.round(7 * s)}px Georgia, serif`; g.textAlign = 'center'; g.fillText('KELP CO.', band.x - cw * 0.2, band.y - ch * 0.3);
     });
     for (const [i, c] of band.crabs.entries()) {
-      const bx = band.x + c.dx * s, by = band.y - 22 * s, hop = Math.max(0, Math.sin(b * Math.PI + i * 1.3)) * 2 * s * band.tempo * 0.6;
+      const bx = band.x + c.dx * s, by = band.y - 22 * s - 6 * s * flat(band.y), hop = Math.max(0, Math.sin(b * Math.PI + i * 1.3)) * 2 * s * band.tempo * 0.6;
       F.crab(g, bx, by - hop, { sc: s * 1.1, col: c.col, claw: c.inst === 'drum' ? 0.5 + Math.sin(b * TAU) * 0.5 : 0.6, walk: b * 0.25 });
       g.save(); g.translate(bx, by - hop); g.scale(s * 1.1, s * 1.1);
       if (c.inst === 'fiddle') { ink(g, ell(-8, -9, 3.2, 5, undefined, -0.5), '#b26a3a', 0.8); g.strokeStyle = LINE; g.lineWidth = 0.7; g.beginPath(); g.moveTo(6, -14 + Math.sin(b * TAU * 2) * 2); g.lineTo(-12, -4 + Math.sin(b * TAU * 2) * 2); g.stroke(); }
@@ -197,7 +198,9 @@ function stall(g, x, y, t, o) {
   const cy = y - 16 * s;
   ink(g, poly([[x - w / 2 - 2 * s, cy], [x + w / 2 + 2 * s, cy], [x + w / 2, y], [x - w / 2, y]]), F.mix(o.col, '#3b2433', 0.15), 1.2);
   g.fillStyle = 'rgba(70,40,80,0.3)'; g.fillRect(x + w * 0.1, cy, w * 0.4, 16 * s);
-  F.plank(g, [x - w / 2 - 3 * s, cy], [x + w / 2 + 3 * s, cy], 3 * s, F.PAL.drift, Math.round(x), 1.1);
+  // the counter's top, seen from a little above
+  ink(g, poly([[x - w / 2 - 3 * s, cy], [x + w / 2 + 3 * s, cy], [x + w / 2 + 1 * s, cy - 5 * s * flat(y) * 4], [x - w / 2 - 1 * s, cy - 5 * s * flat(y) * 4]]), F.PAL.drift.lit, 1);
+  F.plank(g, [x - w / 2 - 3 * s, cy + 1 * s], [x + w / 2 + 3 * s, cy + 1 * s], 3 * s, F.PAL.drift, Math.round(x), 1.1);
   if (o.goods) o.goods(g, x, cy, s);
   // the awning: stripes, a scalloped hem that ripples in the wind, and its shade on the counter
   const wv = D.wind(t, x), fl = o.flap || 0;

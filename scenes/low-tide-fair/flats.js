@@ -138,7 +138,7 @@ layer({
     g.beginPath(); creek.R.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y)));
     g.lineWidth = 9; g.strokeStyle = 'rgba(150,126,140,0.3)'; g.stroke();
     g.restore();
-    for (const p of pools) { g.save(); g.translate(0, -p.rx * flat(p.y) * 0.12); g.lineWidth = Math.max(3, p.rx * 0.08); g.strokeStyle = 'rgba(118,92,116,0.18)'; g.stroke(p.path); g.lineWidth = Math.max(1.5, p.rx * 0.03); g.strokeStyle = 'rgba(110,84,108,0.3)'; g.stroke(p.path); g.restore(); }
+    for (const p of pools) { g.save(); g.translate(0, -p.rx * flat(p.y) * 0.12); g.lineWidth = Math.max(4, p.rx * 0.1); g.strokeStyle = 'rgba(130,96,84,0.14)'; g.stroke(p.path); g.lineWidth = Math.max(1.2, p.rx * 0.02); g.strokeStyle = 'rgba(120,86,80,0.25)'; g.stroke(p.path); g.restore(); }
     // the water itself: the sky, upside down
     g.fillStyle = waterGrad(g); g.fill(water);
     g.save(); g.clip(water);
@@ -151,7 +151,7 @@ layer({
     }
     // near edges catch the light; the shallows show sand through them
     g.globalCompositeOperation = 'multiply';
-    for (const p of pools) { g.fillStyle = radial(g, p.x, p.y, p.rx * 0.2, p.rx, [[0, 'rgba(255,255,255,0)'], [1, 'rgba(214,190,170,0.55)']]); g.save(); g.translate(p.x, p.y); g.scale(1, flat(p.y) * 1.15); g.translate(-p.x, -p.y); g.fill(circ(p.x, p.y, p.rx * 1.1)); g.restore(); }
+    for (const p of pools) { g.fillStyle = radial(g, p.x, p.y, p.rx * 0.2, p.rx, [[0, 'rgba(255,255,255,0)'], [0.85, 'rgba(255,255,255,0)'], [1, 'rgba(200,170,150,0.35)']]); g.save(); g.translate(p.x, p.y); g.scale(1, flat(p.y) * 1.15); g.translate(-p.x, -p.y); g.fill(circ(p.x, p.y, p.rx * 1.1)); g.restore(); }
     g.restore();
     // the bright near rim of each pool and the creek, where the water meets the lit sand
     g.save(); g.lineWidth = 1.2; g.strokeStyle = 'rgba(255,248,232,0.35)';
