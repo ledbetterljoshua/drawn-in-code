@@ -134,10 +134,12 @@ layer({
     ridge(g, 905, 60, 11, mix('#3f8f9c', FOG, 0.55), null, (pts, r) => {
       for (let i = 0; i < 22; i++) { const [x, y] = pts[Math.floor(r() * pts.length)]; [brain, staghorn, sponge][i % 3](g, x, y + 6, 14 + r() * 22, fogPal(CORALS[i % 5], 0.8), r); }
     });
+    g.fillStyle = grad(g, 0, 780, 0, 930, [[0, 'rgba(76,159,169,0)'], [1, 'rgba(76,159,169,0.55)']]); g.fillRect(v.x0, 780, v.x1 - v.x0, 150);
     ridge(g, 975, 70, 23, mix('#3b8192', FOG, 0.38), null, (pts, r) => {
       for (let i = 0; i < 10; i++) { const [x, y] = pts[Math.floor(r() * pts.length)]; fan(g, x, y + 8, 60 + r() * 70, mix('#7a6a9c', FOG, 0.5), 1.4, r); }
       for (let i = 0; i < 24; i++) { const [x, y] = pts[Math.floor(r() * pts.length)]; [brain, staghorn, sponge][(i + 1) % 3](g, x, y + 8, 18 + r() * 26, fogPal(CORALS[(i + 2) % 5], 0.6), r); }
     });
+    g.fillStyle = grad(g, 0, 860, 0, 1000, [[0, 'rgba(76,159,169,0)'], [1, 'rgba(76,159,169,0.45)']]); g.fillRect(v.x0, 860, v.x1 - v.x0, 140);
     ridge(g, 1040, 55, 37, mix('#6a8f92', FOG, 0.14), mix('#2f5e70', FOG, 0.2), (pts, r) => {
       for (let i = 0; i < 9; i++) { const [x, y] = pts[Math.floor(r() * pts.length)]; fan(g, x, y + 10, 70 + r() * 90, mix(['#b56a83', '#c98a5e', '#8f6fa8'][i % 3], FOG, 0.15), 1.8, r); }
       for (let i = 0; i < 26; i++) {
@@ -346,10 +348,12 @@ layer({
 // garden eels: a colony in the sand, swaying into the current; they duck into their burrows when the
 // pointer comes near and ease back out once it's gone
 const eels = [];
-{ const r = rng(61); for (let i = 0; i < 8; i++) eels.push({ x: 1185 + i * 30 + r() * 22, y: 1090 + r() * 26, h: 50 + r() * 34, out: 1, ph: r() * 6, wait: 0 }); }
+{ const r = rng(61);
+  for (let i = 0; i < 9; i++) { const y = 1080 + Math.pow(r(), 0.8) * 40; eels.push({ x: 1120 + i * 23 + r() * 16, y, h: (30 + r() * 50) * (0.7 + (y - 1080) / 80), out: 1, ph: r() * 6, wait: 0, lean: (r() - 0.3) * 14 }); }
+  eels.sort((a, b) => a.y - b.y); }
 layer({
   id: 'eels', z: 14,
-  hit: (x, y) => x > 1160 && x < 1430 && y > 1020 && y < 1125,
+  hit: (x, y) => x > 1160 && x < 1450 && y > 1010 && y < 1125,
   update(dt, t, L) {
     for (const e of eels) {
       const near = P.inside && Math.hypot(P.x - e.x, P.y - (e.y - e.h * 0.5)) < (L.hovered ? 140 : 90);
@@ -363,7 +367,7 @@ layer({
       g.fillStyle = '#d6bc8e'; g.fill(ell(e.x, e.y + 1, 11, 4)); g.fillStyle = 'rgba(255,240,206,0.6)'; g.fill(ell(e.x - 3, e.y - 1, 7, 1.6)); g.fillStyle = 'rgba(60,50,50,0.7)'; g.fill(ell(e.x, e.y, 4.5, 1.8));
       if (e.out < 0.04) continue;
       const h = e.h * e.out, w = wind(t, e.x);
-      const pts = []; for (let i = 0; i <= 10; i++) { const u = i / 10; pts.push([e.x + Math.sin(t * 1.2 + e.ph + u * 3) * 6 * u - (w * 10 + 8) * u * u, e.y - h * u * (1 - 0.15 * u)]); }
+      const pts = []; for (let i = 0; i <= 10; i++) { const u = i / 10; pts.push([e.x + Math.sin(t * 1.2 + e.ph + u * 3) * 6 * u - (w * 10 + 8 - e.lean) * u * u, e.y - h * u * (1 - 0.15 * u)]); }
       C_limb(g, pts, 6, 4.5, '#efe6d2', 1.3, '#c9bca4');
       g.fillStyle = '#4a3a3a'; for (let i = 2; i < 10; i += 2) g.fill(circ(pts[i][0] + 1, pts[i][1], 1.1));
       const [hx, hy] = pts[10], [px, py] = pts[9];

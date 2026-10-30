@@ -31,7 +31,7 @@ const cirri = [], sheaths = [];
 // current, one hanging, one tucked under toward the funnel
 const BUNCH = [[146, 204, -0.1, 2, 9, -1.4, 1.05], [126, 236, 0.3, 1, 9, 0.6, 1.15], [138, 262, 0.62, 2, 8, 1.6, 0.9], [96, 286, 1.0, 1, 7, 2.2, 0.75]];
 for (const [bu, bv, ba, layer, n, cv, lm] of BUNCH) {
-  const sl = 18 + r() * 6;
+  const sl = 14 + r() * 5;
   sheaths.push({ u: bu, v: bv, a: ba, len: sl, layer });
   // a darker back row behind each cluster gives it depth
   for (let i = 0; i < n + 3; i++) {
@@ -131,7 +131,7 @@ layer({
       ink(g, ell(106 * fp, 314 + 2 * fp, 4 + S.puff * 3, 8, undefined, 0.2), '#6d3f4a', 1.4);
       // the head: one soft mass from the hood down to the root of the cirri
       const hb = br * 1.6;
-      const headPts = [[-96, 58], [-76, 10 - hb], [-20, -18 - hb], [70, -28 - hb], [146, -16 - hb], [186, 20], [192, 72], [176, 118], [164, 160], [160, 214], [148, 262], [112, 292], [50, 300], [6, 290], [-4, 200], [-40, 120]];
+      const headPts = [[-96, 58], [-76, 10 - hb], [-20, -18 - hb], [70, -28 - hb], [146, -16 - hb], [186, 20], [192, 72], [176, 118], [166, 160], [164, 210], [154, 252], [132, 286], [96, 306], [50, 312], [12, 298], [-4, 200], [-40, 120]];
       const head = curve(headPts);
       ink(g, head, '#d8a690', 2.8);
       g.save(); g.clip(head);
@@ -142,7 +142,7 @@ layer({
       g.fillStyle = 'rgba(120, 60, 70, 0.18)'; g.fill(ell(60, 150, 90, 16));
       // the hood: the upper half of the head, leathery tan, mottled and rough
       const hoodEdge = [[-100, 90], [-20, 112], [60, 130], [140, 128], [200, 108]];
-      const hood = curve([[-120, -80], [220, -80], ...hoodEdge.slice().reverse()]);
+      const hood = curve([[-120, -80], [150, -80], [215, -20], ...hoodEdge.slice().reverse()]);
       g.save(); g.clip(hood);
       g.fillStyle = '#eed9bf'; g.fill(hood);
       const hm = rng(4);
@@ -193,11 +193,13 @@ layer({
         g.lineWidth = 1; g.strokeStyle = 'rgba(255,230,210,0.7)'; g.beginPath(); g.moveTo(ex + er * 0.7, ly - 2); g.quadraticCurveTo(ex, ly + 3, ex - er * 0.6, ly - 2); g.stroke();
         g.restore();
       }
+      // where each cluster leaves the face, a soft fleshy collar, not a tube
       for (const sh of sheaths) {
-        const [x0, y0] = [sh.u, sh.v], x1 = x0 + Math.cos(sh.a) * sh.len, y1 = y0 + Math.sin(sh.a) * sh.len;
-        C.limb(g, [[x0, y0], [lerp(x0, x1, 0.5), lerp(y0, y1, 0.5) + 2], [x1, y1]], 20, 13, sh.layer === 2 ? '#dfae98' : sh.layer === 1 ? '#d09c88' : '#bf8c80', 0.9, '#a87470');
-        g.lineWidth = 0.7; g.strokeStyle = 'rgba(120,60,60,0.3)';
-        for (const f of [0.35, 0.65]) { const cx = lerp(x0, x1, f), cy = lerp(y0, y1, f); g.beginPath(); g.ellipse(cx, cy, 2.5, 6.5, sh.a, 0, TAU); g.stroke(); }
+        const cx = sh.u + Math.cos(sh.a) * sh.len * 0.6, cy = sh.v + Math.sin(sh.a) * sh.len * 0.6;
+        g.fillStyle = sh.layer === 2 ? '#dba792' : '#c99482'; g.fill(ell(cx, cy, sh.len * 0.75, 11, undefined, sh.a));
+        g.fillStyle = 'rgba(255, 226, 206, 0.45)'; g.fill(ell(cx - 2, cy - 4, sh.len * 0.45, 3.5, undefined, sh.a));
+        g.lineWidth = 1; g.strokeStyle = 'rgba(110, 56, 60, 0.45)';
+        g.beginPath(); g.ellipse(cx, cy, sh.len * 0.75, 11, sh.a, -0.3, Math.PI + 0.3); g.stroke();
       }
       drawCirri(g, t, L, false);
       g.restore();

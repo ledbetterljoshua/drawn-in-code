@@ -145,3 +145,14 @@ Did:
 - Kelp bows downstream in the current with its own lean and thickness per strand; the front strand
   moved off the face.
 - Phone: sky above the surface cooler, the big near rock pushed down so it's cropped.
+
+## Round 7
+Worst five:
+1. The cirri sheaths read as four metal nozzles with brooms in them → soft fleshy collars in the face
+   colour, the cirri leaving from under them.
+2. The haze ridges ended in a hard horizon band → a wash of water rises over the top of each ridge so
+   it dissolves upward.
+3. The eel colony was a picket fence at one height → nine eels at staggered depths, nearer ones taller,
+   each with its own lean.
+4. The chin was a right-angled jaw → a rounder underside to the head, the funnel tucked beneath.
+5. (kept) the turtle and the school both sit in the upper-left quadrant; the lower left is kelp and rock.
