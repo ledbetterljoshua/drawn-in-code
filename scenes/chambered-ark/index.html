@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Chambered Ark</title>
+<style>
+  html, body { height: 100%; margin: 0; overflow: hidden; background: #2f7f8c }
+  canvas { position: fixed; inset: 0; display: block; touch-action: manipulation; filter: saturate(1.1) }
+</style>
+</head>
+<body>
+<canvas aria-label="A giant chambered nautilus drifting over a sunlit reef, sliced in half so we see its spiral of rooms, each crewed by small sea creatures going about their day."></canvas>
+<script src="../../engine/drawn.js"></script>
+<script src="kit.js"></script>
+<script src="sea.js"></script>
+<script src="shell.js"></script>
+<script src="crew.js"></script>
+<script src="rooms.js"></script>
+<script src="rooms-inner.js"></script>
+<script src="animal.js"></script>
+<script src="visitors.js"></script>
+<script src="life.js"></script>
+<script>Drawn.start({ W: 1600, H: 1150, slack: 0.7 });</script>
+</body>
+</html>

@@ -1,0 +1,305 @@
+/* shell.js — the ark itself: the cut face of the shell (porcelain skin, nacre walls, every septum),
+   the chamber hollows behind it with the sun's shadow and the nacre's sheen, the siphuncle that
+   threads every chamber, and the uncut body chamber, striped, standing toward us.
+
+   It's one heavy picture, so it is painted once into a sprite (onLayout) and blitted every frame
+   with the ark's bob. Rooms add their fixed furniture to the same sprite through A.furnish(fn, z),
+   so a room's floor, shelves and stove cost nothing per frame.
+
+   shell z30 · the shadow it casts on the sand is in sea.js. */
+(() => {
+const { TAU, lerp, clamp, rng, circ, ell, curve, poly, grad, radial, st, layer, onLayout, sprite, blit } = Drawn;
+const A = window.ARK, LINE = A.LINE, NA = A.NACRE, SH = A.SHELL;
+
+// furniture painted into the shell sprite, in z order (lower first)
+const furniture = [];
+A.furnish = (fn, z = 0) => { furniture.push({ fn, z }); furniture.sort((a, b) => a.z - b.z); };
+
+// the spiral angles of the cut part, from the oldest septum to the back of the body chamber
+const thMin = A.septa[A.septa.length - 1].th, th0 = A.thE - A.Wb;
+const arc = (a, b, rf, n) => { const out = []; for (let i = 0; i <= n; i++) { const th = lerp(a, b, i / n); out.push(A.pt(th, rf(th))); } return out; };
+// the porcelain skin: the outermost part of every whorl's wall, all the way round
+const skin = (() => {
+  const n = 260;
+  return A.toPath([...arc(thMin, A.thE, A.R, n), ...arc(A.thE, thMin, (th) => A.R(th) * (1 - A.tw * 0.42), n)]);
+})();
+// the siphuncle runs just off the inner wall of every chamber
+A.siphR = (th) => lerp(A.ri(th), A.ro(th), 0.14);
+A.siphPts = arc(th0 - A.dTh * 12.5, th0 + 0.05, A.siphR, 200);
+// distance along the siphuncle, for bubbles riding it
+A.siphLen = (() => { let L = 0; const d = [0]; for (let i = 1; i < A.siphPts.length; i++) { L += Math.hypot(A.siphPts[i][0] - A.siphPts[i - 1][0], A.siphPts[i][1] - A.siphPts[i - 1][1]); d.push(L); } A.siphD = d; return L; })();
+A.siphAt = (u) => {
+  const L = clamp(u, 0, 1) * A.siphLen, d = A.siphD;
+  let i = 1; while (i < d.length - 1 && d[i] < L) i++;
+  const f = (L - d[i - 1]) / (d[i] - d[i - 1] || 1), p = A.siphPts[i - 1], q = A.siphPts[i];
+  return [lerp(p[0], q[0], f), lerp(p[1], q[1], f)];
+};
+
+// ------------------------------------------------------------------ painting
+function chamberHollow(g, ch, r) {
+  const s = ch.size;
+  g.save(); g.clip(ch.path);
+  // the far wall: nacre in shadow (it's recessed), cooler toward the inner whorl
+  const [ix, iy] = A.pt(ch.thm, ch.rIn), [ox, oy] = A.pt(ch.thm, ch.rOut);
+  g.fillStyle = grad(g, ix, iy, ox, oy, ['#6d6886', '#8c8094', '#a39098']);
+  g.fill(ch.path);
+  // the sheen of nacre: soft bands following the curve of the whorl
+  for (let i = 0; i < 3; i++) {
+    const f = 0.3 + i * 0.22 + (r() - 0.5) * 0.08;
+    const pts = arc(ch.th0 - 0.1, ch.th1 + 0.1, (th) => lerp(A.ri(th), A.ro(th), f), 16);
+    g.globalAlpha = 0.14;
+    A.stroke(g, pts, s * (0.1 + r() * 0.06), [NA.mint, NA.pink, NA.gold][i]);
+  }
+  g.globalAlpha = 1;
+  // the cut face's own edges shade the far wall from the sun (it's high on the left)
+  const dx = s * 0.17, dy = s * 0.21;
+  const sh = new Path2D(); sh.rect(ch.box.x0 - 50, ch.box.y0 - 50, ch.box.w + 100, ch.box.h + 100);
+  const lit = new Path2D(); lit.addPath(ch.path, new DOMMatrix([1, 0, 0, 1, dx, dy]));
+  g.save(); g.clip(sh); g.fillStyle = 'rgba(64, 70, 122, 0.36)';
+  // even-odd: everything but the lit (shifted) chamber
+  const both = new Path2D(); both.addPath(sh); both.addPath(lit);
+  g.fill(both, 'evenodd'); g.restore();
+  // the inner whorls sink into the dark: quieter, so the big rooms read first
+  g.fillStyle = `rgba(36, 30, 70, ${0.42 * (1 - clamp(s / 190, 0, 1))})`; g.fill(ch.path);
+  // and every room falls off into its corners
+  for (const [w, a] of [[s * 0.5, 0.1], [s * 0.34, 0.1], [s * 0.18, 0.12], [s * 0.08, 0.14], [s * 0.03, 0.16]]) {
+    g.lineWidth = w; g.strokeStyle = `rgba(56, 44, 84, ${a})`; g.stroke(ch.path);
+  }
+  g.restore();
+}
+
+// the hollows and everything furnished inside them (behind the crew)
+function paintBack(g) {
+  const r = rng(77);
+  g.fillStyle = '#9a90ac';
+  for (const ch of A.chambers) g.fill(ch.path);
+  for (const ch of A.chambers) chamberHollow(g, ch, r);
+  for (const f of furniture) { g.save(); f.fn(g); g.restore(); }
+}
+// the cut face: nacre walls and septa with the hollows cut out of it, the siphuncle, the body
+// chamber whole, and the silhouette (in front of the crew)
+function paintFace(g) {
+  const r = rng(78);
+  const [cx, cy] = A.C;
+  g.fillStyle = grad(g, cx - 500, cy - 450, cx + 400, cy + 500, ['#fbf3ee', '#efe6ea', '#e2dbe6']);
+  g.fill(A.outlinePath);
+  g.save(); g.globalCompositeOperation = 'destination-out';
+  for (const ch of A.chambers) g.fill(ch.path);
+  g.restore();
+  // the porcelain skin on every whorl, with the stripes' pigment where they reach the cut
+  g.save(); g.clip(skin);
+  g.fillStyle = SH.base; g.fill(skin);
+  g.globalAlpha = 0.9;
+  for (let th = thMin; th < th0; th += 0.05 + r() * 0.05) {
+    const band = Math.sin(th * 5.3 + Math.sin(th * 2.1) * 1.5);
+    if (band < 0.25) continue;
+    const R = A.R(th);
+    g.fillStyle = band > 0.7 ? SH.stripeDk : SH.stripe;
+    g.fill(poly([A.pt(th, R + 2), A.pt(th + 0.035, R + 2), A.pt(th + 0.045, R * (1 - A.tw * 0.4)), A.pt(th + 0.01, R * (1 - A.tw * 0.4))]));
+  }
+  g.restore();
+  g.lineWidth = 0.9; g.strokeStyle = 'rgba(120, 92, 96, 0.55)'; g.stroke(skin);
+  // septa: the nacre walls, each cut edge inked, lit on the sun side
+  for (const s of A.septa) {
+    // a pearly slice: thin across the middle, flaring where it grows from the walls, lit along its
+    // sun side with the nacre's layers showing on the far side
+    const w = Math.max(1.6, A.R(s.th) * 0.034), lw = clamp(A.R(s.th) * 0.007, 0.7, 2.4);
+    const n = s.pts.length, Ls = [], Rs = [];
+    for (let i = 0; i < n; i++) {
+      const p = s.pts[Math.max(0, i - 1)], q = s.pts[Math.min(n - 1, i + 1)], dx = q[0] - p[0], dy = q[1] - p[1], d = Math.hypot(dx, dy) || 1;
+      const u = i / (n - 1), hw = (w / 2) * (0.72 + 0.6 * Math.pow(2 * u - 1, 4));
+      Ls.push([s.pts[i][0] - (dy / d) * hw, s.pts[i][1] + (dx / d) * hw]); Rs.push([s.pts[i][0] + (dy / d) * hw, s.pts[i][1] - (dx / d) * hw]);
+    }
+    const band = A.toPath([...Ls, ...Rs.reverse()]);
+    g.fillStyle = '#efe4e6'; g.fill(band);
+    g.save(); g.clip(band);
+    A.stroke(g, s.pts.map(([x, y]) => [x + w * 0.3, y + w * 0.32]), w * 0.45, '#cbbfd2');
+    A.stroke(g, s.pts.map(([x, y]) => [x - w * 0.24, y - w * 0.26]), w * 0.3, '#ffffff');
+    g.restore();
+    g.lineWidth = lw; g.strokeStyle = mixLine(A.R(s.th)); g.stroke(band);
+  }
+  for (const ch of A.chambers) { g.lineWidth = clamp(ch.size * 0.009, 0.5, 1.4); g.strokeStyle = 'rgba(51, 33, 58, 0.7)'; g.stroke(ch.path); }
+  // the siphuncle: a pearl tube, cut open, collared where it passes each septum
+  // a slim pearl tube, quiet against the walls; it fades out where it enters the older coil
+  const sp = A.siphPts, mid = Math.floor(sp.length * 0.45);
+  g.save();
+  g.globalAlpha = 0.45; A.stroke(g, sp.slice(0, mid + 1), 4, LINE); A.stroke(g, sp.slice(0, mid + 1), 2.4, '#e9d6c6');
+  g.globalAlpha = 0.85; A.stroke(g, sp.slice(mid), 5.6, LINE); A.stroke(g, sp.slice(mid), 3.6, '#ecdccc'); A.stroke(g, sp.slice(mid), 1.2, '#a88f96');
+  g.restore();
+  for (const s of A.septa) {
+    if (s.th < th0 - A.dTh * 9 || s.th > th0 + 0.05) continue;
+    const [x, y] = A.pt(s.th, A.siphR(s.th)), w = Math.max(1.6, A.R(s.th) * 0.02), hgt = Math.min(11, 4 + A.R(s.th) * 0.03);
+    g.save(); g.translate(x, y); g.rotate(s.th + Math.PI / 2);
+    crewInk(g, A.rr(-w * 0.6, -hgt / 2, w * 1.2, hgt, 1.5), '#e7d4c2', 0.9);
+    g.restore();
+  }
+  paintBody(g, r);
+  for (const f of faceItems) { g.save(); f(g); g.restore(); }
+  // the silhouette: a heavy ink line, a warm rim where the sun catches it, cool below
+  g.save(); g.clip(A.outlinePath);
+  g.lineWidth = 9; g.strokeStyle = 'rgba(255, 244, 214, 0.75)';
+  g.save(); g.translate(6, 7); g.stroke(A.outlinePath); g.restore();
+  g.lineWidth = 16; g.strokeStyle = 'rgba(40, 96, 128, 0.32)';
+  g.save(); g.translate(-9, -10); g.stroke(A.outlinePath); g.restore();
+  g.restore();
+  g.lineWidth = 3.4; g.strokeStyle = LINE; g.stroke(A.outlinePath);
+}
+// things fixed into the cut face itself (a telescope through the wall, a tube through a septum)
+const faceItems = [];
+A.faceItem = (fn) => faceItems.push(fn);
+// ink gets lighter and thinner toward the coil, so the oldest chambers stay quiet
+const mixLine = (R) => (R > 160 ? LINE : `rgba(51, 33, 58, ${0.45 + 0.55 * R / 160})`);
+const crewInk = (g, p, fill, lw) => { g.fillStyle = fill; g.fill(p); g.lineWidth = lw; g.strokeStyle = LINE; g.stroke(p); };
+A.ink = crewInk;
+
+function paintBody(g, r) {
+  const W = A.wedgePath;
+  g.save(); g.clip(W);
+  // a rounded tube seen from the side: lit up toward the coil, falling into shade at the keel
+  g.fillStyle = SH.base; g.fill(W);
+  const rm = A.R((th0 + A.thE) / 2), rim = A.ri((th0 + A.thE) / 2);
+  g.fillStyle = radial(g, A.C[0], A.C[1], rim, rm, [[0, '#e6d8c4'], [0.18, '#f6ead6'], [0.5, '#fff6e6'], [0.8, '#f0e2cc'], [1, '#dcc9b0']]);
+  g.fill(W);
+  // flame stripes: broad wavy bands from the coil outward, swept back, strongest on the older
+  // part of the whorl and fading out toward the aperture
+  const n = 11;
+  for (let i = 0; i < n; i++) {
+    const f0 = i / (n - 1);
+    const thS = lerp(th0 + 0.06, A.thE - 0.12, Math.pow(f0, 0.9)) + (r() - 0.5) * 0.1;
+    const fade = clamp(1.15 - f0 * 1.1, 0, 1);
+    if (fade <= 0.05) continue;
+    const reach = lerp(0.92, 0.5, f0) * (0.85 + r() * 0.2);
+    const wob = r() * 10, wid = (0.04 + r() * 0.07) * (1 - f0 * 0.3);
+    const L = [], Rr = [];
+    for (let j = 0; j <= 16; j++) {
+      const u = j / 16, f = u * reach;
+      const th = thS - u * 0.2 + Math.sin(u * 6 + wob) * 0.022;
+      const rad = lerp(A.ri(th) * 0.98, A.R(th), f);
+      const w = wid * (1 - u * 0.6) * (0.75 + 0.35 * Math.sin(u * 8 + wob));
+      L.push(A.pt(th - w / 2, rad)); Rr.push(A.pt(th + w / 2, rad));
+    }
+    const S = curve([...L, ...Rr.reverse()]);
+    g.globalAlpha = 0.9 * fade;
+    g.fillStyle = SH.stripe; g.fill(S);
+    // some flames fork near the coil
+    if (r() < 0.45) {
+      const j = 5 + Math.floor(r() * 4), base = L[j], tip = A.pt(thS - 0.28 - r() * 0.1, lerp(A.ri(thS), A.R(thS), reach * 0.75));
+      A.stroke(g, [base, [lerp(base[0], tip[0], 0.5) + 4, lerp(base[1], tip[1], 0.5)], tip], wid * A.R(thS) * 0.35, SH.stripe);
+    }
+    g.save(); g.clip(S); g.globalAlpha = 0.55 * fade; g.fillStyle = SH.stripeDk; g.translate(4, 5); g.fill(S); g.restore();
+    g.globalAlpha = 1;
+  }
+  // the whorl's roundness: the sun on the upper left, the keel turning away into shade
+  g.fillStyle = grad(g, A.C[0] - 200, A.C[1] + 100, A.C[0] + 250, A.C[1] + 560, [[0, 'rgba(255, 250, 235, 0.3)'], [0.5, 'rgba(255, 250, 235, 0)'], [1, 'rgba(70, 90, 120, 0.35)']]);
+  g.fill(W);
+  // the belly of the whorl turns away from the sun into the water's blue
+  const belly = A.toPath([...arc(th0, A.thE, A.R, 50), ...arc(A.thE, th0, (th) => A.R(th) * 0.8, 50)]);
+  g.fillStyle = grad(g, A.C[0], A.C[1] + 250, A.C[0] + 150, A.C[1] + 560, [[0, 'rgba(60, 110, 150, 0)'], [1, 'rgba(60, 110, 150, 0.35)']]);
+  g.fill(belly);
+  g.restore();
+  // where the whole whorl meets the cut: the shell's thickness shown flush on the same plane, a thin
+  // porcelain-and-nacre strip along the last septum
+  const e0 = A.pt(th0, A.ri(th0)), e1 = A.pt(th0, A.R(th0));
+  A.stroke(g, [e0, e1], 7, LINE); A.stroke(g, [e0, e1], 4.5, '#f6eee9'); A.stroke(g, [e0, e1].map(([x, y]) => [x + 1.2, y - 1]), 1.4, SH.base);
+  g.lineWidth = 2.4; g.strokeStyle = LINE; g.stroke(W);
+}
+
+// ------------------------------------------------------------------ the layer
+let back = null, face = null;
+const pad = 30;
+const box = (() => {
+  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+  for (const [x, y] of A.outline) { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); }
+  return { x0: x0 - pad, y0: y0 - pad - 60, w: x1 - x0 + pad * 2, h: y1 - y0 + pad * 2 + 60 };
+})();
+A.shellBox = box;
+// the engine's sprite() at the shell's own scale, so the ark stays crisp when drawn larger
+function hiSprite(x0, y0, w, h, fn) {
+  const R = st.R * A.SC, c = document.createElement('canvas');
+  c.width = Math.ceil(w * R); c.height = Math.ceil(h * R);
+  const g = c.getContext('2d');
+  g.setTransform(R, 0, 0, R, -x0 * R, -y0 * R); g.lineJoin = g.lineCap = 'round';
+  fn(g);
+  return { c, x0, y0, w, h };
+}
+onLayout(() => {
+  back = hiSprite(box.x0, box.y0, box.w, box.h, paintBack);
+  face = hiSprite(box.x0, box.y0, box.w, box.h, paintFace);
+});
+
+layer({
+  id: 'bob', z: -1,
+  update(dt, t) { A.stepBob(dt, t); },
+  draw() {},
+});
+layer({ id: 'shell-back', z: 30, draw(g) { if (back) A.inShell(g, () => blit(g, back)); } });
+layer({ id: 'shell-face', z: 55, draw(g) { if (face) A.inShell(g, () => blit(g, face)); } });
+
+// barnacles crusted on the keel, where nobody can scrub
+A.faceItem((g) => {
+  const r = rng(808);
+  for (let i = 0; i < 14; i++) {
+    const th = 1.15 + Math.pow(r(), 1.5) * 0.4, rad = A.R(th) * (0.92 + r() * 0.06), [x, y] = A.pt(th, rad), s = 2.5 + Math.pow(r(), 2) * 9;
+    // a volcano of plates seen from the side of the shell, its little door shut
+    g.fillStyle = 'rgba(70, 60, 80, 0.35)'; g.fill(ell(x + 1.5, y + 2, s * 1.1, s * 0.8));
+    crewInk(g, ell(x, y, s, s * 0.78, undefined, th), i % 3 ? '#e9e1d4' : '#d4c7b8', 1);
+    g.lineWidth = 0.7; g.strokeStyle = '#a89a8c';
+    for (let k = 0; k < 5; k++) { const a = (k / 5) * TAU + th; g.beginPath(); g.moveTo(x + Math.cos(a) * s * 0.35, y + Math.sin(a) * s * 0.3); g.lineTo(x + Math.cos(a) * s * 0.92, y + Math.sin(a) * s * 0.72); g.stroke(); }
+    crewInk(g, ell(x, y, s * 0.36, s * 0.24, undefined, th), '#6a5a62', 0.7);
+    g.fillStyle = '#fff'; g.fill(ell(x - s * 0.4, y - s * 0.35, s * 0.25, s * 0.12));
+  }
+});
+
+// a cleaner wrasse working along the shell; hover and it darts away, then comes back to its job
+const WR = { th: 1.0, out: 0, peck: 0, gone: 0 };
+layer({
+  id: 'wrasse', z: 58,
+  hit: (x, y) => { const [sx, sy] = A.toShell(x, y), [wx, wy] = A.pt(WR.th, A.R(WR.th) * 0.8); return Math.hypot(sx - wx, sy - wy) < 26; },
+  onEnter() { WR.gone = 1.8; },
+  update(dt, t) {
+    WR.gone -= dt;
+    WR.out = Drawn.ease(WR.out, WR.gone > 0 ? 1 : 0, WR.gone > 0 ? 6 : 1.2, dt);
+    WR.th = 1.0 + Math.sin(t * 0.13) * 0.18;
+    WR.peck = Math.max(0, Math.sin(t * 5)) * (1 - WR.out);
+  },
+  draw(g, t) {
+    A.inShell(g, () => {
+      const [x0, y0] = A.pt(WR.th, A.R(WR.th) * 0.8 + 6);
+      const x = x0 + WR.out * 70, y = y0 + 6 - WR.peck * 2 + WR.out * 30;
+      g.save(); g.translate(x, y); g.rotate(-0.4 - WR.out * 0.3);
+      const B = ell(0, 0, 15, 4.6);
+      const wag = Math.sin(t * 12) * 2;
+      crewInk(g, poly([[11, 0], [17, -4 + wag], [17, 4 + wag]]), '#2f5f9a', 0.9);
+      crewInk(g, B, '#f2f2e8', 1.1);
+      g.save(); g.clip(B); g.fillStyle = '#1e3050'; g.fillRect(-14, -1, 28, 2.4); g.fillStyle = '#6aa8e0'; g.fillRect(-14, -3.8, 28, 2); g.restore();
+      g.fillStyle = '#1e3050'; g.fill(circ(-8, -1, 1.2)); g.fillStyle = '#fff'; g.fill(circ(-8.3, -1.4, 0.4));
+      g.restore();
+    });
+  },
+});
+
+// bubble-mail: little silver capsules riding the siphuncle between rooms. A.mail(from, to, done)
+const mail = [];
+A.mail = (u0, u1, done) => mail.push({ u: u0, u1, done, sp: 0.09 + Math.random() * 0.04, wob: Math.random() * 6 });
+let nextMail = 2;
+layer({
+  id: 'mail', z: 56,
+  update(dt, t) {
+    if ((nextMail -= dt) < 0) { nextMail = 3 + Math.random() * 5; const a = Math.random(), b = Math.random(); A.mail(a, b); }
+    for (const m of mail) { const d = m.u1 - m.u; m.u += Math.sign(d) * Math.min(Math.abs(d), m.sp * dt); if (Math.abs(m.u1 - m.u) < 1e-4) { m.gone = true; if (m.done) m.done(); } }
+    for (let i = mail.length - 1; i >= 0; i--) if (mail[i].gone) mail.splice(i, 1);
+  },
+  draw(g, t) {
+    if (!mail.length) return;
+    A.inShell(g, () => {
+      for (const m of mail) {
+        const [x, y] = A.siphAt(m.u);
+        const s = 2.2 + Math.sin(t * 8 + m.wob) * 0.3;
+        g.fillStyle = 'rgba(236,252,250,0.95)'; g.fill(circ(x, y, s));
+        g.lineWidth = 0.8; g.strokeStyle = LINE; g.stroke(circ(x, y, s));
+        g.fillStyle = '#fff'; g.fill(circ(x - 0.7, y - 0.8, 0.7));
+      }
+    });
+  },
+});
+})();

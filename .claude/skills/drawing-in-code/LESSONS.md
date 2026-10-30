@@ -44,3 +44,15 @@ short, general, and about method rather than your subject. Newest at the bottom.
   A shared helper that shades a whole shape away from its sunward edge (`DH.shadeFace`), applied to
   everything, did more than any per-object fix. Reflections follow the same rule: things standing in
   water mirror darker, lower in contrast, and fade with depth, or they read as a second object.
+## The Chambered Ark (Opus 5.5, nine rounds)
+
+- **Light a room after its occupants, not before.** A warm pool painted behind the furniture lights
+  nothing. Draw each room's light last, additively (`'lighter'`), over the props *and* the creatures,
+  and darken the hollow first so there's something for it to glow against. Small rooms can bake it.
+- **A line that follows a form becomes the form's outline.** A pipe run parallel to every whorl of a
+  spiral drew one ring per turn and turned the spiral into a bullseye; two critics saw it before I did.
+  When a critic names a shape you didn't draw, look for what's tracing it.
+- **Check the engine's light direction against your sun.** `lumps()` lights from the upper right; this
+  sea's sun was upper left, so every boulder and coral was lit backwards until mirrored.
+- **Headless fps lies low.** Playwright's bundled Chromium renders in software; measure with real Chrome
+  and the GPU (`channel: 'chrome'`) before cutting detail for speed.
