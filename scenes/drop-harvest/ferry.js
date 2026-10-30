@@ -19,7 +19,7 @@
 
   function drawBoat(g, t, x, y, refl) {
     const tilt = boat.rock.x * 0.05 + Math.sin(t * 1.3) * 0.02;
-    g.save(); g.translate(x, y); g.rotate(tilt); g.scale(boat.dir, 1);
+    g.save(); g.translate(x, y); g.rotate(tilt); g.scale(boat.dir * 1.3, 1.3);
     // the willow-leaf hull, sides curled up, seen nearly side-on
     const hull = new Path2D();
     hull.moveTo(-64, -10); hull.quadraticCurveTo(-30, 8, 10, 7); hull.quadraticCurveTo(48, 6, 70, -14);
@@ -87,7 +87,7 @@
 
   layer({
     id: 'ferry', z: 14,
-    hit: (x, y) => Math.abs(x - boat.x) < 76 && y > BY - 56 && y < BY + 12,
+    hit: (x, y) => Math.abs(x - boat.x) < 96 && y > BY - 72 && y < BY + 14,
     onEnter() { boat.bell = 1; boat.rock.v += 2; },
     update(dt, t, L) {
       // across and back, slow as a snail
@@ -102,11 +102,11 @@
     draw(g, t) {
       // reflection first: the hull and a smear of the passengers, flipped
       g.save(); g.globalAlpha = 0.35;
-      g.translate(0, BY * 2 + 8); g.scale(1, -1);
+      g.translate(0, BY * 2 + 12); g.scale(1, -1);
       drawBoat(g, t, boat.x, BY, true);
       g.restore();
       // the waterline
-      g.fillStyle = 'rgba(255,220,160,0.35)'; g.fill(ell(boat.x, BY + 6, 58, 2));
+      g.fillStyle = 'rgba(255,220,160,0.35)'; g.fill(ell(boat.x, BY + 7, 76, 2.4));
       drawBoat(g, t, boat.x, BY, false);
     },
   });

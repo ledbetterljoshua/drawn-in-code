@@ -86,12 +86,6 @@
       g.lineWidth = 1.4; g.strokeStyle = r() < 0.6 ? '#5a4248' : '#2e4430'; g.stroke(p);
       if (r() < 0.3) DH.glassDrop(g, x, y + L + 2, 1.8);
     }
-    // moss creeping down the face in patches
-    for (let i = 0; i < 14; i++) {
-      const x = v.x0 + r() * (500 - v.x0), y = bankY(x) + 50 + r() * 110, rr = 10 + r() * 18;
-      g.fillStyle = 'rgba(30,48,30,0.55)'; g.fill(DH.blob(x, y, rr * 1.5, rr * 0.7, 8, 0.4, i + 40));
-      g.fillStyle = 'rgba(80,110,60,0.25)'; g.fill(DH.blob(x - 2, y - rr * 0.25, rr * 1.1, rr * 0.35, 8, 0.4, i + 60));
-    }
     g.restore();
     // fairy-bonnet mushrooms in a huddle on the bank, caps beaded
     for (const [mx, n] of [[48, 4], [470, 3]]) {
@@ -141,7 +135,7 @@
   const lady = { spin: 0, sv: 0, blink: Drawn.blinker(), tilt: DH.spring(60, 4) };
   layer({
     id: 'ladybird', z: 25,
-    hit: (x, y) => Math.abs(x - LB.x) < 44 && y > LB.y - 80 && y < LB.y + 6,
+    hit: (x, y) => Math.abs(x - LB.x - 8) < 56 && y > LB.y - 104 && y < LB.y + 8,
     onEnter() {
       lady.sv = 14;
       for (let i = 0; i < 14; i++) { const a = (i / 14) * TAU; DH.spawn({ kind: 'spray', x: LB.x + Math.cos(a) * 30, y: LB.y - 64 + Math.sin(a) * 6, vx: Math.cos(a) * 160, vy: -40 + Math.sin(a) * 30, r: 1.2, life: 0.6, g: 900, z: 'fore' }); }
@@ -152,6 +146,7 @@
     },
     draw(g, t) {
       const { x, y } = LB;
+      g.save(); g.translate(x, y); g.scale(1.3, 1.3); g.translate(-x, -y);
       g.fillStyle = 'rgba(10,8,16,0.55)'; g.fill(ell(x, y + 1, 18, 3.5));
       // legs
       g.lineWidth = 1.4; g.strokeStyle = LINE;
@@ -196,11 +191,12 @@
       const cx = x + 12 + Math.sin(lady.tilt.x) * 54, cy = y - 70;
       DH.glassDrop(g, cx - 26, cy + 10, 2.6);
       DH.glassDrop(g, cx + 22, cy + 9, 2.2);
+      g.restore();
     },
   });
   // rain lands on the clover, not the ladybird
-  DH.surface({ band: 'near', x0: LB.x - 18, x1: LB.x + 46, y: () => LB.y - 74, hit(x, y, d) { lady.sv += 0.6; DH.splash(x, y, d.r * 0.6, 'ground', 'mid'); } });
-  DH.surface({ band: 'fore', x0: LB.x - 18, x1: LB.x + 46, y: () => LB.y - 74, hit(x, y, d) { lady.sv += 1.4; DH.splash(x, y, d.r * 0.6, 'ground', 'fore'); } });
+  DH.surface({ band: 'near', x0: LB.x - 22, x1: LB.x + 58, y: () => LB.y - 96, hit(x, y, d) { lady.sv += 0.6; DH.splash(x, y, d.r * 0.6, 'ground', 'mid'); } });
+  DH.surface({ band: 'fore', x0: LB.x - 22, x1: LB.x + 58, y: () => LB.y - 96, hit(x, y, d) { lady.sv += 1.4; DH.splash(x, y, d.r * 0.6, 'ground', 'fore'); } });
 
   // ------------------------------------------------------------ the earthworm
   const WORM = { x: 128, y: bankY(128) + 4 };
@@ -266,7 +262,7 @@
     for (let i = 0; i < 16; i++) oak.beads.push({ x: -70 + r() * 130, y: (r() - 0.5) * 50, r: 2 + r() * 4, vx: 0, home: 0 });
     for (const b of oak.beads) b.home = b.x;
   });
-  const K2 = () => DH.persp(OAK.y) * 1.05;
+  const K2 = () => DH.persp(OAK.y) * 1.7;
   layer({
     id: 'oak', z: 23,
     hit(x, y) { const k = K2(); return Math.hypot((x - OAK.x) / (100 * OAK.s), (y - OAK.y) / (52 * OAK.s * k + 14)) < 1; },
@@ -294,7 +290,7 @@
       g.fillStyle = 'rgba(20,14,26,0.4)'; g.fill(ell(OAK.x, OAK.y + bob + 10, 100 * OAK.s, 18));
       // curled rim: the underside showing, a little above the waterline
       const under = curve(lobes.map((p) => toW(p, Math.abs(p[1]) * 0.12 + 3)));
-      ink(g, under, '#c88a52', 2.4);
+      ink(g, under, '#d8a068', 2.8);
       const top = curve(lobes.map((p) => toW([p[0] * 0.94, p[1] * 0.9], Math.abs(p[1]) * 0.06 + 5)));
       g.lineWidth = 1.6; g.strokeStyle = LINE; g.stroke(top);
       g.fillStyle = grad(g, OAK.x - 100, 0, OAK.x + 100, 0, ['#e0a050', '#b86a38', '#7a3e2a']); g.fill(top);

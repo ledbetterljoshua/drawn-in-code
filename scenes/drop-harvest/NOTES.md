@@ -127,3 +127,13 @@ Five worst now:
 3. The leaf has no undulation along its lower margin — a smooth arc against the sky.
 4. The snail ferry and ladybird are still tiny at full frame.
 5. The island's right end and the Nut House get little light or story.
+
+## Round 6
+
+The weather gets an event in the empty upper left: a **squall curtain** hung from the deck to the far
+bank, slanting with the wind, streaked inside, darkening the sky behind the web so its beads glow. A
+maple key comes spinning down out of it every half minute, lands with a ring and floats off with the
+petals (hover it in the air and it catches your umbrella's wind). The reflection's strips are shorter
+and the waver grows slower toward us (fewer stair-steps). The Great Leaf's margin undulates. Ferry and
+ladybird 1.3×. The oak leaf less foreshortened (it read as a mustard splat). Moss blobs on the near
+bank's soil removed (lily pads).

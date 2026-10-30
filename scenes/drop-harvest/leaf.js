@@ -30,7 +30,7 @@
       for (let k = 0; k < 4; k++) {
         const u = k / 4, x = lerp(a[0], b[0], u), y = lerp(a[1], b[1], u);
         const nx = -(b[1] - a[1]), ny = b[0] - a[0], nl = Math.hypot(nx, ny) || 1;
-        const tooth = Math.sin((i * 4 + k) * 0.9) * 4 + (r() - 0.5) * 1.6;
+        const tooth = Math.sin((i * 4 + k) * 0.55) * 6.5 + Math.sin((i * 4 + k) * 1.7) * 1.6 + (r() - 0.5) * 1.4;
         pts.push([x + (nx / nl) * tooth, y + (ny / nl) * tooth]);
       }
     }

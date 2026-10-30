@@ -75,6 +75,7 @@
     for (let i = 0; i < nF; i++) floats.push({ kind: r() < 0.5 ? 'petal' : 'seed', x: lerp(v.x0, v.x1, r()), y: lerp(FAR + 30, v.y1 - 40, r() ** 0.8), a: r() * TAU, s: 0.7 + r() * 0.6, ph: r() * TAU });
   });
   const bubbles = [];
+  DH.addFloat = (f) => { floats.push(Object.assign({ a: 0, s: 1, ph: Math.random() * TAU }, f)); if (floats.length > 24) floats.shift(); };
 
   const stir = { x: 0, y: 0, a: 0, next: 0 };
 
@@ -117,8 +118,8 @@
       let y = FAR;
       while (y < v.y1) {
         const d = y - FAR;
-        const h = 2.4 + Math.min(7, d * 0.014);
-        const amp = (0.7 + d * 0.007) * (0.7 + I * 0.4) * (1 + DH.gust.v * 1.5);
+        const h = 2.4 + Math.min(4.5, d * 0.012);
+        const amp = (0.6 + d * 0.0042) * (0.7 + I * 0.4) * (1 + DH.gust.v * 1.5);
         let off = noise(y * 0.21 + t * 2.3) * amp + Math.sin(y * 0.7 + t * 5) * amp * 0.35;
         if (stir.a > 0.01) { const q = Math.exp(-((y - stir.y) ** 2) / 1800); off += Math.sin(y * 0.5 - t * 9) * 6 * stir.a * q; }
         const sy = (y - sky.y0) * R, sh = h * R;
@@ -183,6 +184,8 @@
         if (f.kind === 'petal') {
           const p = new Path2D(); p.moveTo(-14, 0); p.quadraticCurveTo(-4, -12, 14, -4); p.quadraticCurveTo(6, 8, -14, 0); p.closePath();
           ink(g, p, '#c86a92', 2.2 / sc); g.fillStyle = 'rgba(255,200,220,0.6)'; g.fill(ell(2, -3, 7, 2.5));
+        } else if (f.kind === 'samara') {
+          DH.drawSamara(g, 0, 0, 1 / sc);
         } else {
           ink(g, ell(0, 0, 6, 3.5), '#6a4a34', 2 / sc);
           g.lineWidth = 1 / sc; g.strokeStyle = 'rgba(230,220,200,0.8)';
