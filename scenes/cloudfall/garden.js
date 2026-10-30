@@ -479,7 +479,7 @@ const fallAt = (t, side, w0 = 13) => {
 };
 layer({
   id: 'waterfall', z: 35,
-  hit: (x, y) => { const [lx, ly] = pr(LIP[0], 0, LIP[1]); return y > ly && y < 1150 && Math.abs(x - lx - 30) < 44; },
+  hit: (x, y) => { const [lx, ly] = pr(LIP[0], 0, LIP[1]); return y > ly - 6 && y < 1120 && Math.abs(x - lx - 14 - Math.min(70, Math.sqrt(Math.max(0, y - ly)) * 3.4)) < 34; },
   onEnter() { const [lx, ly] = pr(LIP[0], 0, LIP[1]); spawn({ kind: 'fish', x: lx + 20, y: ly + 130, vx: 60 + Math.random() * 30, vy: -170, g: 300, life: 1.6, size: 1 }); },
   update(dt, t, L) { fall.flow = ease(fall.flow, L.hover, 2, dt); },
   draw(g, t) {
