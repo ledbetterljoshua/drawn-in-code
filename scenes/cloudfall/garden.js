@@ -33,8 +33,8 @@ layer({
       }
       return out;
     };
-    for (const [X, Z] of stonesAlong(PATH, 22).concat(stonesAlong(SPUR, 24))) {
-      const [x, y] = pr(X, 0, Z), w = 9 + r() * 5, h = (8 + r() * 4) * S + 1.5, rot = (r() - 0.5) * 0.4;
+    for (const [X, Z] of stonesAlong(PATH, 19).concat(stonesAlong(SPUR, 21))) {
+      const [x, y] = pr(X, 0, Z), w = 6.5 + r() * 4, h = (6 + r() * 3) * S + 1.3, rot = (r() - 0.5) * 0.4;
       ink(g, ell(x, y + 1.5, w + 1, h + 1, undefined, rot), rgba('#3a2a3a', 0.25), 0);
       const p = ell(x, y, w, h, undefined, rot);
       ink(g, p, grad(g, x - w, y, x + w, y, [tone(M.stone, 0.45), tone(M.stone, 0.75 + r() * 0.15)]), 1.3, M.stone.line);
@@ -109,11 +109,7 @@ function drawTree(g) {
   CF.leafy(g, cl.map(([x, y, r_]) => [x - 8, y - 12, r_ * 0.95]), M.leaf, { seed: 3, dark: (x, y) => clamp(dark(x, y) + 0.35, 0, 0.95), lw: 2.2 });
   CF.leafy(g, cl, M.leafWarm, { seed: 7, dark, lw: 2.4 });
   // gaps of sky between the clumps aren't there; but light between: a few bright leaves
-  for (let i = 0; i < 40; i++) {
-    const a = R() * TAU, d = R() ** 0.5, x = cx + Math.cos(a) * 140 * d, y = cy + Math.sin(a) * 95 * d;
-    if (dark(x, y) > 0.4) continue;
-    ink(g, ell(x, y, 4, 2.2, undefined, R() * 3), R() < 0.5 ? '#d8ec88' : '#b6dc74', 0.8, M.leaf.line);
-  }
+
   // ripe peaches, mostly on the sunny side
   peaches.length = 0;
   for (let i = 0; i < 24; i++) {
@@ -229,7 +225,7 @@ function bedBox(g, B) {
   g.restore();
 }
 layer({
-  id: 'garden-beds', z: 26, still: true,
+  id: 'garden-beds', z: 33, still: true,
   draw(g) {
     for (const B of BEDS) bedBox(g, B);
     // the bean poles: a teepee of sticks with runner beans climbing it
@@ -243,7 +239,7 @@ layer({
       if (r() < 0.25) ink(g, circ(x + 3, y + 2, 2), '#e0503f', 0.7, '#5a2030');
     }
     // the wheelbarrow, left with a pumpkin in it
-    const [wx, wy] = pr(-86, 0, 180);
+    const [wx, wy] = pr(-52, 0, 196);
     CF.contact(g, wx, wy + 2, 26, 6, 0.45);
     ink(g, poly([[wx - 22, wy - 18], [wx + 14, wy - 20], [wx + 10, wy - 6], [wx - 18, wy - 4]]), grad(g, wx - 22, 0, wx + 14, 0, ['#5a6a8a', '#8aa0b8', '#c8d8e0']), 1.6);
     tube(g, seg(wx - 18, wy - 10, wx - 36, wy - 14), tone(M.timber, 0.6), 2.4, 1); tube(g, seg(wx - 14, wy - 6, wx - 32, wy - 9), tone(M.timber, 0.4), 2.4, 1);
@@ -253,8 +249,8 @@ layer({
   },
 });
 layer({
-  id: 'garden-life', z: 26.5,
-  hit: (x, y) => { const [cx, cy] = pr(-252, 0, 180); return Math.abs(x - cx) < 80 && y > cy - 50 && y < cy + 30; },
+  id: 'garden-life', z: 33.5,
+  hit: (x, y) => { const [cx, cy] = pr(-170, 0, 180); return Math.abs(x - cx) < 110 && y > cy - 50 && y < cy + 30; },
   update(dt, t, L) {
     gard.water = ease(gard.water, L.hovered ? 1 : 0, L.hovered ? 3 : 1.4, dt);
     gard.perk = ease(gard.perk, L.hovered && L.since > 0.6 ? 1 : 0, 1.2, dt);
@@ -266,13 +262,17 @@ layer({
       const x0 = B.X - B.w / 2, z0 = B.Z - B.d / 2;
       for (let i = 0; i < Math.round(B.w / 14); i++) for (let k = 0; k < (B.crop === 'pumpkin' ? 1 : 2); k++) {
         const X = x0 + 8 + i * 14 + (r() - 0.5) * 3, Z = z0 + 8 + k * 14, [x, y] = pr(X, 8, Z), sw = Math.sin(t * 1.5 + X * 0.1) * (wind(t, x) - 0.6) * 2, perk = gard.perk;
-        if (B.crop === 'cabbage') lumps(g, [[x - 4, y - 3 - perk * 2, 5.5], [x + 4, y - 3 - perk * 2, 5.5], [x, y - 7 - perk * 3, 5.5]], { line: '#24392c', lw: 1, shade: '#4f8a6a', base: '#7cbc7c', lit: '#c4e6a0' });
+        if (B.crop === 'cabbage') {
+          if (i % 2) continue;
+          for (const [dx, dy, rot] of [[-5, -2, -0.5], [5, -2, 0.5], [0, -1, 0], [-3, -5, -0.9], [3, -5, 0.9]]) ink(g, ell(x + dx, y + dy - perk, 5, 3.2, undefined, rot), '#5f9a70', 0.9, '#24392c');
+          ink(g, circ(x, y - 5 - perk * 2, 4.6), radial(g, x + 1.5, y - 7 - perk * 2, 0.5, 5, ['#e4f2b8', '#9fd08c', '#6faa76']), 1, '#24392c');
+        }
         else if (B.crop === 'carrot') { for (const dx of [-3, 0, 3]) { g.lineWidth = 1.4; g.strokeStyle = '#5f9e52'; g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + dx, y - 6, x + dx * 1.6 + sw, y - 11 - perk * 3); g.stroke(); } ink(g, ell(x, y + 0.5, 2.4, 1.4), '#ef8a3c', 0.8, '#6a2a20'); }
         else if (i < 4) { const p = ell(x, y - 5, 9, 6.5); ink(g, p, grad(g, x - 9, 0, x + 9, 0, ['#c9562f', '#ef8a3c', '#f9c070']), 1.4, '#6a2a20'); g.lineWidth = 0.9; g.strokeStyle = 'rgba(106,42,32,0.5)'; for (const dx of [-4, 0, 4]) { g.beginPath(); g.ellipse(x + dx, y - 5, 3, 6.5, 0, -Math.PI / 2, Math.PI / 2, dx < 0); g.stroke(); } tube(g, quad(x, y - 11, x + 2, y - 15, x + 5, y - 15), '#5f7a3a', 1.8, 0.8); }
       }
     }
     // the gardener, in her sun hat, watering can in hand
-    const [gx, gy] = pr(-196, 0, 184);
+    const [gx, gy] = pr(-104, 0, 150);
     CF.contact(g, gx, gy, 16, 4, 0.5);
     const w = gard.water;
     frog(g, gx, gy, 0.7, { c: CF.FROG_TINTS.gold, open: gard.blink(t), look: [-0.9 + w * 0.2, 0.5 + w * 0.3], smile: 2.2 + w, flip: true, rot: -w * 0.08,
@@ -288,18 +288,18 @@ layer({
     void sx; void sy;
   },
 });
-function canSpout() { const w = gard.water; return [-196 - 26 - w * 4, 18 - w * 8, 184]; }
+function canSpout() { const w = gard.water; return [-104 - 26 - w * 4, 18 - w * 8, 150]; }
 
 // ------------------------------------------------------------------ the fence along the front edge
 layer({
-  id: 'fence', z: 27, still: true,
+  id: 'fence', z: 36.5, still: true,
   draw(g) {
     const posts = [];
     for (let a = 1.75; a <= 2.75; a += 0.07) { const [X, Z] = CF.rim(a); posts.push([X * 0.93, Z * 0.93]); }
-    const top = posts.map(([X, Z]) => pr(X, 22, Z)), mid = posts.map(([X, Z]) => pr(X, 11, Z));
+    const top = posts.map(([X, Z]) => pr(X, 15, Z)), mid = posts.map(([X, Z]) => pr(X, 7, Z));
     for (let i = 0; i < posts.length; i++) {
       if (hash(i * 4.1) < 0.1) continue; // a post gone missing
-      const [X, Z] = posts[i], [x, y] = pr(X, 0, Z), [, y2] = pr(X, 25, Z), lean = (hash(i) - 0.5) * 3;
+      const [X, Z] = posts[i], [x, y] = pr(X, 0, Z), [, y2] = pr(X, 18, Z), lean = (hash(i) - 0.5) * 3;
       CF.contact(g, x, y, 5, 1.5, 0.4);
       ink(g, poly([[x - 2.4, y], [x - 2.4 + lean, y2 + 3], [x + lean, y2], [x + 2.4 + lean, y2 + 3], [x + 2.4, y]]), tone(M.plaster, 0.75), 1.3, M.timber.line);
     }
@@ -308,9 +308,9 @@ layer({
 });
 
 // ------------------------------------------------------------------ sunflowers that turn to watch you
-const flowers = [[44, -4, 96, 1], [62, 14, 78, 2], [30, 18, 112, 3], [78, -12, 88, 4]].map(([X, Z, h, s]) => ({ X, Z, h, s, nod: 0, face: 0.8 }));
+const flowers = [[96, -14, 96, 1], [112, 2, 78, 2], [84, 10, 108, 3], [124, -22, 88, 4]].map(([X, Z, h, s]) => ({ X, Z, h, s, nod: 0, face: 0.8 }));
 layer({
-  id: 'sunflowers', z: 28,
+  id: 'sunflowers', z: 31.8,
   hit: (x, y) => flowers.some((f) => Math.hypot(x - f.hx, y - f.hy) < 22),
   update(dt, t, L) {
     for (const f of flowers) {
@@ -339,11 +339,11 @@ layer({
 });
 
 // ------------------------------------------------------------------ the beehive and its bees
-const HIVE = [112, 0, 26];
+const HIVE = [142, 0, 18];
 const bees = Array.from({ length: 7 }, (_, i) => ({ ph: i * 0.9, x: 0, y: 0, out: 0 }));
 const hive = { out: 0 };
 layer({
-  id: 'hive', z: 28.5,
+  id: 'hive', z: 31.9,
   hit: (x, y) => { const [hx, hy] = pr(...HIVE); return Math.abs(x - hx) < 22 && y > hy - 44 && y < hy + 4; },
   update(dt, t, L) {
     hive.out = ease(hive.out, L.hovered ? 1 : 0, L.hovered ? 2 : 0.6, dt);
@@ -395,13 +395,32 @@ layer({
     if (L.hovered && d.q < 0) { d.q = 1.1; spawn({ kind: 'note', x: d.x + 6, y: d.y - 16, vy: -24, vx: 8, life: 1.6, size: 0.9 }); }
   },
   draw(g, t) {
-    // the brook running to the edge, its banks
-    const bp = brookPts().map(([X, Z]) => pr(X, 0, Z));
-    g.lineCap = 'round'; g.lineJoin = 'round';
-    g.lineWidth = 22; g.strokeStyle = M.soil.line; g.stroke(curve(bp, false));
-    g.lineWidth = 18; g.strokeStyle = tone(M.soil, 0.4); g.stroke(curve(bp, false));
-    g.lineWidth = 12; g.strokeStyle = grad(g, bp[0][0], 0, bp[3][0], 0, [tone(M.water, 0.55), tone(M.water, 0.8)]); g.stroke(curve(bp, false));
-    g.lineWidth = 1.4; g.strokeStyle = 'rgba(255,255,255,0.7)'; g.setLineDash([6, 10]); g.lineDashOffset = -t * 30; g.stroke(curve(bp, false)); g.setLineDash([]);
+    // the brook: a channel cut in the turf, its far bank showing as a little wall of earth
+    const bp = brookPts(), N = 24, L_ = [], R_ = [], W_ = [];
+    const cat = (u) => { const n = bp.length - 1, i = Math.min(n - 1, Math.floor(u * n)), f = u * n - i; return [lerp(bp[i][0], bp[i + 1][0], f), lerp(bp[i][1], bp[i + 1][1], f)]; };
+    for (let i = 0; i <= N; i++) {
+      const u = i / N, [X, Z] = cat(u), [X2, Z2] = cat(Math.min(1, u + 0.02)), [X0, Z0] = cat(Math.max(0, u - 0.02));
+      const dx = X2 - X0, dz = Z2 - Z0, l = Math.hypot(dx, dz) || 1, nx = -dz / l, nz = dx / l, w = 15 + u * 12 + Math.sin(u * 9) * 2;
+      const m = Math.sin(u * 7) * 5;
+      L_.push([X + nx * (w + m * 0.2) + nz * m, Z + nz * w]); R_.push([X - nx * w + nz * m, Z - nz * (w + m * 0.2)]); W_.push(w);
+    }
+    const far = L_.map(([X, Z]) => (Z < 0 ? null : null) || [X, Z]);
+    const farSide = (L_[0][1] < R_[0][1]) ? L_ : R_, nearSide = farSide === L_ ? R_ : L_;
+    const bank = poly(farSide.map(([X, Z]) => pr(X, 0, Z)).concat(farSide.slice().reverse().map(([X, Z]) => pr(X, -5, Z))));
+    ink(g, bank, tone(M.soil, 0.45), 1.2, M.soil.line);
+    const wat = poly(farSide.map(([X, Z]) => pr(X, -5, Z)).concat(nearSide.slice().reverse().map(([X, Z]) => pr(X, -4, Z))));
+    const [b0x] = pr(...bp[0].flatMap((v, i) => (i ? [0, v] : [v])));
+    g.fillStyle = grad(g, b0x, 0, pr(LIP[0], 0, LIP[1])[0], 0, ['#8fc6d8', '#b8e2ea', '#dff3f2']); g.fill(wat);
+    g.lineWidth = 1.4; g.strokeStyle = M.water.line; g.stroke(wat);
+    g.save(); g.clip(wat);
+    g.lineWidth = 1.2; g.strokeStyle = 'rgba(255,255,255,0.8)'; g.setLineDash([5, 9]); g.lineDashOffset = -t * 34;
+    g.stroke(curve(bp.map(([X, Z]) => pr(X, -4, Z)), false)); g.lineDashOffset = -t * 34 + 7; g.globalAlpha = 0.5;
+    g.stroke(curve(bp.map(([X, Z]) => pr(X + 2, -4, Z + 4)), false)); g.setLineDash([]); g.globalAlpha = 1;
+    g.restore();
+    // grass hanging over its near edge, and two stones to hop across on
+    for (let i = 1; i < N; i++) { const [X, Z] = nearSide[i], [x, y] = pr(X, 0, Z); g.lineWidth = 1.3; g.strokeStyle = tone(M.grass, 0.55); g.beginPath(); g.moveTo(x - 2, y + 1); g.lineTo(x + 1, y - 4); g.moveTo(x + 2, y + 1); g.lineTo(x + 4, y - 3); g.stroke(); }
+    for (const u of [0.36]) { const [X, Z] = cat(u); const [x, y] = pr(X, -2, Z); ink(g, ell(x - 4, y, 5, 2.4), tone(M.stone, 0.7), 1, M.stone.line); ink(g, ell(x + 6, y + 3, 4.5, 2.2), tone(M.stone, 0.6), 1, M.stone.line); }
+    void far; void W_;
     // the pond's stone rim
     const water = pondPath(), [cx, cy] = pr(POND.X, 0, POND.Z);
     const r = rng(8);

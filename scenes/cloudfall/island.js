@@ -19,7 +19,7 @@ const { pr, mix, rgba, tone, lit, M, frog, spawn, plane, on } = CF;
 // rim(a) → plan [X, Z] of the top edge at angle a (0 = right, π/2 = toward us). bands: depth and
 // how much of the rim's radius is left at that depth.
 function makeRock({ rim, bands, tip, seed, ox = 0, oy = 0, oz = 0, ledges = [], scale = 1 }) {
-  const R = rng(seed), cells = [], th0 = -0.4, th1 = Math.PI + 0.4;
+  const R = rng(seed), cells = [], th0 = 0, th1 = Math.PI;
   const inset = (b, a) => {
     if (b === 0) return 1;
     let f = 0.95;
@@ -196,7 +196,7 @@ layer({
     // the turf lip: a band of dark soil and roots under the grass, all along the front edge
     const T = [], B = [];
     for (let i = 0; i <= 120; i++) {
-      const a = -0.3 + (i / 120) * (Math.PI + 0.6), [x, z] = rim(a);
+      const a = (i / 120) * Math.PI, [x, z] = rim(a);
       T.push(pr(x, 0, z)); B.push(pr(x * 0.985, -16, z * 0.985));
     }
     const lip = poly(T.concat(B.slice().reverse()));
@@ -237,8 +237,9 @@ layer({
     g.restore();
     // grass hanging over the lip
     for (let i = 0; i < 260; i++) {
-      const a = -0.25 + (i / 260) * (Math.PI + 0.5), [X, Z] = rim(a), [x, y] = pr(X, 0, Z);
-      const len = 5 + Math.abs(noise(i * 0.37)) * 12 + (r() < 0.08 ? 10 + r() * 14 : 0), b = clamp(0.3 + Math.cos(a) * 0.35, 0.1, 0.8);
+      const a = 0.04 + (i / 260) * (Math.PI - 0.08), [X, Z] = rim(a), [x, y] = pr(X, 0, Z);
+      const edge = Math.sin(a); if (edge < 0.25 && r() > edge * 3) continue;
+      const len = (5 + Math.abs(noise(i * 0.37)) * 12 + (r() < 0.08 ? 10 + r() * 14 : 0)) * (0.35 + 0.65 * edge), b = clamp(0.3 + Math.cos(a) * 0.35, 0.1, 0.8);
       const p = new Path2D(); p.moveTo(x - 4, y - 2); p.quadraticCurveTo(x - 3, y + len * 0.6, x + (r() - 0.3) * 3, y + len); p.quadraticCurveTo(x + 3, y + len * 0.5, x + 4, y - 2); p.closePath();
       ink(g, p, tone(M.grass, b + (r() - 0.5) * 0.12), 1.1, M.grass.line);
     }
@@ -470,14 +471,14 @@ layer({
   draw(g) {
     drawRock(g, SATR, { lw: 2.2 });
     const T = [], B = [];
-    for (let i = 0; i <= 40; i++) { const a = -0.3 + (i / 40) * (Math.PI + 0.6), [x, z] = satRim(a); T.push(pr(SAT.X + x, SAT.Y, SAT.Z + z)); B.push(pr(SAT.X + x * 0.985, SAT.Y - 8, SAT.Z + z * 0.985)); }
+    for (let i = 0; i <= 40; i++) { const a = (i / 40) * Math.PI, [x, z] = satRim(a); T.push(pr(SAT.X + x, SAT.Y, SAT.Z + z)); B.push(pr(SAT.X + x * 0.985, SAT.Y - 8, SAT.Z + z * 0.985)); }
     ink(g, poly(T.concat(B.reverse())), M.soil.base, 1.8, M.soil.line);
     const pts = []; for (let i = 0; i < 60; i++) { const a = (i / 60) * TAU, [x, z] = satRim(a); pts.push(pr(SAT.X + x, SAT.Y, SAT.Z + z)); }
     const top = poly(pts);
     ink(g, top, grad(g, SAT.X + 760 - 70, 0, SAT.X + 760 + 70, 0, [tone(M.grass, 0.38), tone(M.grass, 0.68)]), 2.6, M.grass.line);
     const r = rng(3);
     for (let i = 0; i < 46; i++) {
-      const a = -0.2 + (i / 46) * (Math.PI + 0.4), [X, Z] = satRim(a), [x, y] = pr(SAT.X + X, SAT.Y, SAT.Z + Z), len = 4 + r() * 8;
+      const a = 0.04 + (i / 46) * (Math.PI - 0.08), [X, Z] = satRim(a), [x, y] = pr(SAT.X + X, SAT.Y, SAT.Z + Z), len = 4 + r() * 8;
       const p = new Path2D(); p.moveTo(x - 3, y - 1); p.quadraticCurveTo(x - 2, y + len * 0.6, x, y + len); p.quadraticCurveTo(x + 2, y + len * 0.5, x + 3, y - 1); p.closePath();
       ink(g, p, tone(M.grass, clamp(0.35 + Math.cos(a) * 0.3, 0.1, 0.8)), 1, M.grass.line);
     }
@@ -489,7 +490,7 @@ layer({
     const [px, py] = pr(SAT.X + 18, SAT.Y, SAT.Z - 22);
     CF.contact(g, px, py, 9, 3, 0.45);
     tube(g, D.seg(px, py, px, py - 58), tone(M.timber, 0.55), 3.4, 1.4);
-    for (const [dy, dir, txt, w] of [[-52, 1, 'COTTAGE', 50], [-38, -1, 'NOWHERE', 48]]) {
+    for (const [dy, dir, txt, w] of [[-52, 1, 'COTTAGE', 52], [-38, -1, 'NOWHERE', 58]]) {
       const x0 = px, x1 = px + dir * w, yy = py + dy;
       ink(g, poly([[x0, yy - 6], [x1 - dir * 8, yy - 6], [x1, yy], [x1 - dir * 8, yy + 6], [x0, yy + 6]]), dir > 0 ? '#f1dcb4' : '#d9c39c', 1.4, M.timber.line);
       g.font = 'italic 700 8px Georgia, serif'; g.fillStyle = '#5a3a3e'; g.textAlign = 'center'; g.fillText(txt, (x0 + x1 - dir * 6) / 2, yy + 3);

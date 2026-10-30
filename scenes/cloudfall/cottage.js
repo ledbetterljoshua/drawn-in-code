@@ -171,8 +171,9 @@ function turret(g) {
   // its window, facing us over the roof
   const wa = Math.PI / 2 + 0.25, Mw = CF.cylM(X, 292, Z, TR, wa);
   windowFlat(g, Mw, -8, 6, 16, 26, lit([Math.cos(wa), 0, Math.sin(wa)]), { arch: true, lamp: true, cols: 1, rows: 2 });
-  const wb = Math.PI / 2 + 1.1, Mw2 = CF.cylM(X, 200, Z, TR, wb);
-  windowFlat(g, Mw2, -6, 6, 12, 20, lit([Math.cos(wb), 0, Math.sin(wb)]), { arch: true, cols: 1, rows: 2 });
+  // an arrow slit lower down, on the shaded side
+  const wb = Math.PI / 2 + 0.95, Mw2 = CF.cylM(X, 210, Z, TR, wb);
+  ink(g, on(Mw2, CF.archPath(-2.5, 0, 5, 18)), '#3a2232', 1, M.plaster.line);
 }
 function turretCone(g) {
   const [X, Z] = T0, rb = 45;
@@ -290,9 +291,11 @@ function tiles(g) {
     }
   }
   // moss creeping up from the eave, thicker on the side that stays damp
-  for (let i = 0; i < 40; i++) {
-    const s = r() ** 1.6 * Ls * 0.8, t = Lt - r() * r() * 45, [x, y] = CF.at(Mx, s, t);
-    ink(g, ell(x, y, 3 + r() * 6, 2 + r() * 2.5), r() < 0.5 ? tone(M.grass, 0.45) : tone(M.grass, 0.7), 0.8, rgba(M.grass.line, 0.6));
+  for (const [cs, ct, n] of [[18, Lt - 10, 16], [52, Lt - 22, 9], [96, Lt - 6, 7], [150, 30, 5]]) {
+    for (let i = 0; i < n; i++) {
+      const s = cs + (r() - 0.5) * 34, t = ct + (r() - 0.5) * 16, [x, y] = CF.at(Mx, s, t);
+      ink(g, ell(x, y, 2 + r() * 3.5, 1.4 + r() * 1.6), ['#6f7f40', '#8d9c4e', '#a9b860'][(r() * 3) | 0], 0.6, rgba('#3a4220', 0.6));
+    }
   }
   g.restore();
   // ridge capping, following the sag
@@ -486,9 +489,9 @@ layer({
     // smoke: soft puffs, lit warm on the sun side, going transparent as they spread
     for (const p of smoke) {
       const a = Math.min(1, p.age * 2) * Math.max(0, 1 - p.age / 6) * 0.65, x = p.x + Math.sin(p.age * 1.7 + p.s * 6) * 4;
-      g.globalAlpha = a;
-      ink(g, circ(x, p.y, p.r), '#ece2ec', 1.1, 'rgba(140,110,140,0.55)');
-      g.fillStyle = '#fff4e4'; g.fill(circ(x + p.r * 0.3, p.y - p.r * 0.25, p.r * 0.6));
+      g.globalAlpha = a * 0.8;
+      g.fillStyle = radial(g, x - p.r * 0.2, p.y + p.r * 0.2, 0, p.r * 1.2, [[0, 'rgba(196,180,206,0.9)'], [0.7, 'rgba(196,180,206,0.5)'], [1, 'rgba(196,180,206,0)']]); g.fill(circ(x, p.y, p.r * 1.2));
+      g.fillStyle = radial(g, x + p.r * 0.3, p.y - p.r * 0.3, 0, p.r * 0.8, [[0, 'rgba(255,240,222,0.9)'], [1, 'rgba(255,240,222,0)']]); g.fill(circ(x + p.r * 0.3, p.y - p.r * 0.3, p.r * 0.8));
     }
     g.globalAlpha = 1;
     // lamplight breathing in the windows

@@ -57,3 +57,21 @@ Worst five after the first shot, fixed in the same round:
    across the far side.
 5. The island was small in the desktop frame. Cropped the artboard to 1100 tall and lifted
    everything 60, so it's ~9% larger.
+
+## Round 4
+1. The brook was a raised blue pipe laid on the grass. Now a channel cut in the turf: water a
+   little below ground, its far bank a strip of earth, grass hanging over the near edge, two
+   stepping stones.
+2. Back facets of the rock poked up through the grass at both tips of the island (their ink and
+   rim-light strokes). The rock now only builds the front half; the grass overhang thins to
+   nothing where the edge turns away from us.
+3. Chimney smoke was outlined bubbles. Now soft puffs, shade low-left and lit top-right, no ink.
+4. The gardener and her cabbages were hidden behind the fence, and the cabbages read as one
+   green caterpillar. Lowered the fence, drew the cabbages as separate rosettes with pale hearts,
+   moved her out onto the path by the bean poles. Found the cause of a deeper bug while there:
+   everything in front of the cottage (garden, sunflowers, hive) had a lower z than the cottage
+   and was drawn behind it. Re-layered by depth.
+5. Roof moss was confetti. Now four clumps where the roof stays damp, olive not grass-green.
+Also: the turret's lower window was a black slab (now an arrow slit); NOWHERE was clipped; the
+canopy had rice-grain highlights; the sunflowers stood in front of the door lamp (moved past the
+corner); stepping stones were too big for frogs.
