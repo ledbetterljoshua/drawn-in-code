@@ -56,6 +56,13 @@ layer({
     CF.multiply(g, ell(x, y, 150, 150 * S * 1.2), CF.SHADOW, 0.7);
     const r = rng(2);
     for (let i = 0; i < 14; i++) CF.multiply(g, ell(x + (r() - 0.5) * 260, y + (r() - 0.5) * 70, 30 + r() * 30, 10 + r() * 8), CF.SHADOW, 0.35);
+    // little things cast long thin shadows too: flowers, poles, the hive, the barrel, the post
+    const streak = (X, Z, h, w, a = 0.75) => { const [x0, y0] = pr(X, 0, Z), [sx, sz] = CF.shadowOf(X, h, Z), [x1, y1] = pr(sx, 0, sz); g.save(); g.globalCompositeOperation = 'multiply'; g.globalAlpha = a; g.strokeStyle = CF.SHADOW; g.lineCap = 'round'; g.lineWidth = w; g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke(); g.fillStyle = CF.SHADOW; g.fill(ell(x1, y1, w * 2.2, w * 0.9)); g.restore(); };
+    for (const f of flowers) streak(f.X, f.Z, f.h, 2.5);
+    streak(HIVE[0], HIVE[2], 40, 14); streak(-150, 168, 78, 6); streak(HB[0], HB[2], 62, 4);
+    const [bX, bZ] = CF.cottage.at(-84, 76); streak(bX, bZ, 30, 18);
+    streak(-104, 150, 30, 12, 0.6); streak(-52, 196, 22, 16, 0.6);
+    for (let a = 1.75; a <= 2.75; a += 0.07) { const [X, Z] = CF.rim(a); streak(X * 0.93, Z * 0.93, 18, 2.2, 0.5); }
     // the trunk's shadow, a long thin streak back to the left
     const [tx, ty] = pr(TREE.X, 0, TREE.Z), [sx2, sz2] = CF.shadowOf(TREE.X, 130, TREE.Z), [ex, ey] = pr(sx2, 0, sz2);
     g.lineCap = 'round'; g.lineWidth = 20; g.save(); g.globalCompositeOperation = 'multiply'; g.strokeStyle = CF.SHADOW; g.globalAlpha = 0.85; g.beginPath(); g.moveTo(tx, ty); g.lineTo(ex, ey); g.stroke(); g.restore();
@@ -275,7 +282,7 @@ layer({
     const [gx, gy] = pr(-104, 0, 150);
     CF.contact(g, gx, gy, 16, 4, 0.5);
     const w = gard.water;
-    frog(g, gx, gy, 0.7, { c: CF.FROG_TINTS.gold, open: gard.blink(t), look: [-0.9 + w * 0.2, 0.5 + w * 0.3], smile: 2.2 + w, flip: true, rot: -w * 0.08,
+    frog(g, gx, gy, 0.7, { c: CF.FROG_TINTS.gold, open: gard.blink(t), look: CF.lookAt(gx, gy, [-0.9 + w * 0.2, 0.5 + w * 0.3]).map((v, i) => (i ? v : -v)), smile: 2.2 + w, flip: true, rot: -w * 0.08,
       arms: [[-16 - w * 2, -16 + w * 6], [12, -10]],
       hat: (g, lw) => { ink(g, D.ell(0, -31, 22, 5), '#f0d68a', lw); ink(g, D.ell(0, -36, 11, 7), '#f0d68a', lw); g.lineWidth = 2.2; g.strokeStyle = '#7fb8b0'; g.beginPath(); g.ellipse(0, -33, 10.6, 2.6, 0, 0, Math.PI); g.stroke(); ink(g, circ(8, -35, 2.4), '#f3a0b0', 0.8); } });
     const [sx, sy] = pr(...canSpout());
@@ -467,41 +474,58 @@ layer({
 });
 
 // ------------------------------------------------------------------ the waterfall
+// the brook's water shoots out over the lip on an arc, falls as one sheet, then tears into
+// ribbons and blows away as spray long before the cloud floor
 const fall = { flow: 0 };
+const OUT = CF.norm([Math.cos(0.42), 0, Math.sin(0.42)]), TAN = [-OUT[2], 0, OUT[0]];
+const fallAt = (t, side, w0 = 13) => {
+  const v = 34, gg = 60, sp = w0 + t * 5.5;
+  return pr(LIP[0] + OUT[0] * v * t + TAN[0] * side * sp, -4 - 0.5 * gg * t * t, LIP[1] + OUT[2] * v * t + TAN[2] * side * sp);
+};
 layer({
   id: 'waterfall', z: 35,
-  hit: (x, y) => { const [lx, ly] = pr(LIP[0], 0, LIP[1]); return y > ly && y < 1200 && Math.abs(x - lx - (y - ly) * 0.04) < 30; },
-  onEnter() { const [lx, ly] = pr(LIP[0], 0, LIP[1]); spawn({ kind: 'fish', x: lx + 8, y: ly + 130, vx: 60 + Math.random() * 30, vy: -170, g: 300, life: 1.6, size: 1 }); },
+  hit: (x, y) => { const [lx, ly] = pr(LIP[0], 0, LIP[1]); return y > ly && y < 1150 && Math.abs(x - lx - 30) < 44; },
+  onEnter() { const [lx, ly] = pr(LIP[0], 0, LIP[1]); spawn({ kind: 'fish', x: lx + 20, y: ly + 130, vx: 60 + Math.random() * 30, vy: -170, g: 300, life: 1.6, size: 1 }); },
   update(dt, t, L) { fall.flow = ease(fall.flow, L.hover, 2, dt); },
   draw(g, t) {
-    const [lx, ly] = pr(LIP[0], 0, LIP[1]), y0 = ly, y1 = 1230, f = fall.flow;
-    // the water shoots out a little over the lip, then drops; the rock face falls away behind it
-    const xAt = (y) => lx + 6 + Math.sqrt(Math.max(0, y - y0)) * 1.6 + (wind(t, 1100) - 0.7) * (y - y0) * 0.02;
-    const half = (y) => 11 + (y - y0) * 0.035 + f * 3;
-    const left = [], right = [];
-    for (let y = y0; y <= y1; y += 14) { left.push([xAt(y) - half(y), y]); right.push([xAt(y) + half(y), y]); }
-    const sheet = new Path2D(); sheet.moveTo(...left[0]); for (const p of left) sheet.lineTo(...p); for (const p of right.slice().reverse()) sheet.lineTo(...p); sheet.closePath();
-    const yb = 1180;
-    g.fillStyle = grad(g, 0, y0, 0, yb, [[0, 'rgba(120,190,215,1)'], [0.3, 'rgba(170,222,236,0.96)'], [0.7, 'rgba(225,244,246,0.82)'], [0.9, 'rgba(255,248,240,0.4)'], [1, 'rgba(255,248,240,0)']]);
-    g.fill(sheet);
-    g.save(); g.clip(sheet);
-    // a darker core where it's deepest, the sun on its right edge
-    g.fillStyle = grad(g, xAt(900) - 30, 0, xAt(900) + 30, 0, ['rgba(50,100,150,0.28)', 'rgba(50,100,150,0.05)', 'rgba(255,236,200,0.45)']);
-    g.fillRect(lx - 60, y0, 200, y1 - y0);
-    for (let i = 0; i < 12; i++) {
-      const u = (i + 0.5) / 12 - 0.5, sp = 230 + (i % 3) * 40 + f * 120;
-      for (let k = 0; k < 4; k++) {
-        const yy = y0 + ((t * sp + i * 97 + k * 140) % (yb - y0)), len = 26 + (yy - y0) * 0.1;
-        g.lineWidth = 1.8; g.strokeStyle = `rgba(255,255,255,${0.75 - ((yy - y0) / (yb - y0)) * 0.6})`;
-        g.beginPath(); g.moveTo(xAt(yy) + u * half(yy) * 2, yy); g.lineTo(xAt(yy + len) + u * half(yy + len) * 2, yy + len); g.stroke();
+    const f = fall.flow, gust = (wind(t, 1100) - 0.7) * 6;
+    const T1 = 4.3, TS = 2.1, N = 30;
+    const edge = (side, t0, t1, w0, off = 0) => { const pts = []; for (let i = 0; i <= N; i++) { const tt = lerp(t0, t1, i / N), sp = clamp((tt - TS + 0.5) / (T1 - TS + 0.5), 0, 1), [x, y] = fallAt(tt, side, w0 + f * 2 + (1 - sp) * (13 - w0) * (off ? 1 : 0)); pts.push([x + off * sp + gust * tt * tt * 0.6 + Math.sin(tt * 3 + t * 2 + off) * tt * 2, y]); } return pts; };
+    const sheet = (t0, t1, w0, off, a0, a1) => {
+      const L = edge(-1, t0, t1, w0, off), R = edge(1, t0, t1, w0, off);
+      const p = poly(L.concat(R.reverse()));
+      const y0 = L[0][1], y1 = L[L.length - 1][1];
+      g.fillStyle = grad(g, 0, y0, 0, y1, [[0, `rgba(120,188,218,${a0})`], [0.5, `rgba(190,228,242,${(a0 + a1) / 2})`], [1, `rgba(255,250,244,${a1})`]]);
+      g.fill(p);
+      g.save(); g.clip(p);
+      const [cx] = fallAt((t0 + t1) / 2, 0);
+      g.fillStyle = grad(g, cx - 30, 0, cx + 30, 0, ['rgba(50,100,150,0.25)', 'rgba(50,100,150,0.04)', 'rgba(255,236,200,0.5)']); g.fillRect(cx - 80, y0, 160, y1 - y0);
+      for (let i = 0; i < 9; i++) {
+        const u = (i + 0.5) / 9 * 2 - 1, sp = 0.9 + (i % 3) * 0.2 + f * 0.4;
+        for (let k = 0; k < 3; k++) {
+          const tt = t0 + ((t * sp * 0.6 + i * 0.37 + k * 0.33) % 1) * (t1 - t0), [x, y] = fallAt(tt, u, w0), [x2, y2] = fallAt(Math.min(t1, tt + 0.12), u, w0);
+          g.lineWidth = 1.7; g.strokeStyle = `rgba(255,255,255,${0.8 - (tt - t0) / (t1 - t0) * 0.5})`;
+          g.beginPath(); g.moveTo(x + off + gust * tt * tt * 0.6, y); g.lineTo(x2 + off + gust * tt * tt * 0.6, y2); g.stroke();
+        }
       }
-    }
+      g.restore();
+      return p;
+    };
+    // the main sheet, inked down its first stretch, then three ribbons tearing apart
+    const main = sheet(0, TS, 13, 0, 1, 0.5);
+    g.save(); g.clip(new Path2D(main)); g.restore();
+    const L0 = edge(-1, 0, TS * 0.55, 13 + f * 2), R0 = edge(1, 0, TS * 0.55, 13 + f * 2);
+    g.lineWidth = 1.5; g.strokeStyle = 'rgba(40,66,94,0.55)'; g.stroke(poly(L0, false)); g.stroke(poly(R0, false));
+    for (const [w0, off, a] of [[5, -16, 0.8], [6, 1, 0.9], [4, 17, 0.7]]) sheet(TS - 0.5, T1, w0, off, 0.75 * a, 0);
+    // the lip: a lit roll of water where it goes over, foam at its foot
+    const [lx, ly] = fallAt(0, -1), [rx, ry] = fallAt(0, 1);
+    g.lineWidth = 3; g.strokeStyle = 'rgba(255,255,255,0.85)'; g.beginPath(); g.moveTo(lx, ly + 2); g.quadraticCurveTo((lx + rx) / 2, (ly + ry) / 2 + 6, rx, ry + 2); g.stroke();
+    for (let i = 0; i < 6; i++) { const ph = (t * 1.5 + i * 0.17) % 1, [fx_, fy] = fallAt(0.05, -1 + i * 0.4); g.fillStyle = `rgba(255,255,255,${0.7 * (1 - ph)})`; g.fill(circ(fx_, fy - ph * 6, 1.8 + ph * 2.5)); }
+    // spray: drops blown off the edges, and the veil of mist where it all comes apart
+    for (let i = 0; i < 18; i++) { const ph = (t * 0.5 + i / 18) % 1, tt = 0.4 + ph * (T1 - 0.4), [x, y] = fallAt(tt, i % 2 ? 1.4 : -1.3); g.fillStyle = `rgba(255,255,255,${0.45 * (1 - ph)})`; g.fill(circ(x + gust * tt * tt + ph * 16 + Math.sin(i * 3) * 5, y, 1.2 + ph * 2)); }
+    g.save(); g.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < 6; i++) { const ph = (t * 0.25 + i / 6) % 1, [x, y] = fallAt(T1 - 0.3 + ph * 0.3, (i - 2.5) * 0.5); const mx = x + gust * 4 + ph * 20, my = y - ph * 30, mr = 22 + ph * 30; g.fillStyle = radial(g, mx, my, 0, mr, [[0, `rgba(255,246,236,${0.22 * Math.sin(ph * Math.PI)})`], [1, 'rgba(255,246,236,0)']]); g.fill(circ(mx, my, mr)); }
     g.restore();
-    g.lineWidth = 1.5; g.strokeStyle = 'rgba(40,66,94,0.5)';
-    g.stroke(poly(left.slice(0, 22), false)); g.stroke(poly(right.slice(0, 22), false));
-    // foam where it goes over the lip, and spray blown off its edges
-    for (let i = 0; i < 6; i++) { const ph = (t * 1.5 + i * 0.17) % 1; g.fillStyle = `rgba(255,255,255,${0.7 * (1 - ph)})`; g.fill(circ(lx + (i - 2.5) * 6, y0 + 2 - ph * 6, 2 + ph * 3)); }
-    for (let i = 0; i < 14; i++) { const ph = (t * 0.6 + i / 14) % 1, y = y0 + 40 + ph * 500; g.fillStyle = `rgba(255,255,255,${0.35 * (1 - ph)})`; g.fill(circ(xAt(y) + half(y) + 4 + ph * 30 + Math.sin(i * 3) * 6, y, 1.4 + ph * 2)); }
   },
 });
 })();

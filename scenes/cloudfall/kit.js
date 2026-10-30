@@ -241,6 +241,9 @@ CF.contact = (g, x, y, rx, ry, a = 0.35) => {
 };
 
 // ------------------------------------------------------------------ particles
+// one shared event everyone turns to look at (set by whoever's having it): { x, y, k 0..1 }
+CF.attn = { x: 0, y: 0, k: 0 };
+CF.lookAt = (x, y, base, s = 200) => { const a = CF.attn; if (a.k < 0.01) return base; const l = [D.clamp((a.x - x) / s, -1, 1), D.clamp((a.y - y) / s, -1, 1)]; return [D.lerp(base[0], l[0], a.k), D.lerp(base[1], l[1], a.k)]; };
 CF.fx = [];
 CF.spawn = (p) => CF.fx.push(Object.assign({ age: 0, life: 2, vx: 0, vy: 0, rot: 0, vr: 0, size: 1, g: 0 }, p));
 CF.heartPath = (g, x, y, s) => {

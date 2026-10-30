@@ -253,11 +253,22 @@ layer({
     // a lighter edge where the grass turns down toward us and catches the sky
     g.lineWidth = 16; g.strokeStyle = rgba('#e9f0a0', 0.18); g.stroke(top);
     g.restore();
+    // the edge isn't combed: bites where the turf has crumbled to bare soil, clumps that slump over
+    const bites = [0.6, 1.05, 1.9, 2.3, 2.8], clumps = [0.25, 0.9, 1.4, 2.05, 2.65, 3.0];
+    for (const ab of bites) {
+      const pts = [];
+      for (let k = 0; k <= 10; k++) { const a = ab - 0.05 + (k / 10) * 0.1, [X, Z] = rim(a), d = Math.sin((k / 10) * Math.PI); pts.push(pr(X * (1 - d * 0.035), 0, Z * (1 - d * 0.035))); }
+      const p = curve(pts.concat(pts.slice().reverse().map(([x, y]) => [x, y + 3])), true);
+      ink(g, p, tone(M.soil, 0.55), 1.2, M.soil.line);
+      g.fillStyle = rgba('#2c1a28', 0.3); for (let k = 0; k < 4; k++) { const [x, y] = pts[2 + k * 2]; g.fill(ell(x, y - 1, 2, 1.2)); }
+    }
     // grass hanging over the lip
     for (let i = 0; i < 260; i++) {
       const a = 0.04 + (i / 260) * (Math.PI - 0.08), [X, Z] = rim(a), [x, y] = pr(X, 0, Z);
       const edge = Math.sin(a); if (edge < 0.25 && r() > edge * 3) continue;
-      const len = (5 + Math.abs(noise(i * 0.37)) * 12 + (r() < 0.08 ? 10 + r() * 14 : 0)) * (0.35 + 0.65 * edge), b = clamp(0.3 + Math.cos(a) * 0.35, 0.1, 0.8);
+      if (bites.some((ab) => Math.abs(a - ab) < 0.04)) continue;
+      const clump = clumps.some((ac) => Math.abs(a - ac) < 0.03) ? 14 + r() * 16 : 0;
+      const len = (4 + Math.abs(noise(i * 0.37)) * 9 + clump) * (0.35 + 0.65 * edge), b = clamp(0.3 + Math.cos(a) * 0.35, 0.1, 0.8);
       const p = new Path2D(); p.moveTo(x - 4, y - 2); p.quadraticCurveTo(x - 3, y + len * 0.6, x + (r() - 0.3) * 3, y + len); p.quadraticCurveTo(x + 3, y + len * 0.5, x + 4, y - 2); p.closePath();
       ink(g, p, tone(M.grass, b + (r() - 0.5) * 0.12), 1.1, M.grass.line);
     }
@@ -292,12 +303,13 @@ D.onLayout(() => {
     roots.push({ X, Y: Y + 4, Z, len: 14 + r() ** 2 * 70, ph: r() * 6, curl: r() < 0.5 ? 1 : -1, leaf: r() < 0.35, kids: r() < 0.6 ? 1 + ((r() * 2) | 0) : 0, bend: (r() - 0.5) * 30 });
   }
   roots.sort((a, b) => a.Z - b.Z);
-  for (let i = 0; i < 16; i++) {
-    const a = 0.1 + r() * (Math.PI - 0.2), [X, Z] = rim(a);
-    if (Math.abs(a - 0.42) < 0.12) continue; // not through the waterfall
-    vines.push({ X: X * 0.99, Z: Z * 0.99, len: 30 + r() * 90, ph: r() * 6, n: 0 });
+  // vines gather in a few heavy curtains (and one or two strays), as they do where water seeps
+  for (const [ac, n, L0] of [[0.78, 6, 110], [1.62, 4, 70], [2.55, 7, 130], [2.95, 3, 60], [1.15, 1, 50], [2.15, 1, 40]]) {
+    for (let i = 0; i < n; i++) {
+      const a = ac + (i - n / 2) * 0.022 + (r() - 0.5) * 0.01, [X, Z] = rim(a);
+      vines.push({ X: X * 0.99, Z: Z * 0.99, len: L0 * (0.4 + r() * 0.7) * (1 - Math.abs(i - n / 2) / n * 0.6), ph: r() * 6 + i * 0.3, n: 0 });
+    }
   }
-  // the lowest root carries a lantern
   // the lantern hangs from a root on the sunny side, low down; the tip itself trails a short tangle
   const lc = ISLE.cells.filter((c) => c.b === 4 && c.facing > 0.3 && c.nrm[0] > 0.2)[0];
   if (lc) { const q = lc.p; roots.push({ X: (q[2][0] + q[3][0]) / 2, Y: (q[2][1] + q[3][1]) / 2 + 3, Z: (q[2][2] + q[3][2]) / 2, len: 44, ph: 1, curl: 1, lantern: true, kids: 0 }); }
@@ -618,7 +630,11 @@ const FP = () => pr(SAT.X + 4, SAT.Y, SAT.Z + SAT.rz * 0.92);
 layer({
   id: 'fisher', z: 12,
   hit: (x, y) => { const [fx_, fy] = FP(); return Math.hypot(x - fx_, y - fy + 14) < 30 || (x > fx_ - 70 && x < fx_ - 20 && y > fy - 60 && y < (fisher.by || fy) + 20); },
-  update(dt, t, L) { fisher.catch = ease(fisher.catch, L.hovered && L.since > 0.3 ? 1 : 0, L.hovered ? 1.5 : 0.9, dt); },
+  update(dt, t, L) {
+    fisher.catch = ease(fisher.catch, L.hovered && L.since > 0.3 ? 1 : 0, L.hovered ? 1.5 : 0.9, dt);
+    // a catch coming up is news: everyone on the island turns to see
+    const [fx_, fy] = FP(); CF.attn.x = fx_ - 50; CF.attn.y = fy + 20; CF.attn.k = ease(CF.attn.k, fisher.catch > 0.55 ? 1 : 0, 2.5, dt);
+  },
   draw(g, t, L) {
     const [fx_, fy] = FP(), c = fisher.catch;
     const tip = [fx_ - 52 - c * 4, fy - 46 - c * 20];

@@ -105,3 +105,20 @@ Fixed this round:
   nibble round the bobber instead of floating beside the line.
 Left for round 6: waterfall, grass lip and vine curtains, the frogs' shared moment, line weight
 by distance, small-object shadows.
+
+## Round 6
+1. The waterfall was a ruler-straight pale strip that faded out mid-air. Now the brook's water
+   shoots out over the lip on a real arc (outward speed plus gravity, in plan), falls as one
+   inked sheet, tears into three ribbons that drift apart, and goes to spray and soft mist; a
+   lit roll of water where it goes over, the gust pushes it.
+2. The grass lip was a combed fringe and the vines hung like evenly spaced strings. Now there
+   are bites of bare soil, slumped clumps that hang further, and the vines gather in curtains of
+   three to seven (one heavy curtain each side), with a couple of strays.
+3. The light still wasn't applied to the small things. Every flower, pole, the hive, the barrel,
+   the hammock post, the frogs, the barrow and each fence post now throws a long thin shadow to
+   the left, the way they all would an hour before sunset.
+4. Nothing happened between the frogs. Now there's one shared moment: when the fisher lands a
+   catch, everyone turns to look: the door frog, grandma, the miller, the gardener, the
+   balloonist, and the stargazer swings her telescope round to it (`CF.attn`, `CF.lookAt`).
+5. The roof's right end had no barge board and the dormer floated on the tiles. Added the barge,
+   a lead apron and a cast shadow down the roof under the dormer. Sky clouds' ink lightened.

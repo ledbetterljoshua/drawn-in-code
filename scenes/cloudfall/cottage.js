@@ -310,6 +310,8 @@ function tiles(g) {
   const back = P3d(-117, YE + 10, -66);
   const [bx, by] = pr(...back);
   tube(g, seg(a0[0] - 1, a0[1], bx, by), tone(M.timber, 0.2), 5, 1.4);
+  const [c0, c1] = [CF.at(Mx, Ls, sag(Ls)), CF.at(Mx, Ls, Lt)];
+  tube(g, seg(c0[0] + 1, c0[1], c1[0] + 1, c1[1] + 1), tone(M.timber, 0.85), 5, 1.4);
   const e0 = CF.at(Mx, 0, Lt), e1 = CF.at(Mx, Ls, Lt);
   tube(g, seg(e0[0], e0[1] + 2, e1[0], e1[1] + 2), tone(M.timber, 0.75), 4.5, 1.4);
   tube(g, seg(e0[0] + 2, e0[1] + 6.5, e1[0], e1[1] + 6.5), tone(M.metal, 0.6), 4, 1.3);
@@ -319,6 +321,9 @@ function dormer(g) {
   const A = -32, B = 14, Bd = 47, y0 = roofY(Bd) - 2, y1 = y0 + 30, yA = y1 + 20, mid = (A + B) / 2;
   const front = wall(at(A, Bd), at(B, Bd), y0, yA - y0);
   const bF = lit(front.n), w = front.len, H = yA - y0;
+  // where it sits in the roof: a lead apron and the shadow it throws down the tiles
+  CF.multiply(g, CF.P3([P3d(A - 4, roofY(Bd + 2), Bd + 2), P3d(B + 6, roofY(Bd + 2), Bd + 2), P3d(B + 2, roofY(Bd + 16), Bd + 16), P3d(A - 10, roofY(Bd + 18), Bd + 18)]), '#8a80c0', 0.8);
+  face3(g, [P3d(A - 2, y0 + 1, Bd + 1), P3d(B + 2, y0 + 1, Bd + 1), P3d(B + 2, roofY(Bd + 5), Bd + 5), P3d(A - 2, roofY(Bd + 5), Bd + 5)], M.metal, 1.1);
   // its left cheek, sitting on the roof
   const bRoof = roofY(Bd), cheekBack = RB + (RIDGE - y1) / SLOPE;
   face3(g, [P3d(A, y1, Bd), P3d(A, y1, cheekBack), P3d(A, roofY(Bd), Bd)], M.plaster, 1.6);
@@ -505,7 +510,7 @@ layer({
       const gl = on(uw.M, rect(uw.x, uw.y, uw.w, uw.h));
       g.save(); g.clip(gl);
       const [fx, fy] = CF.at(uw.M, uw.x + uw.w * 0.5, uw.y + uw.h + 14 - cot.gran * 12);
-      frog(g, fx, fy, 0.62, { c: CF.FROG_TINTS.teal, open: cot.granBlink(t), look: [clamp((P.x - fx) / 200, -1, 1), clamp((P.y - fy) / 200, -1, 1)], smile: 1.6 + cot.gran * 1.5,
+      frog(g, fx, fy, 0.62, { c: CF.FROG_TINTS.teal, open: cot.granBlink(t), look: CF.lookAt(fx, fy, [clamp((P.x - fx) / 200, -1, 1), clamp((P.y - fy) / 200, -1, 1)]), smile: 1.6 + cot.gran * 1.5,
         hat: (g, lw) => { g.lineWidth = lw; g.strokeStyle = '#3a2232'; g.beginPath(); g.arc(-10, -27, 6, 0, TAU); g.arc(10, -27, 6, 0, TAU); g.stroke(); } });
       g.restore();
     }
@@ -528,7 +533,7 @@ layer({
         g.fillStyle = radial(g, hx, hy, 3, 46, ['#ffe09a', '#e89a50', '#6a3426']); g.fill(hole);
         g.save(); g.clip(hole);
         const [fx, fy] = CF.at(Mx, d.x + d.w / 2, d.y + d.h);
-        frog(g, fx, fy, 0.82, { open: cot.blink(t), look: [clamp((P.x - fx) / 200, -1, 1), clamp((P.y - fy + 30) / 200, -1, 1)], smile: 3.5,
+        frog(g, fx, fy, 0.82, { open: cot.blink(t), look: CF.lookAt(fx, fy, [clamp((P.x - fx) / 200, -1, 1), clamp((P.y - fy + 30) / 200, -1, 1)]), smile: 3.5,
           arms: cot.cup > 0.1 ? [[8, -22 - cot.cup * 6, 12, -12]] : [[17, -28 - Math.sin(t * 10) * 7 * o, 13, -12]],
           hat: (g, lw) => { ink(g, D.ell(0, -12, 17, 9), '#f3e4c8', lw * 0.8); g.lineWidth = lw * 0.8; g.strokeStyle = '#e0644c'; g.setLineDash([3, 3]); g.stroke(D.ell(0, -12, 13, 6)); g.setLineDash([]); } });
         if (cot.cup > 0.1) {
@@ -579,7 +584,8 @@ layer({
   update(dt, t, L) {
     const [gx, gy] = pr(...gazerPos());
     const dx = P.x - gx, dy = P.y - gy + 20, near = P.inside && Math.hypot(dx, dy) < 560;
-    const target = near ? Math.atan2(dy, dx) : -2.2 + Math.sin(t * 0.25) * 0.3;
+    let target = near ? Math.atan2(dy, dx) : -2.2 + Math.sin(t * 0.25) * 0.3;
+    if (CF.attn.k > 0.5) target = Math.atan2(CF.attn.y - gy + 20, CF.attn.x - gx);
     let tg = target; if (tg > 0.6) tg = tg > 1.9 ? -Math.PI + 0.1 : 0.6;
     gazer.a = ease(gazer.a, tg, near ? 3 : 0.8, dt);
     gazer.hv += 900 * dt; gazer.hop += gazer.hv * dt;

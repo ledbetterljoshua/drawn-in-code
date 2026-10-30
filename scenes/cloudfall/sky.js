@@ -194,7 +194,7 @@ layer({
 });
 
 // ------------------------------------------------------------------ cumulus drifting across the sky
-const CLOUD = { union: true, line: 'rgba(150,110,150,0.4)', lw: 1.4, shade: '#c8bcdc', base: '#f3e6ea', lit: '#fff7ea' };
+const CLOUD = { union: true, line: 'rgba(150,120,170,0.22)', lw: 1.2, shade: '#c8bcdc', base: '#f3e6ea', lit: '#fff7ea' };
 function cumulusCircles(seed, w, h) {
   const r = rng(seed), cs = [], n = Math.max(4, Math.round(w / 42));
   for (let i = 0; i < n; i++) {
@@ -341,7 +341,7 @@ layer({
       g.beginPath(); g.moveTo(-6, r + 28); g.quadraticCurveTo(-7, r + 12 - fl * f * 0.6, 0, r + 10 - fl * f); g.quadraticCurveTo(7, r + 12 - fl * f * 0.6, 6, r + 28); g.fill();
       g.fillStyle = `rgba(255,240,170,${f})`; g.fill(ell(0, r + 24 - fl * 0.3 * f, 3, 6 * f + 1));
     }
-    const lookX = clamp((P.x - cx) / 300, -1, 1), lookY = clamp((P.y - cy - 110) / 300, -1, 1);
+    const [lookX, lookY] = CF.lookAt(cx, cy + 110, [clamp((P.x - cx) / 300, -1, 1), clamp((P.y - cy - 110) / 300, -1, 1)], 300);
     frog(g, 2, r + 56, 0.66, { c: CF.FROG_TINTS.gold, open: balloon.blink(t), look: [lookX, lookY], smile: 2 + L.hover * 2.5,
       arms: L.hover > 0.3 ? [[18, -22 - Math.sin(t * 12) * 6 * L.hover]] : null,
       hat: (g, lw) => { ink(g, poly([[-14, -33], [14, -33], [10, -38], [-10, -38]]), '#7a4a3a', lw); ink(g, D.ell(0, -38, 10, 5), '#8f5a44', lw); } });
