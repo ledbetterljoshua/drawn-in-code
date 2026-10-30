@@ -31,7 +31,7 @@
     for (let i = 0; i < 11; i++) {
       const u = 0.42 + i * 0.05;
       const s = lerp(1.05, 0.35, i / 10) * (0.9 + r() * 0.2);
-      bells.push({ u, s, side: i % 3 === 2 ? -1 : 1, ph: r() * TAU, wet: r(), a: 0, v: 0 });
+      bells.push({ u, s, side: [1, 1, -1, 1, -1, 1, 1, -1, 1, -1, 1][i], ph: r() * TAU, wet: r(), a: 0, v: 0 });
     }
   });
   function bellPath(s) {
@@ -47,25 +47,31 @@
     return p;
   }
   function drawBell(g, b, x, y, t) {
-    g.save(); g.translate(x, y); g.rotate(b.side * 0.45 + b.a - 0.1); g.scale(b.side, 1);
-    const P0 = bellPath(b.s);
+    g.save(); g.translate(x, y); g.rotate(b.side * 0.5 + b.a - 0.08); g.scale(b.side, 1);
+    const s2 = b.s, L = 78 * s2, W = 30 * s2;
+    const P0 = bellPath(s2);
     g.lineWidth = 2.4; g.strokeStyle = LINE; g.stroke(P0);
-    // lit through: hot pink at the thin mouth, deeper rose at the stalk
-    g.fillStyle = grad(g, 0, 0, 0, 80 * b.s, [[0, '#7a3a68'], [0.5, '#c45a8a'], [1, '#f39abc']]);
+    // a tube lit through from behind: deep rose on the shaded flank, hot pink toward the sun side
+    g.fillStyle = grad(g, -W, 0, W, 0, [[0, '#6a2a5a'], [0.45, '#b04a7e'], [0.85, '#e47aa6'], [1, '#ffb0cc']]);
     g.fill(P0);
     g.save(); g.clip(P0);
-    g.fillStyle = 'rgba(70,30,70,0.5)'; g.fill(DH.shift(P0, -9 * b.s, 0));
-    // the speckled throat shows at the mouth
-    g.fillStyle = '#fde4ee'; g.fill(ell(4 * b.s, 80 * b.s, 22 * b.s, 9 * b.s));
-    const r = rng(b.ph * 1000 | 0);
-    for (let i = 0; i < 9; i++) { g.fillStyle = '#8a2a5a'; g.fill(circ((r() - 0.4) * 30 * b.s, 70 * b.s + r() * 10 * b.s, 1.4 * b.s + 0.6)); }
+    g.fillStyle = grad(g, 0, 0, 0, L * 0.5, [[0, 'rgba(60,30,50,0.6)'], [1, 'rgba(60,30,50,0)']]); g.fillRect(-W * 1.2, 0, W * 2.4, L * 0.5);
     // veins along the tube
-    g.lineWidth = 0.7; g.strokeStyle = 'rgba(255,200,220,0.4)';
-    for (let i = -2; i <= 2; i++) { g.beginPath(); g.moveTo(i * 2 * b.s, 4); g.quadraticCurveTo(i * 9 * b.s, 40 * b.s, i * 13 * b.s, 80 * b.s); g.stroke(); }
+    g.lineWidth = 0.7; g.strokeStyle = 'rgba(255,190,215,0.35)';
+    for (let i = -2; i <= 2; i++) { g.beginPath(); g.moveTo(i * 2 * s2, 4); g.quadraticCurveTo(i * 9 * s2, 40 * s2, i * 14 * s2, 80 * s2); g.stroke(); }
     g.restore();
-    DH.crescent(g, P0, 'rgba(255,220,200,0.85)', -3, 0);
+    // the open mouth, seen at an angle: a dark throat freckled with spots, a pale long lower lip
+    const mx = W * 0.05, my = L * 1.02, mrx = W * 0.98, mry = W * 0.34;
+    const mouth = ell(mx, my, mrx, mry, undefined, 0.12);
+    ink(g, mouth, '#4a1838', 1.6);
+    g.save(); g.clip(mouth);
+    g.fillStyle = '#f6d6e2'; g.fill(ell(mx + W * 0.1, my + mry * 0.55, mrx * 0.9, mry * 0.6, undefined, 0.12));
+    const r = rng(b.ph * 1000 | 0);
+    for (let i = 0; i < 8; i++) { g.fillStyle = '#7a1a4a'; g.fill(ell(mx + (r() - 0.5) * mrx * 1.4, my + mry * (0.2 + r() * 0.6), 1.3 * s2 + 0.5, 1 * s2 + 0.4)); }
+    g.restore();
+    DH.crescent(g, P0, 'rgba(255,224,210,0.9)', -2.6, 0);
     // a drop hanging from the lip
-    if (b.wet > 0.35) DH.glassDrop(g, -26 * b.s, 82 * b.s + 3 + b.wet * 2, 2 + b.wet * 2 * b.s, { sy: 1.15 });
+    if (b.wet > 0.35) DH.glassDrop(g, mx - mrx * 0.6, my + mry + 2 + b.wet * 2, 2 + b.wet * 2 * s2, { sy: 1.15 });
     g.restore();
   }
 
@@ -114,6 +120,8 @@
       for (let i = bells.length - 1; i >= 0; i--) {
         const b = bells[i], [x, y] = stemAt(b.u, t);
         g.lineWidth = 2.2; g.strokeStyle = '#3e5a3a'; g.beginPath(); g.moveTo(x, y); g.lineTo(x + b.side * 8, y + 4); g.stroke();
+        const br = new Path2D(); br.moveTo(x, y + 2); br.quadraticCurveTo(x - b.side * 10 * b.s, y + 4, x - b.side * 16 * b.s, y + 14 * b.s); br.quadraticCurveTo(x - b.side * 4, y + 10 * b.s, x, y + 2); br.closePath();
+        ink(g, br, '#3e5a3a', 1.2);
         if (i === 0) continue; // the bee's bell is drawn over the bee
         drawBell(g, b, x + b.side * 8, y + 4, t);
       }

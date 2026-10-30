@@ -121,7 +121,7 @@
     });
   }
 
-  const masses = [];
+  const masses = (DH.masses = []);
   const scud = [];
   onLayout(() => {
     masses.length = 0; scud.length = 0;

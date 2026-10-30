@@ -24,62 +24,82 @@
   const cushions = [];
   (() => {
     const r = rng(903);
-    for (let x = -900; x < 540; x += 26 + r() * 26) cushions.push([x, bankY(x) + 4, 18 + r() * 22 * (x > 420 ? 0.6 : 1)]);
+    for (let x = -900; x < 545; x += 14 + r() * 18) cushions.push([x, bankY(x) + 8 + r() * 8, 14 + r() * 20 * (x > 420 ? 0.6 : 1)]);
   })();
+  // the shore curls back under toward the bottom left (the phone sees a lot of it)
+  const shoreX = (y) => (y < 1060 ? 548 : 548 - (y - 1060) * 0.55);
   const bankPath = () => {
-    const v = st.view, p = new Path2D();
+    const v = st.view, p = new Path2D(), yb = Math.max(v.y1, 1250) + 40;
     for (const [x, y, rr] of cushions) circ(x, y, rr, p);
-    p.moveTo(v.x0 - 40, Math.max(v.y1, 1250) + 40); p.lineTo(v.x0 - 40, 1000);
-    for (let x = v.x0 - 40; x <= 540; x += 8) p.lineTo(x, bankY(x) + 10);
-    // the soil slopes under the water toward the right
-    p.lineTo(560, Math.max(v.y1, 1250) + 40); p.closePath();
+    p.moveTo(v.x0 - 40, yb); p.lineTo(v.x0 - 40, 1010);
+    for (let x = v.x0 - 40; x <= 540; x += 8) p.lineTo(x, bankY(x) + 14);
+    for (let y = bankY(540) + 14; y <= yb; y += 20) p.lineTo(shoreX(y), y);
+    p.lineTo(v.x0 - 40, yb); p.closePath();
     return p;
   };
+  // points on the silhouette: tops of cushions not buried in a neighbour
+  const edgePts = (() => {
+    const out = [], r = rng(904);
+    for (const [x, y, rr] of cushions) {
+      for (let a = -Math.PI * 0.95; a < -Math.PI * 0.05; a += 0.13 + r() * 0.1) {
+        const px = x + Math.cos(a) * rr, py = y + Math.sin(a) * rr;
+        if (cushions.some(([x2, y2, r2]) => (x2 !== x || y2 !== y) && Math.hypot(px - x2, py - y2) < r2 - 1.5)) continue;
+        out.push([px, py, a, r()]);
+      }
+    }
+    return out;
+  })();
 
   function paintBank(g) {
     const v = st.view, B = bankPath(), r = rng(901);
-    g.lineWidth = 6; g.strokeStyle = LINE; g.stroke(B);
-    // a backlit mass: deep shade, cool, the only light a rim along the cushions
-    g.fillStyle = grad(g, 0, 960, 0, Math.max(v.y1, 1300), [[0, '#22341f'], [0.15, '#1c2a1e'], [0.4, '#1d1420'], [1, '#100a12']]);
+    g.lineWidth = 5; g.strokeStyle = LINE; g.stroke(B);
+    // a backlit mass: deep cool shade, only the cushions' tops catch the light
+    g.fillStyle = grad(g, 0, 960, 0, Math.max(v.y1, 1300), [[0, '#1e2e1e'], [0.12, '#18241a'], [0.35, '#1a121c'], [1, '#0e0910']]);
     g.fill(B);
     g.save(); g.clip(B);
-    // each cushion shaded on its own, bottom-lit faintly by the water
+    const U = new Path2D(); for (const [x, y, rr] of cushions) circ(x, y, rr, U);
+    DH.cel(g, U, { dark: '#1a2a1c', base: '#2a4026', lit: '#4a6634', dd: [6, 8], ld: [-5, 7] });
+    // the soft hollows where cushions meet, and a stipple of shoots over the moss
     for (const [x, y, rr] of cushions) {
-      const c = circ(x, y, rr);
-      DH.cel(g, c, { dark: '#1a2a1c', base: '#2c4428', lit: '#4c6a34', dd: [rr * 0.3, rr * 0.25], ld: [-DH.sunSide(x) * rr * 0.25, rr * 0.2] });
-      g.lineWidth = 1; g.strokeStyle = 'rgba(10,16,10,0.6)'; g.beginPath(); g.arc(x, y, rr, Math.PI * 0.1, Math.PI * 0.9); g.stroke();
-      // the tiny star-shoots of the moss on each cushion
-      for (let i = 0; i < rr * 0.8; i++) {
-        const a = -Math.PI * (0.15 + r() * 0.7), px = x + Math.cos(a) * rr * (0.4 + r() * 0.55), py = y + Math.sin(a) * rr * (0.4 + r() * 0.55);
-        g.fillStyle = r() < 0.5 ? 'rgba(120,150,70,0.5)' : 'rgba(20,34,20,0.5)'; g.fill(circ(px, py, 1 + r() * 1.3));
+      g.fillStyle = 'rgba(8,14,8,0.35)'; g.fill(ell(x, y + rr * 0.75, rr * 0.8, rr * 0.35));
+      for (let i = 0; i < rr * 1.4; i++) {
+        const a = -Math.PI * (0.1 + r() * 0.8), d = rr * (0.3 + r() * 0.65);
+        const px = x + Math.cos(a) * d, py = y + Math.sin(a) * d;
+        g.lineWidth = 1; g.strokeStyle = r() < 0.5 ? 'rgba(120,150,70,0.45)' : 'rgba(14,24,14,0.5)';
+        g.beginPath(); g.moveTo(px, py); g.lineTo(px + Math.cos(a) * 2.5, py + Math.sin(a) * 2.5); g.stroke();
       }
     }
-    // soil under the moss: grit, two stones
-    for (let i = 0; i < 180; i++) { const x = v.x0 + r() * (560 - v.x0), y = bankY(x) + 40 + r() * 400; g.fillStyle = r() < 0.5 ? 'rgba(110,70,80,0.35)' : 'rgba(6,4,8,0.45)'; g.fill(circ(x, y, 0.8 + r() * 1.8)); }
-    for (const [x, y, sz] of [[60, 1100, 20], [300, 1140, 14], [-120, 1180, 24]]) {
+    // soil under the moss: grit and two stones
+    for (let i = 0; i < 180; i++) { const x = v.x0 + r() * (560 - v.x0), y = bankY(x) + 40 + r() * 600; g.fillStyle = r() < 0.5 ? 'rgba(110,70,80,0.3)' : 'rgba(6,4,8,0.45)'; g.fill(circ(x, y, 0.8 + r() * 1.8)); }
+    for (const [x, y, sz] of [[60, 1100, 20], [300, 1120, 14], [-120, 1180, 24], [120, 1400, 30]]) {
       const p = DH.blob(x, y, sz * 1.3, sz * 0.8, 9, 0.2, x + 5);
-      ink(g, p, '#3a3448', 1.8); DH.crescent(g, p, '#241f30', 0, -sz * 0.3); DH.crescent(g, p, 'rgba(200,150,140,0.3)', 0, -3);
+      ink(g, p, '#332e40', 1.8); DH.crescent(g, p, '#201b2a', 0, -sz * 0.3); DH.crescent(g, p, 'rgba(200,150,140,0.3)', 0, -3);
     }
     g.restore();
-    // the rim: gold along the cushions' tops, a fringe of shoots catching the sun
-    for (const [x, y, rr] of cushions) {
-      const near = DH.sunNear(x, 700);
-      g.lineWidth = 2.4; g.strokeStyle = `rgba(255,${190 + near * 50 | 0},120,${0.45 + near * 0.5})`;
-      const s0 = DH.sunSide(x) > 0 ? -Math.PI * 0.75 : -Math.PI * 0.95, s1 = DH.sunSide(x) > 0 ? -Math.PI * 0.05 : -Math.PI * 0.25;
-      g.beginPath(); g.arc(x, y, rr - 1, s0, s1); g.stroke();
-      for (let i = 0; i < rr * 0.5; i++) {
-        const a = lerp(s0, s1, r()), px = x + Math.cos(a) * rr, py = y + Math.sin(a) * rr, h = 3 + r() * 6;
-        g.lineWidth = 1.1; g.strokeStyle = `rgba(255,${200 + near * 40 | 0},130,${0.5 + near * 0.4})`;
-        g.beginPath(); g.moveTo(px, py); g.lineTo(px + Math.cos(a) * h, py + Math.sin(a) * h); g.stroke();
+    // the fuzzy silhouette: shoots standing off the cushions' tops, tipped gold on the sun side
+    for (const [px, py, a, q] of edgePts) {
+      const near = DH.sunNear(px, 700), h = 3 + q * 6;
+      const ca = Math.cos(a), sa = Math.sin(a);
+      g.lineWidth = 2; g.strokeStyle = '#1a2a1a';
+      g.beginPath(); g.moveTo(px - ca, py - sa); g.lineTo(px + ca * h, py + sa * h); g.stroke();
+      const lit = (DH.sunSide(px) > 0 ? ca > -0.3 : ca < 0.3) && sa < -0.2;
+      if (lit) {
+        g.lineWidth = 1.3; g.strokeStyle = `rgba(255,${196 + near * 44 | 0},130,${0.5 + near * 0.45})`;
+        g.beginPath(); g.moveTo(px + ca * h * 0.3, py + sa * h * 0.3); g.lineTo(px + ca * h, py + sa * h); g.stroke();
+        g.lineWidth = 2; g.strokeStyle = `rgba(255,${190 + near * 40 | 0},120,${0.35 + near * 0.4})`;
+        g.beginPath(); g.arc(px - ca * 1.5, py - sa * 1.5, 2.5, a - 0.6, a + 0.6); g.stroke();
       }
     }
+    // the waterline round its right side
+    g.lineWidth = 1.6; g.strokeStyle = 'rgba(255,214,160,0.35)';
+    g.beginPath(); for (let y = bankY(540) + 20; y < Math.min(v.y1, 1900); y += 12) { const x = shoreX(y) + 3; y === bankY(540) + 20 ? g.moveTo(x, y) : g.lineTo(x, y); } g.stroke();
   }
   layer({ id: 'near-bank', z: 24, still: true, draw: paintBank });
 
   // rain on the near bank (and the fore drops)
   const bankHit = (x, y, d) => DH.splash(x, y, d.r * 0.8, 'ground', d.band === 'fore' ? 'fore' : 'mid');
-  DH.surface({ band: 'fore', x0: -2000, x1: 545, y: bankY, hit: bankHit });
-  DH.surface({ band: 'near', x0: -2000, x1: 545, y: bankY, hit: bankHit });
+  DH.surface({ band: 'fore', x0: -2000, x1: 545, y: (x) => bankY(x) + 2, hit: bankHit });
+  DH.surface({ band: 'near', x0: -2000, x1: 545, y: (x) => bankY(x) + 2, hit: bankHit });
 
   // ------------------------------------------------------------ the ladybird and her clover
   const LB = { x: 318, y: bankY(318) - 2 };

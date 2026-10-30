@@ -130,7 +130,7 @@
     let y = RIM - 6;
     const r = rng(9);
     for (const [n, rr] of rows) {
-      for (let i = 0; i < n; i++) heap.push({ x: CX + (i - (n - 1) / 2) * rr * 1.75 + (r() - 0.5) * 3, y: y + (r() - 0.5) * 2, r: rr * (0.85 + r() * 0.3), w: DH.spring(160, 5, 0), ph: r() * TAU });
+      for (let i = 0; i < n; i++) heap.push({ x: CX + (i - (n - 1) / 2) * rr * 1.75 + (r() - 0.5) * 4, y: y + (r() - 0.5) * 3, r: rr * (0.75 + r() * 0.45), w: DH.spring(160, 5, 0), ph: r() * TAU });
       y -= rr * 1.45;
     }
   });
@@ -211,7 +211,7 @@
     draw(g, t) {
       for (const h of heap) {
         const w = clamp(h.w.x * 0.06, -0.35, 0.35);
-        DH.glassDrop(g, h.x, h.y - h.r * 0.75, h.r, { sx: 1 + w, sy: 1 - w, flat: 0.5, bright: 0.7 + 0.3 * Math.sin(t * 0.8 + h.ph) });
+        DH.glassDrop(g, h.x, h.y - h.r * 0.6, h.r, { sx: 1 + w, sy: 1 - w, flat: 0.15, bright: 0.7 + 0.3 * Math.sin(t * 0.8 + h.ph) });
       }
     },
   });
