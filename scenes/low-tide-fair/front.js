@@ -65,7 +65,7 @@ layer({
 });
 
 // ============================================================ the tide post and its puffin
-const bell = { x: 1612, y: 588, p: F.pendulum({ k: 40, damp: 1.6, lean: 0.03, x: 1612 }), ring: 0, puffin: { blink: F.blinker(301), flap: 0 } };
+const bell = { x: 1760, y: 548, p: F.pendulum({ k: 40, damp: 1.6, lean: 0.03, x: 1760 }), ring: 0, puffin: { blink: F.blinker(301), flap: 0 } };
 layer({
   id: 'bellpost', z: F.zOf(bell.y),
   hit: (x, y) => Math.abs(x - bell.x) < 26 && y > bell.y - 120 && y < bell.y + 6,

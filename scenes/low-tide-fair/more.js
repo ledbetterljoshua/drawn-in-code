@@ -107,21 +107,21 @@ function drawPunter(g, p, t) {
 }
 
 // ============================================================ the clam diggers
-const clams = { diggers: [F.makeFolk({ sp: 'mole', x: 520, y: 702, coat: '#6f9d58', dir: 1, hat: F.HATS.knit('#e07f62') }), F.makeFolk({ sp: 'mole', x: 610, y: 716, coat: '#e7a43c', dir: -1 })], squirt: 0, up: 0 };
+const clams = { diggers: [F.makeFolk({ sp: 'mole', x: 345, y: 742, coat: '#6f9d58', dir: 1, hat: F.HATS.knit('#e07f62') }), F.makeFolk({ sp: 'mole', x: 440, y: 758, coat: '#e7a43c', dir: -1 })], squirt: 0, up: 0 };
 layer({
-  id: 'clamdig', z: F.zOf(716),
-  hit: (x, y) => x > 470 && x < 660 && y > 650 && y < 730,
+  id: 'clamdig', z: F.zOf(758),
+  hit: (x, y) => x > 300 && x < 490 && y > 690 && y < 775,
   onEnter() { clams.squirt = 1.4; },
   update(dt, t, L) { clams.squirt = Math.max(0, clams.squirt - dt); clams.up = ease(clams.up, L.hovered ? 1 : 0, 3, dt); for (const d of clams.diggers) F.stepFolk(d, dt); },
   draw(g, t) {
     // a dug-out hollow with a heap of sand beside it, a bucket half full of clams
-    for (const [x, y] of [[548, 704], [632, 718]]) {
+    for (const [x, y] of [[373, 744], [462, 760]]) {
       const s = pxu(y);
       g.fillStyle = 'rgba(120,90,100,0.55)'; g.fill(ell(x, y, 12 * s, 3.5 * s));
       ink(g, curve([[x + 10 * s, y - 1], [x + 16 * s, y - 6 * s], [x + 24 * s, y - 5 * s], [x + 28 * s, y]]), '#cfa577', 0.9);
       g.fillStyle = '#ecc99a'; g.fill(ell(x + 16 * s, y - 4.5 * s, 4 * s, 1.4 * s));
     }
-    const bs = pxu(712), bx = 575, by = 712;
+    const bs = pxu(752), bx = 400, by = 752;
     F.contact(g, bx, by, 7 * bs, 0.5);
     ink(g, poly([[bx - 6 * bs, by - 10 * bs], [bx + 6 * bs, by - 10 * bs], [bx + 5 * bs, by], [bx - 5 * bs, by]]), '#7a9cae', 1);
     for (let k = 0; k < 4; k++) ink(g, ell(bx - 3.6 * bs + k * 2.4 * bs, by - 10.5 * bs, 1.6 * bs, 1.1 * bs), '#e9d9c3', 0.6);
@@ -174,7 +174,7 @@ const tufts = [];
 }
 layer({
   id: 'near', z: 45,
-  hit(x, y) { for (const tf of tufts) if (Math.abs(x - tf.x) < 30 * tf.k && y > tf.y - 70 * tf.k && y < tf.y + 10) return (this.which = tf), true; return false; },
+  hit(x, y) { for (const tf of tufts) if (Math.abs(x - tf.x) < 16 * tf.k && y > tf.y - 50 * tf.k && y < tf.y + 10) return (this.which = tf), true; return false; },
   onEnter(L) { if (L.which) L.which.kick = 1; },
   update(dt) { for (const tf of tufts) tf.kick = Math.max(0, (tf.kick || 0) - dt * 0.8); },
   draw(g, t) {

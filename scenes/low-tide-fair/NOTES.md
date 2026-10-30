@@ -133,3 +133,17 @@ The five worst now:
    rim at half strength, a smoother meander.
 5. **The phone frame is half empty sky.** *Fix:* the phone draws the panorama larger (≈700 artboard
    units across) and biases less toward sky.
+
+## Round 4
+
+Checked every hover with before/after pairs (tower lights, tea lanterns, race cheer, band tempo,
+seal, sleeper's door, bell, hermit swap, kite, laundry, castle flag). Found and fixed:
+
+1. **The bell post — the story's trigger — had vanished** behind the enlarged tea-house. Moved it
+   to the creek mouth where the tide comes in.
+2. **The clam diggers were completely hidden** behind the grandmother's tail. Moved them out onto
+   open sand by the book snail.
+3. **A foreground grass tuft swallowed the hermit queue's hover.** Tuft hit areas cut to the blades.
+4. **The tea-house neck** was a flat brown slab with a thick pair of rods. Smaller foot, thinner
+   stalks, core shadow and mottling.
+5. **The creek's meander** had a hairpin by the tea-house that looked drawn with a ruler: smoothed.
