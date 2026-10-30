@@ -32,6 +32,18 @@ layer({
     g.fillStyle = 'rgba(255,250,240,0.72)'; g.fill(ell(mx + 9, my, mr * 0.78, mr * 1.02));
     g.fillStyle = 'rgba(190,200,230,0.35)'; g.fill(circ(mx + 6, my - 5, 3)); g.fill(circ(mx + 12, my + 6, 2.2));
     g.restore();
+    // on a tall screen the sky goes on up into the first faint stars
+    if (v.y0 < -250) {
+      const rs = rng(77);
+      for (let i = 0; i < 70; i++) {
+        const y = lerp(v.y0, -260, rs() ** 1.4), x = v.x0 + rs() * (v.x1 - v.x0), a = clamp((-260 - y) / 500, 0, 1) * (0.3 + rs() * 0.6);
+        g.fillStyle = `rgba(255,250,235,${a})`; g.fill(circ(x, y, 0.7 + rs() * 1.1));
+        if (rs() < 0.08) { g.strokeStyle = `rgba(255,250,235,${a * 0.6})`; g.lineWidth = 0.8; g.beginPath(); g.moveTo(x - 4, y); g.lineTo(x + 4, y); g.moveTo(x, y - 4); g.lineTo(x, y + 4); g.stroke(); }
+      }
+      // and an island floating far above, seen from underneath, its waterfall a thread
+      farIsle(g, 1290, -300, 190, 0.18, 9);
+      farIsle(g, 420, -640, 90, 0.4, 13);
+    }
     // long thin streaks of high cloud, lit underneath by the low sun
     const r = rng(8);
     for (let i = 0; i < 16; i++) {
@@ -220,10 +232,17 @@ onLayout(() => {
   for (const c of clouds) {
     c.cs = cumulusCircles(c.seed, c.w, c.h);
     // the underside of a cloud above us is in its own shade; its top catches the sun
-    c.sp_ = sprite(-c.w * 0.6 - 10, -c.h * 1.25, c.w * 1.2 + 20, c.h * 1.3, (g) => {
-      lumps(g, c.cs, CLOUD, 0);
+    c.sp_ = sprite(-c.w * 0.6 - 10, -c.h * 1.25, c.w * 1.2 + 20, c.h * 1.45, (g) => {
+      // a base of small lumps, so the underside is nearly flat but never ruled
+      const r = rng(c.seed * 5), cs = c.cs.slice();
+      for (let x = -c.w * 0.46; x < c.w * 0.46; x += c.h * 0.2) cs.push([x, -c.h * 0.1 + (r() - 0.5) * c.h * 0.05, c.h * (0.13 + r() * 0.06)]);
+      const warm = clamp((c.x + 200) / 1600, 0, 1);
+      lumps(g, cs, { union: true, line: rgba('#8f7cae', 0.22), lw: 1.1, shade: mix('#aaa2d2', '#cfa6c0', warm), base: mix('#ece4f2', '#fbe2d8', warm), lit: mix('#fffaf4', '#fff0d2', warm) }, c.h * 0.02);
       g.save(); g.globalCompositeOperation = 'source-atop';
-      g.fillStyle = grad(g, 0, -c.h * 1.2, 0, 0, [[0, 'rgba(255,240,210,0)'], [0.7, 'rgba(200,170,210,0.0)'], [1, 'rgba(170,140,190,0.45)']]);
+      // the underside, in its own shade; the sun-side tops catching warm
+      g.fillStyle = grad(g, 0, -c.h * 0.7, 0, 0, [[0, 'rgba(150,130,190,0)'], [1, 'rgba(150,130,190,0.5)']]);
+      g.fillRect(-c.w, -c.h * 0.7, c.w * 2, c.h * 0.8);
+      g.fillStyle = radial(g, c.w * 0.3, -c.h, 0, c.w * 0.6, [[0, `rgba(255,214,160,${0.25 + warm * 0.3})`], [1, 'rgba(255,214,160,0)']]);
       g.fillRect(-c.w, -c.h * 1.3, c.w * 2, c.h * 1.4);
       g.restore();
     });
@@ -357,4 +376,35 @@ layer({
   },
 });
 const LINEB = '#3a2232';
+
+// ------------------------------------------------------------------ a school of sky-fish in the cloud tops
+// far below the island, only on a tall screen: they porpoise in and out of the cloud, and scatter
+const school = { x: 700, fish: Array.from({ length: 9 }, (_, i) => ({ dx: (i % 3) * 34 + (i * 13) % 20, dy: Math.floor(i / 3) * 22, ph: i * 0.8, ox: 0, oy: 0, vx: 0, vy: 0 })) };
+layer({
+  id: 'school', z: 3,
+  hit: (x, y) => st.view.y1 > 1500 && Math.abs(y - 1560) < 120 && Math.abs(x - school.cx) < 120,
+  onEnter() { for (const f of school.fish) { f.vx += (Math.random() - 0.5) * 200; f.vy += (Math.random() - 0.5) * 160; } },
+  update(dt, t) {
+    const v = st.view;
+    school.x += dt * 26;
+    school.cx = v.x0 - 150 + (school.x % (v.x1 - v.x0 + 300));
+    for (const f of school.fish) { f.vx += (-3 * f.ox - 1.5 * f.vx) * dt; f.vy += (-3 * f.oy - 1.5 * f.vy) * dt; f.ox += f.vx * dt; f.oy += f.vy * dt; }
+  },
+  draw(g, t) {
+    if (st.view.y1 < 1500) return;
+    for (const f of school.fish) {
+      const x = school.cx + f.dx + f.ox, arc = Math.sin(t * 1.4 + f.ph + f.dx * 0.02), y = 1540 + f.dy - Math.max(0, arc) * 34 + f.oy;
+      const dive = clamp(arc * 2, -1, 1);
+      g.save(); g.translate(x, y); g.rotate(-Math.cos(t * 1.4 + f.ph + f.dx * 0.02) * 0.5);
+      g.globalAlpha = clamp(0.35 + arc, 0, 1);
+      const wag = Math.sin(t * 9 + f.ph) * 2.5;
+      ink(g, poly([[-7, 0], [-13, -4 + wag], [-13, 4 + wag]]), '#f2a65e', 1.1);
+      ink(g, ell(0, 0, 8, 5.2), grad(g, 0, -5, 0, 5, ['#ffd48a', '#f29a5e']), 1.2);
+      g.fillStyle = '#2a1c26'; g.fill(circ(3.5, -1, 1.2));
+      g.restore();
+      // the cloud closes over them as they dive
+      if (dive < 0.2) { g.fillStyle = `rgba(250,226,220,${clamp(0.4 - dive, 0, 0.7)})`; g.fill(ell(x, y + 6, 14, 5)); }
+    }
+  },
+});
 })();

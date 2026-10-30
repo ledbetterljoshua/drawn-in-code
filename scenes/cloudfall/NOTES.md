@@ -122,3 +122,16 @@ by distance, small-object shadows.
    balloonist, and the stargazer swings her telescope round to it (`CF.attn`, `CF.lookAt`).
 5. The roof's right end had no barge board and the dormer floated on the tiles. Added the barge,
    a lead apron and a cast shadow down the roof under the dormer. Sky clouds' ink lightened.
+
+## Round 7
+1. The phone frame's top 40% was empty sky and its bottom 30% filler. The sky now goes on up
+   into the first faint stars, with a neighbour's island floating far overhead (seen from
+   underneath, so only its rock and the fringe of its trees) and a second, smaller one; low in
+   the cloud floor a school of sky-fish porpoises in and out of the cloud tops (hover: scatter).
+2. The sky cumulus had ruled-flat bases and heavy ink. Now a base of small lumps, a lavender
+   underside in shadow, the sun-side tops warmer, lighter ink.
+3. The rock's left half was one undifferentiated mass with no story. Swallows have mud nests
+   under the turf overhang there and loop out and back (hover: they swoop round the pointer);
+   ferns grow from the cracks on the wet side.
+4. The hedgehog's door had no way in or out. A rope ladder now hangs to it from the turf above.
+5. One of the new high islands was cut by the phone's left edge; moved.

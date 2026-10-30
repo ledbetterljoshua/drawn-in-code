@@ -193,6 +193,19 @@ layer({
         if (lt > 0.1) { g.lineWidth = 1.4; g.strokeStyle = rgba(M.rock.lit, 0.6 * lt); g.beginPath(); g.moveTo(x0, y0 + 2); g.lineTo(x1, y1 + 2); g.stroke(); }
       }
     }
+    // ferns rooted in the cracks where the seep keeps them wet
+    const fern = (x, y, s, dir) => {
+      for (let k = 0; k < 4; k++) {
+        const a = -1.9 + k * 0.45 * dir + (dir < 0 ? 0.5 : -0.5), len = (14 + k * 3) * s, ex = x + Math.cos(a) * len, ey = y + Math.sin(a) * len * 0.6 + len * 0.35;
+        const p = D.quad(x, y, x + Math.cos(a) * len * 0.5, y + Math.sin(a) * len * 0.6 - 4, ex, ey);
+        g.lineWidth = 1.2; g.strokeStyle = '#3f6a40'; g.stroke(p);
+        for (let q = 1; q < 6; q++) { const u = q / 6, px = lerp(lerp(x, x + Math.cos(a) * len * 0.5, u), lerp(x + Math.cos(a) * len * 0.5, ex, u), u), py = lerp(lerp(y, y + Math.sin(a) * len * 0.6 - 4, u), lerp(y + Math.sin(a) * len * 0.6 - 4, ey, u), u); ink(g, ell(px, py + 1.5, 2.6 * s * (1 - u * 0.5), 1.2 * s, undefined, a + 1.2), q % 2 ? '#6fae55' : '#5a9a4e', 0.6, '#24392c'); }
+      }
+    };
+    for (const c of ISLE.cells.filter((c) => c.b >= 1 && c.b <= 3 && c.facing > 0.4).filter((c, i) => i % 4 === 1)) {
+      const [x, y] = c.s[0], [x1, y1] = c.s[1];
+      fern((x + x1) / 2, (y + y1) / 2 + 3, 0.8 + hash(c.seed) * 0.4, hash(c.seed * 2) < 0.5 ? 1 : -1);
+    }
     // the cloud floor bounces a pink light up into the underside, strongest at the shaded left
     g.save(); g.globalCompositeOperation = 'screen';
     const [tipx, tipy] = pr(40, -450, 30);
@@ -409,6 +422,46 @@ layer({
   },
 });
 
+// ------------------------------------------------------------------ swallows nesting under the lip
+// mud nests stuck under the turf overhang; the swallows loop out and back, and when you come
+// near they swoop round the pointer
+const NESTS = [1.95, 2.03, 2.1, 2.62].map((a) => { const [X, Z] = rim(a); return [X * 0.97, -22, Z * 0.97]; });
+const swallows = [0, 1, 2].map((i) => ({ ph: i * 2.2, x: 0, y: 0, out: 0, vx: 1 }));
+const swal = { stir: 0 };
+layer({
+  id: 'swallows', z: 15.65,
+  hit: (x, y) => NESTS.some((n) => { const [nx, ny] = pr(...n); return Math.hypot(x - nx, y - ny - 6) < 34; }),
+  update(dt, t, L) {
+    swal.stir = ease(swal.stir, L.hovered ? 1 : 0, L.hovered ? 3 : 0.8, dt);
+    swallows.forEach((s, i) => {
+      const [nx, ny] = pr(...NESTS[i]), cyc = (t * 0.22 + s.ph / 6) % 1, out = Math.sin(cyc * Math.PI) ** 0.6;
+      const a = cyc * D.TAU * 1.5 + s.ph;
+      let tx = nx - 40 - out * 170 + Math.cos(a) * 60 * out, ty = ny + 30 + Math.sin(a) * 50 * out + out * 40;
+      if (swal.stir > 0.05) { tx = lerp(tx, P.x + Math.cos(t * 4 + s.ph) * 40, swal.stir); ty = lerp(ty, P.y + Math.sin(t * 4.6 + s.ph) * 26, swal.stir); }
+      const px = s.x; s.x = ease(s.x || nx, tx, 4, dt); s.y = ease(s.y || ny, ty, 4, dt); s.vx = s.x - px; s.out = out;
+    });
+  },
+  draw(g, t) {
+    for (const n of NESTS) {
+      const [x, y] = pr(...n);
+      const cup = new Path2D(); cup.moveTo(x - 9, y); cup.bezierCurveTo(x - 9, y + 11, x + 9, y + 11, x + 9, y); cup.closePath();
+      ink(g, cup, '#9a7a5e', 1.3, '#3a2a28');
+      g.fillStyle = 'rgba(60,40,40,0.35)'; for (let k = 0; k < 6; k++) g.fill(circ(x - 6 + k * 2.4, y + 3 + (k % 2) * 2.5, 1.4));
+      g.fillStyle = '#2a1c26'; g.fill(ell(x, y + 0.5, 5, 1.6));
+    }
+    for (const s of swallows) {
+      if (s.out < 0.04 && swal.stir < 0.05) continue;
+      const f = Math.sin(t * 16 + s.ph), dir = s.vx >= 0 ? 1 : -1;
+      g.save(); g.translate(s.x, s.y); g.scale(dir, 1);
+      const p = new Path2D(); p.moveTo(-9, -3 - f * 5); p.quadraticCurveTo(-3, -2, 0, 0); p.quadraticCurveTo(3, -2, 9, -3 - f * 5);
+      g.lineWidth = 2.4; g.strokeStyle = '#2a3058'; g.stroke(p);
+      ink(g, ell(1, 0, 4.5, 2.2), '#2f3a6a', 0.9, '#1a1a30'); g.fillStyle = '#f3e4d0'; g.fill(ell(1, 1, 3, 1)); g.fillStyle = '#d9584a'; g.fill(circ(4.5, -0.3, 1));
+      g.lineWidth = 1.2; g.strokeStyle = '#2a3058'; g.beginPath(); g.moveTo(-3, 0); g.lineTo(-8, 2.5); g.moveTo(-3, 0); g.lineTo(-8, -0.5); g.stroke();
+      g.restore();
+    }
+  },
+});
+
 // ------------------------------------------------------------------ the round door in the rock
 // it sits flat on one facet, so it is drawn in that facet's plane and foreshortens with it
 const hedge = { open: 0, blink: D.blinker(), peek: 0 };
@@ -420,7 +473,7 @@ D.onLayout(() => {
   const u = [q[0][0] - q[1][0], 0, q[0][2] - q[1][2]], ul = Math.hypot(...u);
   const top = [lerp(q[1][0], q[2][0], 0.15), lerp(q[1][1], q[2][1], 0.15), lerp(q[1][2], q[2][2], 0.15)];
   doorM = plane(top, u.map((x) => x / ul), [0, -1, 0]);
-  doorM.w = ul; doorM.h = (q[1][1] - q[2][1]) * 0.85; doorM.cell = c;
+  doorM.w = ul; doorM.h = (q[1][1] - q[2][1]) * 0.85; doorM.cell = c; doorM.a3 = Math.atan2(((q[1][2] + q[0][2]) / 2) / RZ, ((q[1][0] + q[0][0]) / 2) / RX);
 });
 layer({
   id: 'rock-door', z: 15.7,
@@ -465,6 +518,11 @@ layer({
       for (const dx of [-8, 0, 8]) g.stroke(on(DM, D.seg(cx + dx, cy - r + 4, cx + dx, cy + r - 4)));
       ink(g, on(DM, circ(cx + 11, cy + 2, 2)), '#f2c14e', 1);
     }
+    // a rope ladder down to it from the turf above, swaying a little
+    const [rX, rZ] = rim(doorM.a3), [sx0, sy0] = CF.at(Mx, cx - 10, cy + r + 8), [tx0, ty0] = pr(rX * 0.99, 0, rZ * 0.99);
+    const swy = Math.sin(t * 1.3) * 3 + (wind(t, sx0) - 0.7) * 6;
+    for (const k of [-7, 7]) { g.lineWidth = 1.6; g.strokeStyle = '#7a5a46'; g.beginPath(); g.moveTo(tx0 + k, ty0); g.quadraticCurveTo((tx0 + sx0) / 2 + k + swy, (ty0 + sy0) / 2, sx0 + k + swy, sy0); g.stroke(); }
+    for (let k = 1; k < 7; k++) { const u = k / 7, x = lerp(tx0, sx0, u) + swy * u * u, y = lerp(ty0, sy0, u); tube(g, D.seg(x - 7, y, x + 7, y), '#c99a62', 1.6, 0.8); }
     // a step below and a little lamp beside it
     const [sx, sy] = CF.at(Mx, cx, cy + r + 9);
     ink(g, ell(sx, sy, 22, 5), tone(M.stone, 0.6), 1.5, M.stone.line);
