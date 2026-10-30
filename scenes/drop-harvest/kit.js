@@ -18,6 +18,8 @@
   // ink: a deep plum that belongs to the storm
   const LINE = (Drawn.style.line = '#251828');
   DH.LINE = LINE;
+  // the island is a plane back from the near bank: its ink is lighter and coloured by the air
+  DH.LINE_MID = '#3c2d4a';
 
   DH.C = {
     storm0: '#1f1d36', storm1: '#2e2b4b', storm2: '#45405f', storm3: '#5d5674', scud: '#7b7190',

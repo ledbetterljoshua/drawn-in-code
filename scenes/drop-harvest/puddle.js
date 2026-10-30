@@ -34,7 +34,8 @@
       }
       g.globalCompositeOperation = darken ? 'source-atop' : 'source-over';
       if (darken) {
-        g.fillStyle = 'rgba(14,10,28,0.5)'; g.fillRect(x0, y0, w, h);
+        // mirrored things lose their contrast to the water: a veil of the water's own violet
+        g.fillStyle = 'rgba(54,46,84,0.55)'; g.fillRect(x0, y0, w, h);
         // the rain breaks it into dashes: thin bright and dark streaks across the mirrored shapes
         const rr = Drawn.rng(17);
         for (let yy = DH.SHORE; yy < y0 + h; yy += 3 + rr() * 5) {
@@ -179,7 +180,7 @@
       }
       // floating petals and seeds, each with its reflection and a waterline
       for (const f of floats) {
-        const k = DH.persp(f.y) * 2.2, sc = f.s * (0.5 + (f.y - FAR) / 600);
+        const k = DH.persp(f.y) * 2.2, sc = f.s * Math.min(1.6, 0.5 + (f.y - FAR) / 600);
         g.save(); g.translate(f.x, f.y + Math.sin(t * 2 + f.ph) * 0.6); g.scale(sc, sc * k); g.rotate(f.a);
         if (f.kind === 'petal') {
           const p = new Path2D(); p.moveTo(-14, 0); p.quadraticCurveTo(-4, -12, 14, -4); p.quadraticCurveTo(6, 8, -14, 0); p.closePath();

@@ -71,20 +71,10 @@
     }
     // soil under the moss: grit and two stones
     for (let i = 0; i < 180; i++) { const x = v.x0 + r() * (560 - v.x0), y = bankY(x) + 40 + r() * 600; g.fillStyle = r() < 0.5 ? 'rgba(110,70,80,0.3)' : 'rgba(6,4,8,0.45)'; g.fill(circ(x, y, 0.8 + r() * 1.8)); }
-    for (const [x, y, sz] of [[60, 1100, 20], [300, 1120, 14], [-120, 1180, 24], [120, 1400, 30]]) {
-      const p = DH.blob(x, y, sz * 1.3, sz * 0.8, 9, 0.2, x + 5);
-      ink(g, p, '#332e40', 1.8); DH.crescent(g, p, '#201b2a', 0, -sz * 0.3); DH.crescent(g, p, 'rgba(200,150,140,0.3)', 0, -3);
-    }
-    g.restore();
-    // hanging from the moss over the soil: roots and beards, beaded
-    g.save(); g.clip(B);
-    g.lineCap = 'round';
-    for (const cx of [-60, 70, 230, 330, 450]) for (let i = 0; i < 4 + (r() * 4 | 0); i++) {
-      const x = cx + (r() - 0.5) * 50, y = bankY(x) + 22 + r() * 12, L = 8 + r() ** 2 * 70;
-      const p = new Path2D(); p.moveTo(x, y); p.bezierCurveTo(x + 4, y + L * 0.3, x - 5, y + L * 0.7, x + (r() - 0.5) * 8, y + L);
-      g.lineWidth = 3; g.strokeStyle = 'rgba(6,4,8,0.6)'; g.stroke(p);
-      g.lineWidth = 1.4; g.strokeStyle = r() < 0.6 ? '#5a4248' : '#2e4430'; g.stroke(p);
-      if (r() < 0.3) DH.glassDrop(g, x, y + L + 2, 1.8);
+    // moss creeping well down the face, so the bank reads as a mossy slope, not a cut
+    for (let i = 0; i < 40; i++) {
+      const x = v.x0 + r() * (540 - v.x0), top = bankY(x) + 14, y = top + r() ** 1.6 * 160;
+      for (let k = 0; k < 6; k++) { const px = x + (r() - 0.5) * 30, py = y + (r() - 0.5) * 10; g.lineWidth = 1.2; g.strokeStyle = r() < 0.5 ? 'rgba(70,100,56,0.35)' : 'rgba(8,14,8,0.5)'; g.beginPath(); g.moveTo(px, py); g.lineTo(px + 1.5, py - 4); g.stroke(); }
     }
     g.restore();
     // fairy-bonnet mushrooms in a huddle on the bank, caps beaded
@@ -118,6 +108,12 @@
         g.lineWidth = 2; g.strokeStyle = `rgba(255,${190 + near * 40 | 0},120,${0.35 + near * 0.4})`;
         g.beginPath(); g.arc(px - ca * 1.5, py - sa * 1.5, 2.5, a - 0.6, a + 0.6); g.stroke();
       }
+    }
+    // pebbles washed together at its waterline, wet on top
+    for (let y = bankY(540) + 30, i = 0; y < Math.min(v.y1, 1900); y += 22 + (i * 7) % 15, i++) {
+      const x = shoreX(y) - 4 - (i % 3) * 6, sz = 5 + (i * 13) % 7;
+      const p = DH.blob(x, y, sz * 1.3, sz * 0.75, 8, 0.2, i + 7);
+      ink(g, p, '#3a3448', 1.4); DH.crescent(g, p, '#221d2c', 0, -sz * 0.4); DH.crescent(g, p, 'rgba(255,200,150,0.5)', 0, 1.6);
     }
     // the waterline round its right side
     g.lineWidth = 1.6; g.strokeStyle = 'rgba(255,214,160,0.35)';
@@ -290,10 +286,10 @@
       g.fillStyle = 'rgba(20,14,26,0.4)'; g.fill(ell(OAK.x, OAK.y + bob + 10, 100 * OAK.s, 18));
       // curled rim: the underside showing, a little above the waterline
       const under = curve(lobes.map((p) => toW(p, Math.abs(p[1]) * 0.12 + 3)));
-      ink(g, under, '#d8a068', 2.8);
+      ink(g, under, '#9a6a48', 2.6);
       const top = curve(lobes.map((p) => toW([p[0] * 0.94, p[1] * 0.9], Math.abs(p[1]) * 0.06 + 5)));
       g.lineWidth = 1.6; g.strokeStyle = LINE; g.stroke(top);
-      g.fillStyle = grad(g, OAK.x - 100, 0, OAK.x + 100, 0, ['#e0a050', '#b86a38', '#7a3e2a']); g.fill(top);
+      g.fillStyle = grad(g, OAK.x - 100, 0, OAK.x + 100, 0, ['#a8703e', '#7a4a32', '#4a2e2a']); g.fill(top);
       g.save(); g.clip(top);
       // veins: midrib and side veins into the lobes
       g.lineWidth = 1.4; g.strokeStyle = 'rgba(255,214,150,0.6)';
@@ -303,7 +299,7 @@
       for (let i = -3; i <= 3; i++) for (const sd of [-1, 1]) { const a = toW([i * 24, 0], 5), b2 = toW([i * 24 + 14, sd * 34], 5); g.beginPath(); g.moveTo(...a); g.lineTo(...b2); g.stroke(); }
       // the wet sheen of the sky on it
       g.fillStyle = 'rgba(255,220,170,0.28)'; g.fill(ell(OAK.x - 30, OAK.y + bob - 8, 60, 6));
-      DH.shadeFace(g, top, OAK.x - 110, OAK.x + 110, 0.4);
+      DH.shadeFace(g, top, OAK.x - 110, OAK.x + 110, 0.55);
       g.restore();
       DH.crescent(g, top, 'rgba(255,214,150,0.9)', 3, 2);
       // the stalk, curling up out of the water at the back
@@ -315,6 +311,60 @@
     },
   });
   DH.surface({ band: 'fore', x0: OAK.x - 100 * OAK.s, x1: OAK.x + 100 * OAK.s, y: () => OAK.y - 6, hit(x, y, d) { oak.tip.v += (x - OAK.x) * 0.002; DH.splash(x, y, d.r * 0.7, 'ground', 'fore'); } });
+
+  // ------------------------------------------------------------ the canopy (tall screens only)
+  // A portrait screen sees far above the artboard; there, the underside of a bramble's leaves hangs
+  // down into the top of the picture, dark and soft, dripping from its tips.
+  const canopy = [];
+  onLayout(() => {
+    canopy.length = 0;
+    const v = st.view;
+    if (v.y0 > -160) return;
+    const r = rng(611);
+    for (let i = 0; i < 7; i++) {
+      const x = lerp(v.x0 - 40, v.x1 + 40, i / 6 + (r() - 0.5) * 0.08);
+      canopy.push({ x, y: v.y0 + 20, len: 200 + r() * 220, w: 80 + r() * 60, lean: (r() - 0.5) * 0.7, ph: r() * TAU, drip: r() });
+    }
+  });
+  layer({
+    id: 'canopy', z: 33,
+    update(dt, t) {
+      for (const c of canopy) {
+        c.drip += dt * 0.25;
+        if (c.drip > 1) {
+          c.drip = 0;
+          const a = c.lean + Math.sin(t * 0.6 + c.ph) * 0.05;
+          DH.spawn({ kind: 'drip', x: c.x + Math.sin(a) * c.len, y: c.y + Math.cos(a) * c.len, vx: 0, vy: 40, r: 3, life: 4, g: 1300, z: 'fore', land: 1100 + Math.random() * (st.view.y1 - 1150) });
+        }
+      }
+    },
+    draw(g, t) {
+      if (canopy.length) {
+        // the arching cane they hang from, with a few thorns
+        const v = st.view, y = canopy[0].y;
+        const cane = new Path2D(); cane.moveTo(v.x0 - 60, y + 70); cane.bezierCurveTo(v.x0 + 300, y - 10, v.x1 - 400, y + 10, v.x1 + 60, y + 60);
+        g.lineCap = 'round';
+        g.lineWidth = 22; g.strokeStyle = 'rgba(14,16,22,0.3)'; g.stroke(cane);
+        g.lineWidth = 12; g.strokeStyle = '#141820'; g.stroke(cane);
+        g.lineWidth = 2; g.strokeStyle = 'rgba(255,190,130,0.3)'; g.save(); g.translate(0, 5); g.stroke(cane); g.restore();
+      }
+      for (const c of canopy) {
+        const a = c.lean + Math.sin(t * 0.6 + c.ph) * 0.05 + (Drawn.wind(t, c.x) - 0.6) * 0.06;
+        g.save(); g.translate(c.x, c.y); g.rotate(-a);
+        const p = new Path2D(); p.moveTo(0, 0); p.bezierCurveTo(c.w, c.len * 0.2, c.w * 0.6, c.len * 0.8, 0, c.len); p.bezierCurveTo(-c.w * 0.6, c.len * 0.8, -c.w, c.len * 0.2, 0, 0); p.closePath();
+        for (const [w, al] of [[18, 0.1], [8, 0.2]]) { g.lineWidth = w; g.strokeStyle = `rgba(16,20,24,${al})`; g.stroke(p); }
+        g.fillStyle = 'rgba(18,24,26,0.95)'; g.fill(p);
+        g.save(); g.clip(p);
+        g.lineWidth = 2; g.strokeStyle = 'rgba(80,100,70,0.35)'; g.beginPath(); g.moveTo(0, 0); g.lineTo(0, c.len); g.stroke();
+        for (let k = 1; k < 6; k++) for (const s of [-1, 1]) { g.beginPath(); g.moveTo(0, c.len * k / 7); g.quadraticCurveTo(s * c.w * 0.3, c.len * k / 7 + 10, s * c.w * 0.55, c.len * k / 7 + 26); g.stroke(); }
+        g.restore();
+        DH.crescent(g, p, 'rgba(255,200,140,0.35)', 0, -4);
+        g.restore();
+        const tx = c.x + Math.sin(a) * c.len, ty = c.y + Math.cos(a) * c.len;
+        DH.glassDrop(g, tx, ty + 2 + c.drip * 4, 2 + c.drip * 2.5, { sy: 1 + c.drip * 0.3 });
+      }
+    },
+  });
 
   // ------------------------------------------------------------ out-of-focus blades at the edges
   const edge = [];

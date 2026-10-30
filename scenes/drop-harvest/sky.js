@@ -85,7 +85,7 @@
       const u = n === 1 ? 0.5 : i / (n - 1), x = lerp(-w / 2 + h * 0.8, w / 2 - h * 0.8, u);
       const hump = Math.sin(u * Math.PI) * (tall ? 1.8 : 1);
       crown.push([x + (r() - 0.5) * h * 0.4, -h * (0.12 + hump * 0.22 + r() * 0.12), h * (0.75 + r() * 0.5), h * (0.32 + hump * 0.12 + r() * 0.1)]);
-      belly.push([x + (r() - 0.5) * h * 0.6, h * (0.12 + r() * 0.06), h * (1.1 + r() * 0.5), h * (0.18 + r() * 0.06)]);
+      if (r() < 0.75) belly.push([x + (r() - 0.5) * h * 1.6, h * (0.08 + r() * 0.12), h * (0.7 + r() * 1.1), h * (0.14 + r() * 0.12)]);
     }
     const pad = h * 1.2;
     return sprite(-w / 2 - pad, -h - pad, w + pad * 2, h * 2 + pad * 2, (g) => {
@@ -109,15 +109,6 @@
         g.fillRect(-w, h * 0.1, w * 2, h * 0.4);
         g.restore();
       }
-      // a few soft streaks of texture along the roll
-      g.save(); g.clip(U);
-      g.lineCap = 'round';
-      for (let i = 0; i < 8; i++) {
-        const y = (r() - 0.6) * h * 0.5, x = (r() - 0.5) * w * 0.8, L = w * (0.1 + r() * 0.2);
-        g.lineWidth = 2 + r() * 4; g.strokeStyle = `rgba(16,14,32,${0.12 + r() * 0.12})`;
-        g.beginPath(); g.moveTo(x - L, y); g.quadraticCurveTo(x, y - 3, x + L, y + 2); g.stroke();
-      }
-      g.restore();
     });
   }
 
@@ -196,26 +187,30 @@
         g.fillStyle = grad(g, 0, top, 0, DH.FAR, [[0, `rgba(${lerp(60, 255, near) | 0},${lerp(56, 200, near) | 0},${lerp(90, 150, near) | 0},${0.1 + near * 0.14})`], [1, 'rgba(80,70,110,0)']]);
         g.fill(p);
       }
-      // the squall: a heavy curtain of rain marching in from the left, hung from the deck down to the
-      // far bank, slanted by the wind, with the downpour's streaks inside it
-      const qx = 150 + Math.sin(t * 0.03) * 90, qw = 420, lean = DH.slant(t, qx) * 520;
-      const top = st.view.y0 - 20;
-      const Q = new Path2D();
-      Q.moveTo(qx - qw / 2, top); Q.lineTo(qx + qw / 2, top);
-      Q.bezierCurveTo(qx + qw / 2 + lean * 0.4, 300, qx + qw * 0.35 + lean, 560, qx + qw * 0.42 + lean, DH.FAR);
-      Q.lineTo(qx - qw * 0.5 + lean, DH.FAR); Q.bezierCurveTo(qx - qw * 0.55 + lean * 0.8, 500, qx - qw / 2, 200, qx - qw / 2, top);
-      Q.closePath();
-      g.fillStyle = grad(g, qx - qw * 0.55, 0, qx + qw * 0.5 + lean, 0, [[0, 'rgba(22,18,40,0)'], [0.35, 'rgba(22,18,40,0.5)'], [0.65, 'rgba(34,28,56,0.42)'], [1, 'rgba(60,50,80,0)']]);
-      g.fill(Q);
-      g.save(); g.clip(Q);
-      g.lineCap = 'round';
-      for (let i = 0; i < 70; i++) {
-        const u = Drawn.hash(i * 3.1), y0 = ((Drawn.hash(i * 7.7) * 900 + t * 520) % 900) - 200;
-        const x = qx - qw / 2 + u * (qw + lean) + (y0 - top) * DH.slant(t, qx) * 0.6;
-        g.lineWidth = 1.2; g.strokeStyle = y0 > 480 ? 'rgba(255,200,150,0.35)' : 'rgba(200,196,230,0.3)';
-        g.beginPath(); g.moveTo(x, y0); g.lineTo(x + 0.2 * 90, y0 + 90); g.stroke();
+      // the squall: a heavy curtain of rain marching in from the left, hung from the deck and fading
+      // out before the far bank — built of wide soft slanted strokes, so it has no edges
+      {
+        const qx = 170 + Math.sin(t * 0.03) * 90, sl = DH.slant(t, qx);
+        const y0 = 300, y1 = DH.FAR - 10;
+        g.save(); g.lineCap = 'round';
+        for (let i = 0; i < 14; i++) {
+          const u = Drawn.hash(i * 5.3), x = qx + (u - 0.5) * 380, w = 30 + Drawn.hash(i * 2.9) * 70;
+          const gr = g.createLinearGradient(0, y0, 0, y1);
+          gr.addColorStop(0, 'rgba(24,20,42,0)'); gr.addColorStop(0.25, 'rgba(24,20,42,0.1)'); gr.addColorStop(0.7, 'rgba(36,30,58,0.09)'); gr.addColorStop(1, 'rgba(60,50,80,0)');
+          g.strokeStyle = gr; g.lineWidth = w;
+          g.beginPath(); g.moveTo(x, y0); g.lineTo(x + sl * (y1 - y0), y1); g.stroke();
+        }
+        const hiQ = new Path2D(), loQ = new Path2D();
+        for (let i = 0; i < 60; i++) {
+          const u = Drawn.hash(i * 3.1), yy = y0 + ((Drawn.hash(i * 7.7) * 400 + t * 520) % 420) - 20;
+          const x = qx + (u - 0.5) * 360 + (yy - y0) * sl;
+          (yy > 500 ? loQ : hiQ).moveTo(x, yy); (yy > 500 ? loQ : hiQ).lineTo(x + sl * 80, yy + 80);
+        }
+        g.lineWidth = 1.1;
+        g.strokeStyle = 'rgba(200,196,230,0.22)'; g.stroke(hiQ);
+        g.strokeStyle = 'rgba(255,200,150,0.26)'; g.stroke(loQ);
+        g.restore();
       }
-      g.restore();
       g.restore();
       // scud: ragged low cloud racing across the rift, dark against the gold
       for (const s of scud) {

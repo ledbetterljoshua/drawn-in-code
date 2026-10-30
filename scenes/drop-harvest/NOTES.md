@@ -137,3 +137,28 @@ petals (hover it in the air and it catches your umbrella's wind). The reflection
 and the waver grows slower toward us (fewer stair-steps). The Great Leaf's margin undulates. Ferry and
 ladybird 1.3×. The oak leaf less foreshortened (it read as a mustard splat). Moss blobs on the near
 bank's soil removed (lily pads).
+
+## Round 7 — second critic
+
+The critic's ten: (1) the left edge looks broken — a dark see-through slab with a ruler edge and
+circles (the far grass with its blurry beads), and the squall a pale rectangle; (2) backlight still not
+committed — leaf brightest green, island top lit from the front; (3) a gate round empty water, the blade
+rising from nowhere, the web the highest-contrast thing; phone top 40% dead cloud; (4) the reflection is
+a murky drowned object with full outlines, the floating leaf a gold sticker in its shadow; (5) the sky
+is a procedure — a repeating scallop and a straight lighter band; (6) the umbrella barely reads; (7)
+stamped textures — polka-dot moss, noisy square scales on the cap; (8) no change with distance in line
+or contrast; (9) the harvest isn't staged as one clear action; (10) the near bank is a cutaway with roots
+dangling into water, the foxglove clones.
+
+Done: the far grass at the left edge is gone; the squall is built of wide soft slanted strokes that
+fade top and bottom (no edges). The leaf is darker olive, glowing only by its tip. Mirrored objects get a
+veil of the water's violet so they lose contrast; the oak leaf is in the water's browns. The umbrella
+dome always shows faintly, always has drops landing on it (extra drops aimed at it), and the water
+beneath it goes calm — a dry pocket. Moss is drifts of tufts following the slope of the hill with
+hollows under them; the parasol's scales sit in rings round the crown. The island plane is inked in
+a lighter, coloured line (`DH.LINE_MID`) than the foreground. **The catcher**: a pill-bug standing on top
+of the heap holds a net up right under the leaf's tip; the pendant drop lets go into it, the net sags,
+he tips it onto the heap, the tally notches; when you make the leaf pour he ducks. That's the one clear
+action at the focal point: leaf → net → heap. The near bank lost its dangling roots and stones, gained
+moss down its face and washed pebbles at its waterline. On a phone, a bramble cane hangs into the top of
+the frame with dripping leaves.

@@ -88,7 +88,9 @@
       }
       if (d.y >= d.land) {
         if (d.on) {
-          if (name === 'back') { if (Math.random() < 0.25) DH.spawn({ kind: 'ring', x: d.x, y: d.land, r: 1.2, k: DH.persp(d.land), life: 0.6, g: 0, z: 'water' }); }
+          if (name !== 'mid' && name !== 'back' && DH.underUmbrella(d.x, d.land) > 0.05) { /* sheltered */ }
+          else if (name === 'back') { if (Math.random() < 0.25) DH.spawn({ kind: 'ring', x: d.x, y: d.land, r: 1.2, k: DH.persp(d.land), life: 0.6, g: 0, z: 'water' }); }
+          else if (name === 'mid' && DH.underUmbrella(d.x, d.land) > 0.05) { /* sheltered */ }
           else if (name === 'mid') { DH.spawn({ kind: 'ring', x: d.x, y: d.land, r: 1.6 + Math.random() * 1.4, k: DH.persp(d.land), life: 0.9, g: 0, z: 'water' }); if (Math.random() < 0.35) DH.spawn({ kind: 'crown', x: d.x, y: d.land, r: 1.8, life: 0.22, g: 0, z: 'back' }); }
           else DH.splash(d.x, d.land, name === 'fore' ? d.r : d.r * 0.9, 'water', name === 'fore' ? 'fore' : 'mid');
         }
@@ -138,7 +140,7 @@
         }
       } else if (p.g) {
         p.vy += p.g * dt; p.x += p.vx * dt; p.y += p.vy * dt;
-        if (p.kind === 'drip' && p.land && p.y >= p.land) { if (p.cistern && DH.cisternPlink) { DH.cisternPlink(p.x, p.r); fx.splice(i, 1); continue; } DH.splash(p.x, p.land, p.r * 0.8, p.land > SHORE ? 'water' : 'ground', 'mid'); fx.splice(i, 1); continue; }
+        if (p.kind === 'drip' && p.land && p.y >= p.land) { if (p.cistern && DH.cisternPlink) { if (p.net && DH.netCatch) DH.netCatch(p.r); else DH.cisternPlink(p.x, p.r); fx.splice(i, 1); continue; } DH.splash(p.x, p.land, p.r * 0.8, p.land > SHORE ? 'water' : 'ground', 'mid'); fx.splice(i, 1); continue; }
       }
       if (p.age >= p.life) fx.splice(i, 1);
     }
@@ -211,6 +213,11 @@
       step(bands.mid, 'mid', dt, t);
       step(bands.near, 'near', dt, t);
       step(bands.fore, 'fore', dt, t);
+      // the umbrella always has rain on it: extra drops aimed at the dome
+      if (UMB.on && Math.random() < dt * 9 * DH.storm.I) {
+        const d = { band: 'near', x: UMB.x + (Math.random() - 0.5) * UMB.r * 1.7, y: UMB.y - UMB.r - 30, vy: 1100, vx: 0, r: 2.4 + Math.random() * 1.4 };
+        umbrellaHit({ ...d, y: UMB.y + 6 - Math.sqrt(Math.max(0, UMB.r ** 2 - (d.x - UMB.x) ** 2)) + 1 }, dt);
+      }
       stepFx(dt);
     },
     draw(g, t) { drawStreaks(g, bands.back, t, 0.8); },
@@ -234,12 +241,13 @@
       // the umbrella: a dome you only see where the rain hits it
       if (UMB.on) {
         const cx = UMB.x, cy = UMB.y + 6, R = UMB.r;
-        if (UMB.glow > 0.02) {
+        if (true) {
+          const gl = 0.25 + UMB.glow * 0.75;
           g.save();
           g.lineCap = 'round';
-          g.lineWidth = 1.6; g.strokeStyle = `rgba(236,232,255,${UMB.glow * 0.28})`;
+          g.lineWidth = 1.6; g.strokeStyle = `rgba(236,232,255,${gl * 0.32})`;
           g.beginPath(); g.arc(cx, cy, R, Math.PI * 1.04, Math.PI * 1.96); g.stroke();
-          g.lineWidth = 3; g.strokeStyle = `rgba(255,236,190,${UMB.glow * 0.14})`;
+          g.lineWidth = 3; g.strokeStyle = `rgba(255,236,190,${gl * 0.2})`;
           g.beginPath(); g.arc(cx, cy, R - 2, Math.PI * 1.15, Math.PI * 1.45); g.stroke();
           g.restore();
         }

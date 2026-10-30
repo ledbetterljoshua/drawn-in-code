@@ -51,7 +51,7 @@
     // a few broad blades arching over, out of focus and hazed toward the sky
     // [x, height, width, bend]: a hedge of broad far leaves and a couple of tall blades, low on the bank
     // [x, height, width, bend, kind]: far clover on long stalks, and tall blades at the edges
-    const spec = [[-330, 520, 70, 200, 'blade'], [-150, 300, 50, 90, 'blade'], [1900, 420, 60, -160, 'blade']];
+    const spec = [[1900, 420, 60, -160, 'blade']];
     for (const [x, h, w, bend, kind] of spec) {
       if (x < v.x0 - 400 || x > v.x1 + 400) continue;
       giants.push({ x, h, w: w || 10, bend, kind, ph: x * 0.01, near: clamp(1 - Math.abs(x - SUN.x) / 900, 0, 1) });
@@ -78,6 +78,8 @@
   layer({
     id: 'giants', z: 4.5,
     hit(x, y) {
+      // the far bank itself, and the far grass on it, both stir up a gust
+      if (y > bankTop(x) - 26 && y < FAR - 2 && Math.abs(x - SUN.x) > 160) return true;
       for (const G of giants) {
         const { at } = giantPath(G, st.t);
         for (let u = 0.1; u <= 1; u += 0.06) { const [px, py] = at(u); if (Math.hypot(x - px, y - py) < G.w * 0.7 + 10) return true; }
@@ -122,9 +124,7 @@
         DH.crescent(g, p, a > 0.25 ? 'rgba(255,196,130,0.55)' : 'rgba(150,130,175,0.4)', -DH.sunSide(G.x) * 5, 3, 0.6 + a * 0.4);
         // a beaded midrib, out of focus: blurry bright dots
 
-        g.save(); g.globalCompositeOperation = 'lighter';
-        for (let u = 0.25; u < 0.95; u += 0.11) { const [bx, by] = at(u); g.fillStyle = `rgba(255,210,160,${0.05 + a * 0.12})`; g.fill(circ(bx, by, 5 + G.w * 0.08)); }
-        g.restore();
+
       }
     },
   });

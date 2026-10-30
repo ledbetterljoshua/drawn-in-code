@@ -16,8 +16,10 @@
 
    cistern z12 · haulers z13 · netter z13.5 · tally z12.2 */
 (function () {
-  const { TAU, clamp, lerp, ease, rng, noise, circ, ell, poly, curve, grad, radial, ink, st, P, layer, onLayout } = Drawn;
-  const { C, SUN, LINE, SHORE } = DH;
+  const { TAU, clamp, lerp, ease, rng, noise, circ, ell, poly, curve, grad, radial, ink: inkFar, st, P, layer, onLayout } = Drawn;
+  const { C, SUN, SHORE } = DH;
+  const LINE = DH.LINE_MID;
+  const ink = (g, p, fill, lw = 2.2) => inkFar(g, p, fill, lw, LINE);
   const BG = C.bug;
 
   // ------------------------------------------------------------ the pill-bug rig
@@ -196,7 +198,7 @@
     g.lineWidth = 1.6; g.strokeStyle = 'rgba(255,200,140,0.6)';
     g.beginPath(); q.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.stroke();
   }
-  layer({ id: 'cup', z: 11.9, still: true, draw(g) { paintCup(g); } });
+  layer({ id: 'cup', z: 10.6, still: true, draw(g) { paintCup(g); } });
   DH.mirror(SHORE + 2, (g) => { paintCup(g); });
   DH.cisternX = CX;
 
@@ -213,6 +215,57 @@
         const w = clamp(h.w.x * 0.06, -0.35, 0.35);
         DH.glassDrop(g, h.x, h.y - h.r * 0.6, h.r, { sx: 1 + w, sy: 1 - w, flat: 0.15, bright: 0.7 + 0.3 * Math.sin(t * 0.8 + h.ph) });
       }
+    },
+  });
+
+  // ------------------------------------------------------------ the catcher on the heap
+  // Standing on top of the heap of drops, a pill-bug holds a little net up under the leaf's tip.
+  // The pendant drop lets go into it, the net sags, and after a beat he tips it onto the heap and
+  // holds it up again. When the leaf pours, he ducks.
+  const catcher = { a: 0, load: 0, hold: 0, duck: 0, blink: Drawn.blinker(), state: 'up', tt: 0 };
+  const catcherFeet = () => { const top = heap[heap.length - 1]; return top ? [top.x + 3, top.y - top.r * 1.55 + 1] : [CX, RIM - 50]; };
+  const netAt = () => {
+    // held up right under the leaf's tip; swung down over the heap's side to tip; tucked when ducking
+    const [fx, fy] = catcherFeet(), [tx, ty] = DH.leafTip();
+    const up = [tx, ty + 36], down = [fx + 30, fy + 6], tuck = [fx - 16, fy - 10];
+    const a = catcher.a, d = catcher.duck;
+    const x = lerp(lerp(up[0], down[0], a), tuck[0], d), y = lerp(lerp(up[1], down[1], a), tuck[1], d);
+    return [x + Math.sin(st.t * 1.3) * 1.2, y];
+  };
+  DH.catchY = () => (catcher.state === 'up' && catcher.duck < 0.2 && DH.leafPour() < 0.2 ? netAt()[1] + 2 : null);
+  DH.netCatch = (r) => { catcher.load = 1; catcher.state = 'full'; catcher.tt = 0; for (let i = 0; i < 3; i++) { const [nx, ny] = netAt(); DH.spawn({ kind: 'spray', x: nx, y: ny, vx: (Math.random() - 0.5) * 80, vy: -40 - Math.random() * 40, r: 0.8, life: 0.35, g: 900, z: 'mid' }); } };
+  layer({
+    id: 'catcher', z: 12.1,
+    hit(x, y) { const [fx, fy] = catcherFeet(), [nx, ny] = netAt(); return Math.hypot(x - fx, y - fy + 10) < 20 || Math.hypot(x - nx, y - ny) < 18; },
+    onEnter() { if (catcher.state === 'up') { catcher.state = 'full'; catcher.tt = 0.6; } },
+    update(dt, t, L) {
+      catcher.duck = ease(catcher.duck, DH.leafPour() > 0.3 ? 1 : 0, 4, dt);
+      catcher.tt += dt;
+      if (catcher.state === 'full' && catcher.tt > 1.1) { catcher.state = 'tip'; catcher.tt = 0; }
+      if (catcher.state === 'tip') {
+        catcher.a = ease(catcher.a, 1, 5, dt);
+        if (catcher.a > 0.9 && catcher.load > 0) { catcher.load = 0; DH.cisternPlink(CX, 6); }
+        if (catcher.tt > 1.2) { catcher.state = 'up'; catcher.tt = 0; }
+      } else catcher.a = ease(catcher.a, 0, 2.5, dt);
+    },
+    draw(g, t) {
+      const [fx, fy] = catcherFeet(), [nx, ny] = netAt();
+      // the pole, gripped in the front legs
+      g.lineCap = 'round';
+      g.lineWidth = 3.4; g.strokeStyle = LINE; g.beginPath(); g.moveTo(fx - 4, fy - 10); g.lineTo(nx, ny); g.stroke();
+      g.lineWidth = 1.8; g.strokeStyle = '#c8b06a'; g.stroke();
+      const sag = 9 + catcher.load * 7;
+      const bag = new Path2D(); bag.moveTo(nx - 10, ny); bag.quadraticCurveTo(nx - 9, ny + sag, nx, ny + sag + 1); bag.quadraticCurveTo(nx + 9, ny + sag, nx + 10, ny); bag.closePath();
+      if (catcher.load > 0) DH.glassDrop(g, nx, ny + sag - 5, 6, { flat: 0.5, bright: 0.8 });
+      g.fillStyle = 'rgba(220,200,150,0.15)'; g.fill(bag);
+      g.save(); g.clip(bag); g.lineWidth = 0.6; g.strokeStyle = 'rgba(230,210,160,0.9)';
+      for (let i = -3; i <= 3; i++) { g.beginPath(); g.moveTo(nx + i * 3, ny); g.lineTo(nx + i * 1.2, ny + sag + 2); g.stroke(); }
+      g.restore();
+      g.lineWidth = 0.9; g.strokeStyle = LINE; g.stroke(bag);
+      g.lineWidth = 2.2; g.strokeStyle = LINE; g.beginPath(); g.ellipse(nx, ny, 10, 2.4, 0, 0, TAU); g.stroke();
+      g.lineWidth = 1.1; g.strokeStyle = '#d8c07a'; g.stroke();
+      const look = catcher.duck > 0.5 ? [0.5, 0.6] : [-0.5, -1];
+      DH.bug(g, fx, fy, 0.95, { dir: -1, rot: -0.15 + catcher.duck * 0.3, roll: catcher.duck * 0.35, open: catcher.blink(t), look, hat: '#a0804a', smile: catcher.load > 0 ? 1.4 : 0.4 });
     },
   });
 
@@ -336,7 +389,7 @@
   const jetty = { waiting: true };
   DH.jettyTake = () => { jetty.waiting = false; };
   layer({
-    id: 'jetty', z: 13.2, still: true,
+    id: 'jetty', z: 10.65, still: true,
     draw(g) {
       // a jetty of three twigs on stilts, out over the water
       for (const [x0, x1, y] of [[820, 880, SHORE - 4], [826, 884, SHORE - 1]]) {

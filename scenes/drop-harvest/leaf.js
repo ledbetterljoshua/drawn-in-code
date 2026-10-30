@@ -11,8 +11,10 @@
 
    leaf z9.5 (behind the island, so its stalk vanishes behind the ridge) · drips z12.5 · moth z9.7 */
 (function () {
-  const { TAU, clamp, lerp, ease, rng, noise, circ, ell, poly, curve, grad, radial, ink, st, P, layer, onLayout, sprite, blit } = Drawn;
-  const { C, SUN, HZ, LINE } = DH;
+  const { TAU, clamp, lerp, ease, rng, noise, circ, ell, poly, curve, grad, radial, ink: inkFar, st, P, layer, onLayout, sprite, blit } = Drawn;
+  const { C, SUN, HZ } = DH;
+  const LINE = DH.LINE_MID;
+  const ink = (g, p, fill, lw = 2.2) => inkFar(g, p, fill, lw, LINE);
   const LF = C.leaf;
   const PIV = [1462, 660];      // where the stalk leaves the ground, behind the ridge
   const JUNC = [1488, 306];     // stalk meets blade
@@ -71,10 +73,10 @@
     g.fillStyle = LF.under; g.fill(blade);
     g.save(); g.clip(blade);
     // light through the leaf: hottest by the tip, where the sun is behind it
-    g.fillStyle = grad(g, 1000, 0, 1800, 0, [[0, '#94a04a'], [0.35, '#6c7c44'], [1, '#3c4c3a']]);
+    g.fillStyle = grad(g, 1000, 0, 1800, 0, [[0, '#7c8a42'], [0.3, '#56663c'], [1, '#2e3a32']]);
     g.fillRect(980, 120, 840, 360);
     g.save(); g.translate(1060, 450); g.scale(1.5, 1);
-    g.fillStyle = radial(g, 0, 0, 0, 340, [[0, 'rgba(250,236,150,0.9)'], [0.3, 'rgba(214,206,100,0.55)'], [0.7, 'rgba(170,170,80,0.2)'], [1, 'rgba(170,170,80,0)']]);
+    g.fillStyle = radial(g, 0, 0, 0, 340, [[0, 'rgba(252,236,150,0.92)'], [0.25, 'rgba(220,206,100,0.55)'], [0.6, 'rgba(160,160,80,0.15)'], [1, 'rgba(160,160,80,0)']]);
     g.fillRect(-360, -360, 720, 720);
     g.restore();
     // the shadowed belly near the stalk, where the blade is thick and turned from the sun
@@ -201,7 +203,8 @@
       if (state.tipDrop >= 1) {
         state.tipDrop = 0;
         const [tx, ty] = DH.leafTip();
-        DH.spawn({ kind: 'drip', x: tx, y: ty + 9, vx: 0, vy: 20, r: 4.8, life: 2, g: 1400, z: 'mid', land: DH.cisternTop ? DH.cisternTop() : 590, cistern: true });
+        const ny = DH.catchY && DH.catchY();
+        DH.spawn({ kind: 'drip', x: tx, y: ty + 9, vx: 0, vy: 20, r: 4.8, life: 2, g: 1400, z: 'mid', land: ny || (DH.cisternTop ? DH.cisternTop() : 590), cistern: true, net: !!ny });
       }
       // the pour: a stream while the leaf sags
       if (state.pour > 0.3 && Math.random() < state.pour * 0.9) {

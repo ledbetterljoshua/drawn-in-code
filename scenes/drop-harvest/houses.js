@@ -16,8 +16,10 @@
 
    houses z10.5 (still) · cap-life z11.4 · pod-life z11.5 · nut-life z11.6 · lanterns z11.8 */
 (function () {
-  const { TAU, clamp, lerp, ease, rng, noise, circ, ell, poly, curve, grad, radial, ink, st, P, layer, onLayout } = Drawn;
-  const { C, SUN, LINE } = DH;
+  const { TAU, clamp, lerp, ease, rng, noise, circ, ell, poly, curve, grad, radial, ink: inkFar, st, P, layer, onLayout } = Drawn;
+  const { C, SUN } = DH;
+  const LINE = DH.LINE_MID;
+  const ink = (g, p, fill, lw = 2.2) => inkFar(g, p, fill, lw, LINE);
 
   // ------------------------------------------------------------ geometry
   // each house is drawn in its own design space (x, base…) and placed on the ridge at scale K
@@ -73,12 +75,20 @@
     g.save(); g.clip(cap);
     // the dark crown and the shaggy brown scales of a parasol
     g.fillStyle = '#5a3a32'; g.fill(ell(x, top - dome - 2, 22, 12));
-    for (let i = 0; i < 46; i++) {
-      const u = r(), a = (r() - 0.5) * Math.PI * 0.9;
-      const sx = x + Math.sin(a) * rx * (0.25 + u * 0.75), sy = top - dome * (1 - u * 0.85) * Math.cos(a * 0.8) + 4;
-      const s = 2.5 + (1 - u) * 4;
-      g.fillStyle = r() < 0.5 ? '#7a5444' : '#9a6f56';
-      g.fill(poly([[sx - s, sy], [sx + s * 0.2, sy - s * 0.6], [sx + s, sy + s * 0.3], [sx, sy + s * 0.5]]));
+    // the brown scales of a parasol, in rings round the crown, smaller and sparser toward the rim
+    for (let ring = 1; ring <= 4; ring++) {
+      const k = ring / 4.6, n = 4 + ring * 3;
+      for (let i = 0; i < n; i++) {
+        const a = -Math.PI / 2 + ((i + (ring % 2) * 0.5) / n - 0.5) * Math.PI * 0.95 + (r() - 0.5) * 0.08;
+        // a point on the dome: across by sin, down the dome by the ring
+        const ax = Math.sin(a + Math.PI / 2), sx = x + ax * rx * (0.18 + k * 0.82) * 1.02;
+        const sy = top - dome * (1 - k ** 1.6) * (1 - Math.abs(ax) * 0.35 * k) - 2 + (r() - 0.5) * 4;
+        const s = (6 - ring) * (0.7 + r() * 0.6);
+        if (r() < 0.3) continue;
+        g.fillStyle = r() < 0.5 ? '#6a4636' : '#8a5e48';
+        g.beginPath(); g.ellipse(sx, sy, s * 1.2, s * 0.55, ax * 0.9, 0, TAU); g.fill();
+        g.fillStyle = 'rgba(40,24,20,0.5)'; g.beginPath(); g.ellipse(sx + ax, sy + s * 0.3, s * 0.9, s * 0.25, ax * 0.9, 0, Math.PI); g.fill();
+      }
     }
     g.restore();
     DH.shadeFace(g, cap, x - rx, x + rx, 0.78);

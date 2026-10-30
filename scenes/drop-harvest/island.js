@@ -9,8 +9,10 @@
 
    island z10 (still) · capsules z10.8 · burrow z11 */
 (function () {
-  const { TAU, clamp, lerp, ease, rng, noise, circ, ell, poly, curve, grad, radial, ink, st, P, layer, onLayout } = Drawn;
-  const { C, SUN, HZ, FAR, SHORE, LINE } = DH;
+  const { TAU, clamp, lerp, ease, rng, noise, circ, ell, poly, curve, grad, radial, ink: inkFar, st, P, layer, onLayout } = Drawn;
+  const { C, SUN, HZ, FAR, SHORE } = DH;
+  const LINE = DH.LINE_MID;
+  const ink = (g, p, fill, lw = 2.2) => inkFar(g, p, fill, lw, LINE);
   const M = C.moss, S = C.soil;
 
   // the front waterline, gently wavering in toward us at the middle
@@ -69,17 +71,24 @@
     g.lineWidth = 3.6; g.strokeStyle = LINE; g.stroke(mat);
     g.fillStyle = grad(g, 0, 620, 0, SHORE, [[0, '#2a3c2a'], [0.6, '#1d2a20'], [1, '#18201a']]); g.fill(mat);
     g.save(); g.clip(mat);
-    // cushions within the mat: soft lumps, a little lighter on their sun-facing shoulders
-    for (let i = 0; i < 90; i++) {
-      const x = 866 + r() * 810, top = DH.ridgeY(x), y = top + 8 + r() * (mossFoot(x) - top - 6), rr = 8 + r() * 16;
-      const c = circ(x, y, rr);
-      g.fillStyle = 'rgba(8,14,10,0.3)'; g.fill(ell(x + 2, y + rr * 0.6, rr, rr * 0.4));
-      g.fillStyle = r() < 0.5 ? 'rgba(46,64,40,0.22)' : 'rgba(30,44,32,0.22)'; g.fill(c);
+    // the moss grows in drifts that follow the hill: bands of tufts parallel to the ridge, each
+    // tuft a short stroke leaning with the slope, lighter near the top where it catches the sky
+    for (let band = 0; band < 9; band++) {
+      const f = (band + 0.5) / 9;
+      for (let x = 866 + r() * 10; x < 1676; x += 2.2 + r() * 3) {
+        if (r() < 0.25) { x += r() * 26; continue; } // gaps between drifts
+        const top = DH.ridgeY(x), y = top + 6 + f * (mossFoot(x) - top - 6) + (r() - 0.5) * 6;
+        const slope = (DH.ridgeY(x + 4) - DH.ridgeY(x - 4)) / 8;
+        const len = 2.5 + r() * 3.5;
+        g.lineWidth = 1.1;
+        g.strokeStyle = r() < 0.55 ? `rgba(${100 - f * 50 | 0},${130 - f * 60 | 0},${70 - f * 30 | 0},${0.45 - f * 0.2})` : 'rgba(8,14,8,0.45)';
+        g.beginPath(); g.moveTo(x, y); g.lineTo(x + len * 0.4 + slope * len, y - len); g.stroke();
+      }
     }
-    // stipple of shoots
-    for (let i = 0; i < 700; i++) {
-      const x = 866 + r() * 810, top = DH.ridgeY(x), y = top + 4 + r() * (mossFoot(x) - top);
-      g.fillStyle = r() < 0.5 ? 'rgba(120,150,80,0.3)' : 'rgba(8,14,8,0.4)'; g.fillRect(x, y, 1.2, 1.8);
+    // shadowed hollows under the drifts
+    for (let i = 0; i < 24; i++) {
+      const x = 880 + r() * 780, top = DH.ridgeY(x), y = top + 18 + r() * (mossFoot(x) - top - 20);
+      g.fillStyle = 'rgba(6,10,8,0.28)'; g.fill(ell(x, y, 20 + r() * 30, 3 + r() * 3, undefined, Math.atan((DH.ridgeY(x + 10) - DH.ridgeY(x - 10)) / 20)));
     }
     // a warm bounce on the mat's lower lip from the bright water
     g.fillStyle = grad(g, 0, SHORE - 70, 0, SHORE, [[0, 'rgba(240,150,110,0)'], [1, 'rgba(240,150,110,0.18)']]);
