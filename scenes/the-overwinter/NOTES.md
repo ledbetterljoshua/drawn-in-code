@@ -127,3 +127,27 @@ Five worst (mine):
 4. **Steel cabinets are the same gradient as card.** → a cold sheen streak down the pressed panel and
    a dent catching it.
 5. **The sleeping dormouse's face is tucked out of sight** under the cap. → less tucked.
+
+## Round 5 (second fresh critic, then fixes)
+
+Critic's ten, condensed: silhouette still a boot (nose at top left, a heel with a straight edge, the
+arch a thin pink hoop); drawers don't belong to the rock; light has no logic — lamp halos whiten
+fronts; sleepers lie *on* drawers; hedgehogs are flattened bugs; no focal hot spot, empty left;
+clouds in two unrelated styles (polka dots vs airbrush); a flat lilac rectangle with a hard edge on
+the left horizon (a bug); distant stacks are tombstones; causeway and water inert; uniform line;
+copy-paste repetition.
+
+Fixed:
+- **Perf first** (phone at 4× CPU throttle was 24 fps idle, 18 in a chain): removed the CSS
+  saturate filter on the canvas, merged still buckets, cached each drawer front per opening step,
+  and cached every *resting* sleeper as a sprite that breathes by a 2.5% stretch about its lip →
+  35 fps idle under throttle, 60 on desktop.
+- The hard-edged band: a flat `fillRect` of afterglow on the tide sheets. Now a radial.
+- **The arch is a tunnel**: its far mouth sits smaller and nearer the vanishing point, so the left
+  jamb and the vault's underside show between the mouths, warming toward the far mouth where the
+  afterglow pours in.
+- **Sleepers sit in their drawers**: an open drawer shows a dark box above its lip framed by side
+  boards (an illustrator's cheat — we're below it — but it is what reads).
+- Lamp halos bluer and softer (they were whitening fronts).
+- **Hedgehogs walk upright** in profile, scarves and suitcases swinging, 1.45× bigger.
+- Rock lips over cabinet corners were reading as ink blots: lighter, with a snow cap.

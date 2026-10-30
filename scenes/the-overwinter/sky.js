@@ -124,7 +124,7 @@ layer({
 // ------------------------------------------------------------ the lighthouse on the far headland
 const LH = { x: -170, y: HZ - 72 };
 const lighthouse = layer({
-  id: 'lighthouse', z: 2,
+  id: 'lighthouse', z: 5.4,
   hit(x, y) { return Math.abs(x - LH.x) < 34 && y > LH.y - 30 && y < HZ; },
   ang: 0, spd: 0.55,
   update(dt, t, L) { L.spd = Drawn.ease(L.spd, L.hovered ? 0.05 : 0.55, 3, dt); L.ang += L.spd * dt; },
@@ -155,7 +155,7 @@ const stars = [];
   stars.push({ x: 1150, y: 640, r: 2.4, ph: 0, sp: 0.4, venus: true });
 }
 layer({
-  id: 'stars', z: 1,
+  id: 'stars', z: 5.3,
   hit(x, y) { for (const s of stars) if ((x - s.x) ** 2 + (y - s.y) ** 2 < 260) { this.cur = s; return true; } return false; },
   draw(g, t, L) {
     for (const s of stars) {

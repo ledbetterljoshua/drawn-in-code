@@ -480,7 +480,7 @@ function drawTag(g, d, H, s, read, t) {
 
 // ------------------------------------------------------------ opening geometry
 const openQ = (q, o) => { const k = 1 / (1 - o * 0.06); return q.map(([x, y]) => [PX + (x - PX) * k, HZ + (y - HZ) * k]); };
-function drawOpen(g, d, o, a) {
+function drawOpen(g, d, o, a, noFront) {
   const slot = d.front, f = openQ(slot, o);
   const T = C[d.tone];
   const below = d.cy > HZ;
@@ -500,6 +500,19 @@ function drawOpen(g, d, o, a) {
   }
   // the guest, behind the front so the front hides its lower half
   const lipL = f[0], lipR = f[1], lx = (lipL[0] + lipR[0]) / 2, ly = (lipL[1] + lipR[1]) / 2;
+  // the open drawer's inside: a dark box above the lip framed by its side boards (an illustrator's
+  // cheat — strictly we're below it — but it's what makes a sleeper sit *in* a drawer)
+  if (!below && o > 0.15 && d.guest !== 'bat') {
+    const ih = clamp((f[3][1] - f[0][1]) * 0.4, 7, 34) * clamp(o / 0.4, 0, 1);
+    const inn = 0.06 * (lipR[0] - lipL[0]);
+    const bl = [lipL[0] + inn, lipL[1] - ih], br = [lipR[0] - inn, lipR[1] - ih];
+    const box = poly([lipL, bl, br, lipR]);
+    g.fillStyle = grad(g, 0, ly - ih, 0, ly, [[0, '#0c0810'], [1, mix('#2a1c26', T.shade, 0.3)]]);
+    g.fill(box);
+    // the back panel's top edge catches a little lamp, the side boards a little more
+    ink(g, poly([bl, br, [br[0], br[1] + 2], [bl[0], bl[1] + 2]]), mix(T.shade, T.lit, 0.3), 0.8);
+    for (const [a0, b0] of [[lipL, bl], [lipR, br]]) ink(g, poly([a0, b0, [b0[0] + (a0 === lipL ? 3 : -3), b0[1]], [a0[0] + (a0 === lipL ? 4 : -4), a0[1]]]), mix(T.shade, T.lit, 0.55), 1);
+  }
   const s = clamp((lipR[0] - lipL[0]) / 66, 0.45, 1.6) * (d.guest === 'bear' ? 0.95 : 1);
   if (d.guest && RIGS[d.guest] && (o > 0.08 || d.guest === 'bear')) {
     g.save();
@@ -518,8 +531,22 @@ function drawOpen(g, d, o, a) {
       ink(g, poly([a0, b0, [b0[0], b0[1] + th * 0.6], [a0[0], a0[1] + th]]), mix(T.shade, T.lit, 0.4), 1.2);
     }
   }
-  OW.drawerFront(g, d, f, rng(d.seed));
+  if (!noFront) frontBlit(g, d, o);
   return { f, s };
+}
+// the front is expensive (material, lamplight): cached per opening step and per layout
+function frontBlit(g, d, o) {
+  const slot = d.front;
+  const key = Math.round(o * 40) + ':' + st.R;
+  if (d.fkey !== key) {
+    const fq = openQ(slot, Math.round(o * 40) / 40);
+    const x0 = Math.min(fq[0][0], fq[3][0]) - 24, y0 = Math.min(fq[0][1], fq[1][1]) - 6;
+    const x1 = Math.max(fq[1][0], fq[2][0]) + 24, y1 = Math.max(fq[2][1], fq[3][1]) + 6;
+    d.fspr = Drawn.sprite(x0, y0, x1 - x0, y1 - y0, (g2) => OW.drawerFront(g2, d, fq, rng(d.seed)));
+    d.fkey = key;
+    d.handleOpen = d.handle;
+  }
+  Drawn.blit(g, d.fspr);
 }
 
 // ------------------------------------------------------------ the yawn: waking, spreading, settling
@@ -643,7 +670,26 @@ for (const d of D) {
       g.save(); g.translate(OW.shake.x, OW.shake.y);
       let s = clamp(d.w / 66, 0.45, 1.6);
       if (d.o > 0.005 || d.guest === 'bear') {
-        const r = drawOpen(g, d, d.o, anim);
+        // a sleeper at rest is drawn once and then breathes as a slight stretch of the cached
+        // picture; anything stirring, waking or yawning is drawn live
+        const resting = d.state === 'sleep' && Math.abs(d.o - d.rest) < 0.004 && anim.rise < 0.01 && anim.yawn < 0.01 && Math.abs(anim.roll) < 0.01 && anim.stir < 0.02 && anim.eye < 0.01 && !(d.focal && OW.tickle);
+        let r;
+        if (resting) {
+          const key = d.rest + ':' + st.R;
+          if (d.rkey !== key) {
+            const q = d.q, pad = 60 * clamp(d.w / 66, 0.45, 1.6);
+            const x0 = Math.min(q[0][0], q[3][0]) - pad, y0 = Math.min(q[0][1], q[1][1]) - pad * 1.1, x1 = Math.max(q[1][0], q[2][0]) + pad, y1 = Math.max(q[2][1], q[3][1]) + 20;
+            const still = Object.assign({}, anim, { br: 0, rise: 0, yawn: 0, roll: 0, eye: 0, stir: 0, t: 0 });
+            d.rspr = Drawn.sprite(x0, y0, x1 - x0, y1 - y0, (g2) => { d.rres = drawOpen(g2, d, d.rest, still, true); });
+            d.rkey = key;
+          }
+          r = d.rres;
+          const lipY = (r.f[0][1] + r.f[1][1]) / 2, k = 1 + 0.025 * anim.br;
+          g.save(); g.translate(0, lipY); g.scale(1, k); g.translate(0, -lipY);
+          Drawn.blit(g, d.rspr);
+          g.restore();
+          frontBlit(g, d, d.rest);
+        } else r = drawOpen(g, d, d.o, anim);
         s = r.s;
         // the handle moves with the front
         const H = OW.qat(r.f, 0.5, 0.66);

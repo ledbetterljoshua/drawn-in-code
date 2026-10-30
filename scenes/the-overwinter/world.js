@@ -8,6 +8,9 @@
 (() => {
 const { clamp, lerp, rng } = Drawn;
 const OW = (window.OW = {});
+// every layer, so dev tools can time them
+OW.layers = [];
+{ const base = Drawn.layer; Drawn.layer = (d) => { const L = base(d); OW.layers.push(L); return L; }; }
 OW.W = 1200; OW.H = 1500;
 OW.HZ = 1150;        // horizon: eye level, a little above the drawers at the stack's foot
 OW.BASE = 1252;      // where the stack meets the sand, at its middle

@@ -243,7 +243,7 @@ for (const p of PORTERS) {
           p.music = Math.min(1, p.music + dt * 2);
           p.crank += dt * 9;
           OW.settleNear(d.cx, d.cy, 170);
-          if (Math.random() < dt * 5) OW.spawn({ kind: 'note', x: p.L.tx + p.face * 14 * p.L.s, y: lerp(p.L.ty, p.L.by, p.rung) - 30 * p.L.s, vy: -24, vx: p.face * 6, life: 2, s: p.L.s * 0.9, ph: Math.random() * 6, two: Math.random() < 0.4 });
+          if (Math.random() < dt * 1.6) OW.spawn({ kind: 'note', x: p.L.tx + p.face * 14 * p.L.s, y: lerp(p.L.ty, p.L.by, p.rung) - 30 * p.L.s, vy: -24, vx: p.face * 6, life: 2, s: p.L.s * 0.9, ph: Math.random() * 6, two: Math.random() < 0.4 });
         }
         if (d.state !== 'wake' && (p.busyT -= dt) < 0) { p.busy = null; p.music = 0; }
       }

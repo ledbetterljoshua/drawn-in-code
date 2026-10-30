@@ -107,40 +107,53 @@ layer({
 const HOGS = [0, 1, 2].map((i) => ({ i, s: 0.24 + i * 0.07, o: -0.15 + i * 0.12, run: 0, ph: i * 1.7, blink: Drawn.blinker(2, 4) }));
 OW.hogs = HOGS;
 function hog(g, x, y, s, h, t) {
-  const step = t * (2.4 + h.run * 4) + h.ph, bob = Math.abs(Math.sin(step)) * (1 + h.run * 1.6) * s;
-  g.save(); g.translate(x, y - bob); g.scale(s, s);
+  // walking upright, in profile, toward the arch (to the right), suitcase in the near paw
+  const step = t * (2.6 + h.run * 5) + h.ph, sw = Math.sin(step), bob = Math.abs(sw) * (1.2 + h.run * 2) * s;
+  g.save(); g.translate(x, y); g.scale(s, s);
   const lw = 1.5 / s;
-  g.fillStyle = 'rgba(20,14,36,0.35)'; g.fill(ell(2, bob / s + 1, 13, 2.4));
-  // feet
-  for (const [fx, ph] of [[-6, 0], [6, Math.PI]]) { const k = Math.sin(step + ph); ink(g, ell(fx + k * 2, 0, 2.4, 1.3), '#6a5040', lw * 0.6); }
-  // the suitcase, carried on the left, bumping
-  const cb = Math.max(0, Math.sin(step * 2)) * h.run * 2;
-  const cx = -14, cy = -8 + cb;
-  ink(g, Drawn.rect(cx - 7, cy - 6, 12, 9), h.i === 1 ? '#7a3a34' : h.i === 2 ? '#4a5a6a' : '#8a6040', lw);
-  g.fillStyle = '#c8a060'; g.fillRect(cx - 7, cy - 3, 12, 1.2); g.fillRect(cx - 7, cy + 0.5, 12, 1.2);
-  ink(g, Drawn.rect(cx - 2.8, cy - 8.5, 3.6, 2.6), null, lw * 0.6);
-  ink(g, Drawn.rect(cx + 1, cy - 4, 4, 3), C.tag.base, 0.4);
-  // body: a spiny dome seen from behind and to the side
-  const dome = new Path2D(); dome.moveTo(-11, -2); dome.ellipse(1, -2, 12, 10, 0, Math.PI, 0); dome.quadraticCurveTo(13, 1, 1, 1); dome.quadraticCurveTo(-11, 1, -11, -2); dome.closePath();
-  ink(g, dome, '#5a4a40', lw);
-  g.save(); g.clip(dome); g.strokeStyle = '#c8b498'; g.lineWidth = 0.8;
-  for (let i = 0; i < 26; i++) { const a = Math.PI + (i / 26) * Math.PI, r = 4 + (i % 3) * 2.6; g.beginPath(); g.moveTo(1 + Math.cos(a) * r, -2 + Math.sin(a) * r); g.lineTo(1 + Math.cos(a) * (r + 3), -2 + Math.sin(a) * (r + 3)); g.stroke(); }
-  g.fillStyle = 'rgba(255,190,170,0.35)'; g.fill(ell(-4, -10, 6, 2.6));
+  g.fillStyle = 'rgba(20,14,36,0.4)'; g.fill(ell(1, 0.5, 13, 2.4));
+  g.translate(0, -bob / s); g.rotate(h.run * 0.18 + sw * 0.03);
+  // legs: short, stumping
+  for (const [ph, far] of [[Math.PI, 1], [0, 0]]) {
+    const k = Math.sin(step + ph);
+    ink(g, poly([[-1 + k * 3, -9], [2 + k * 3, -9], [3 + k * 5, 0], [-2 + k * 5, 0]]), far ? '#8a6a52' : '#a88262', lw * 0.7);
+  }
+  // body: an upright egg, cream belly in front, spines all down the back
+  const body = curve([[2, -30], [8, -26], [10, -16], [8, -7], [0, -5], [-8, -8], [-10, -18], [-7, -28]]);
+  ink(g, body, '#d8c0a0', lw);
+  const back = curve([[-1, -33], [-9, -29], [-13, -19], [-11, -9], [-4, -5], [-2, -14], [0, -26]]);
+  ink(g, back, '#5a4a40', lw);
+  g.save(); g.clip(back); g.strokeStyle = '#c8b498'; g.lineWidth = 0.9;
+  for (let i = 0; i < 18; i++) { const yy = -31 + i * 1.5, xx = -11 + Math.abs(i - 9) * 0.35; g.beginPath(); g.moveTo(xx + 6, yy); g.lineTo(xx, yy + 1.4); g.stroke(); }
+  g.fillStyle = 'rgba(255,190,170,0.35)'; g.fill(ell(-9, -22, 3, 8));
   g.restore();
-  g.lineWidth = 1; g.strokeStyle = LINE;
-  for (let i = 1; i < 10; i++) { const a = Math.PI + (i / 10) * Math.PI; g.beginPath(); g.moveTo(1 + Math.cos(a) * 12, -2 + Math.sin(a) * 10); g.lineTo(1 + Math.cos(a - 0.25) * 14.5, -2 + Math.sin(a - 0.25) * 12.5); g.stroke(); }
-  // the snout peeking out to the right, a scarf, an arm to the suitcase
-  ink(g, curve([[10, -6], [16, -4.2], [18, -2.8], [15, -1.4], [10, -1]]), '#c49a76', lw);
-  g.fillStyle = '#1a1218'; g.fill(circ(18, -2.8, 1));
+  g.lineWidth = 1.1; g.strokeStyle = LINE;
+  for (let i = 0; i < 9; i++) { const a = 2.0 + i * 0.22, r = 12 + (i % 2) * 1.2; g.beginPath(); g.moveTo(-4 + Math.cos(a) * r * 0.75, -19 + Math.sin(a) * r * 1.15); g.lineTo(-4 + Math.cos(a) * (r + 3) * 0.75, -19 + Math.sin(a) * (r + 3) * 1.15); g.stroke(); }
+  // head: the pointed snout forward, a little black nose, a scarf
+  const head = curve([[-1, -36], [6, -35], [13, -31.5], [15.5, -30], [13, -28.5], [5, -27], [-1, -29]]);
+  ink(g, head, '#c49a76', lw);
+  ink(g, poly([[-3, -36], [1, -38], [-1, -33]]), '#5a4a40', lw * 0.7);
+  g.fillStyle = '#1a1218'; g.fill(circ(15.4, -30.2, 1.1));
   const bl = h.blink(t);
-  g.fillStyle = '#120c18'; g.fill(ell(13, -4.2, 0.9, 0.9 * bl));
-  ink(g, poly([[6, -9], [11, -6], [10, -4], [5, -7]]), h.i === 0 ? '#c3343c' : h.i === 1 ? '#6e86b8' : '#e0c070', lw * 0.6);
-  tube(g, seg(-6, -5, cx + 1, cy - 6), '#c49a76', 1.6, lw * 0.4);
+  g.fillStyle = '#120c18'; g.fill(ell(7.6, -32.6, 0.95, 0.95 * bl));
+  const scarf = h.i === 0 ? '#c3343c' : h.i === 1 ? '#6e86b8' : '#e0c070';
+  ink(g, poly([[-3, -29], [7, -27], [7, -24.5], [-3, -26.5]]), scarf, lw * 0.6);
+  ink(g, poly([[-3, -27.5], [-8 - h.run * 3, -22 + Math.sin(step * 2) * 1.5], [-6.5 - h.run * 3, -20.5 + Math.sin(step * 2) * 1.5], [-1.5, -26]]), scarf, lw * 0.6);
+  // the suitcase in the near paw, swinging (and bumping, when running)
+  const cb = h.run * Math.max(0, Math.sin(step * 2)) * 2.5, cs = sw * 2 * (1 - h.run * 0.5);
+  const cx = 6 + cs, cy = -10 + cb;
+  tube(g, seg(5, -19, cx, cy - 9), '#c49a76', 2, lw * 0.4);
+  const caseCol = h.i === 1 ? '#7a3a34' : h.i === 2 ? '#4a5a6a' : '#8a6040';
+  ink(g, Drawn.rect(cx - 7, cy - 7, 14, 10), caseCol, lw);
+  g.fillStyle = 'rgba(255,190,170,0.3)'; g.fillRect(cx - 7, cy - 7, 14, 1.6);
+  g.fillStyle = '#c8a060'; g.fillRect(cx - 4, cy - 7, 1.4, 10); g.fillRect(cx + 2.6, cy - 7, 1.4, 10);
+  ink(g, Drawn.rect(cx - 2.5, cy - 9.5, 5, 2.6), null, lw * 0.6);
+  ink(g, poly([[cx + 6.6, cy - 4], [cx + 10, cy - 3], [cx + 10, cy], [cx + 6.6, cy - 1]]), C.tag.base, 0.4);
   g.restore();
 }
 layer({
   id: 'hogs', z: 15,
-  hit(x, y) { for (const h of HOGS) if (h.at && Math.abs(x - h.at[0]) < 22 * h.sc && y > h.at[1] - 24 * h.sc && y < h.at[1] + 4) { this.cur = h; return true; } return false; },
+  hit(x, y) { for (const h of HOGS) if (h.at && Math.abs(x - h.at[0]) < 20 * h.sc && y > h.at[1] - 40 * h.sc && y < h.at[1] + 4) { this.cur = h; return true; } return false; },
   update(dt, t, L) {
     const last = HOGS[2];
     // the tide coming in, or a hover, makes the last one hurry
@@ -155,7 +168,7 @@ layer({
   draw(g, t) {
     for (const h of HOGS.slice().sort((a, b) => a.s - b.s)) {
       const [x, y] = OW.cwAt(h.s, h.o);
-      const sc = (0.55 + (y - 1262) / 170) * 1.25;
+      const sc = (0.55 + (y - 1262) / 170) * 1.45;
       h.at = [x, y]; h.sc = sc;
       // fade into the arch's shadow at the far end
       g.globalAlpha = clamp((h.s - 0.04) / 0.05, 0, 1);

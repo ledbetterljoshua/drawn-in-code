@@ -260,9 +260,9 @@ function drawCabinet(g, cab) {
   if (R() < 0.55) {
     const side = R() < 0.5 ? 0 : 1, c = side ? q[1] : q[0], w = 14 + R() * 18, h = 10 + R() * 16, sx = side ? -1 : 1;
     const lump = curve([[c[0] - sx * 10, c[1] - 6], [c[0] + sx * w * 0.6, c[1] - 4], [c[0] + sx * w, c[1] + h * 0.3], [c[0] + sx * w * 0.5, c[1] + h * 0.6], [c[0] + sx * 3, c[1] + h], [c[0] - sx * 8, c[1] + h * 0.7]]);
-    g.save(); g.shadowColor = 'rgba(6,4,12,0.6)'; g.shadowBlur = 5; g.shadowOffsetY = 3; ink(g, lump, rockAt(c[1]), 1.6); g.restore();
+    g.save(); g.shadowColor = 'rgba(6,4,12,0.5)'; g.shadowBlur = 5; g.shadowOffsetY = 3; ink(g, lump, mix(rockAt(c[1]), '#4a3e5c', 0.45), 1.2); g.restore();
     g.save(); g.clip(lump);
-    g.fillStyle = 'rgba(150,130,180,0.22)'; g.fill(ell(c[0] + sx * w * 0.35, c[1] - 3, w * 0.5, 3));
+    g.fillStyle = 'rgba(170,150,200,0.35)'; g.fill(ell(c[0] + sx * w * 0.35, c[1] - 3, w * 0.55, 3.4)); ink(g, ell(c[0] + sx * w * 0.3, c[1] - 6, w * 0.4, 2.2), C.snow, 0.6, C.snowShade);
     g.strokeStyle = 'rgba(10,6,18,0.6)'; g.lineWidth = 1; g.beginPath(); g.moveTo(c[0] - sx * 8, c[1] + h * 0.35); g.lineTo(c[0] + sx * w, c[1] + h * 0.3); g.stroke();
     for (let k = 0; k < 8; k++) { g.fillStyle = R() < 0.5 ? '#0e0a16' : '#5a5070'; g.fill(circ(c[0] + sx * R() * w, c[1] + R() * h * 0.7, 0.7 + R())); }
     g.restore();
@@ -420,16 +420,33 @@ function drawFoot(g) {
   g.restore();
 }
 
+// the arch is a tunnel through the foot: its far mouth sits smaller and nearer the vanishing
+// point, so we see its left jamb and the underside of its vault between the two mouths
+const archBack = () => {
+  const P = OW.archPts, cx = 378, cy = 1190;
+  return P.map(([x, y]) => [x + (720 - x) * 0.07 + (cx - x) * 0.12, y + (OW.HZ - y) * 0.05 + (cy - y) * 0.1]);
+};
 function drawArch(g) {
-  // the arch's inner faces look west, straight into the afterglow: lit rose and apricot
-  const A = archPath();
-  const pts = OW.archPts;
-  g.save(); g.clip(stackPath());
-  g.lineWidth = 16; g.strokeStyle = '#c77f86'; g.stroke(A);
-  g.lineWidth = 8; g.strokeStyle = '#f0a894'; g.stroke(A);
+  const A = archPath(), B = curve(archBack());
+  g.save(); g.clip(A);
+  // the inner rock: shaded, warming toward the far mouth where the afterglow pours in
+  g.fillStyle = grad(g, 300, 0, 452, 0, [[0, '#1a1424'], [0.5, '#2a1e30'], [1, '#3a2836']]);
+  g.fill(A);
+  g.fillStyle = radial(g, 380, 1200, 0, 120, [[0, 'rgba(255,170,150,0.55)'], [0.5, 'rgba(230,140,150,0.2)'], [1, 'rgba(200,120,150,0)']]);
+  g.fill(A);
+  // bedding seams running back through the tunnel
+  g.strokeStyle = 'rgba(10,6,16,0.5)'; g.lineWidth = 1.2;
+  for (const t of [0.25, 0.5, 0.75]) {
+    const P = OW.archPts, Q = archBack(), i = Math.round(t * (P.length - 1));
+    g.beginPath(); g.moveTo(P[i][0], P[i][1]); g.lineTo(Q[i][0], Q[i][1]); g.stroke();
+  }
   g.restore();
-  // the hole itself is cut out of the sprite (evenodd) so the sky shows through
+  // a lit rim on the far mouth's edge, where the glow comes round it
+  g.save(); g.clip(A);
+  g.lineWidth = 5; g.strokeStyle = 'rgba(255,190,160,0.7)'; g.stroke(B);
+  g.restore();
 }
+OW.archBack = archBack;
 
 function drawCap(g) {
   // turf and peat on top, under a brow of snow; the brow overhangs on the left, where the bats are
@@ -512,8 +529,10 @@ onLayout(() => {
     drawCap(g);
     // silhouette ink, heavy; then punch the arch out so the sky shows through
     g.lineWidth = 2.6; g.strokeStyle = grad(g, 0, 160, 0, 1260, [[0, LINE], [0.6, LINE], [1, '#5a3448']]); g.stroke(stackPath());
-    g.save(); g.globalCompositeOperation = 'destination-out'; g.fill(archPath()); g.restore();
+    // punch out the far mouth (inside the near one) so the sky shows through the tunnel
+    g.save(); g.clip(archPath()); g.globalCompositeOperation = 'destination-out'; g.fill(curve(archBack())); g.restore();
     g.lineWidth = 2.6; g.strokeStyle = LINE; g.stroke(archPath());
+    g.lineWidth = 1.2; g.strokeStyle = 'rgba(36,25,46,0.7)'; g.save(); g.clip(archPath()); g.stroke(curve(archBack())); g.restore();
   });
 });
 OW.stackSprite = () => SPR;

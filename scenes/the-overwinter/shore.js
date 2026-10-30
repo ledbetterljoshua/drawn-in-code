@@ -171,7 +171,7 @@ layer({
       g.fill(sheet);
       // the afterglow on the incoming water
       g.save(); g.clip(sheet);
-      g.fillStyle = 'rgba(255,190,170,0.18)'; g.fillRect(OW.SUNX - 700, SHORE - 4, 1400, 60);
+      g.save(); g.translate(OW.SUNX, SHORE); g.scale(1, 0.08); g.fillStyle = radial(g, 0, 0, 0, 900, [[0, 'rgba(255,200,170,0.32)'], [1, 'rgba(255,190,170,0)']]); g.fillRect(-900, -100, 1800, 1000); g.restore();
       g.restore();
       // foam: a bright broken line on the edge, a fainter one a beat behind it
       for (let i = 0; i < pts.length - 1; i++) {
@@ -274,7 +274,7 @@ layer({
 const POSTS = [[0.05, 1.25], [0.15, -1.3], [0.3, 1.2], [0.44, -1.25], [0.6, 1.2], [0.75, -1.25]].map(([s, o], i) => ({ i, s, o, at: OW.cwAt(s, o), sw: 0, sv: 0, gut: 0 }));
 OW.posts = POSTS;
 function lampGlow(g, x, y, r, a) {
-  g.fillStyle = radial(g, x, y, 0, r, [[0, `rgba(170,200,255,${a})`], [0.3, `rgba(120,160,255,${a * 0.4})`], [1, 'rgba(110,150,255,0)']]);
+  g.fillStyle = radial(g, x, y, 0, r, [[0, `rgba(120,160,255,${a * 0.8})`], [0.35, `rgba(90,130,250,${a * 0.32})`], [1, 'rgba(80,120,250,0)']]);
   g.fillRect(x - r, y - r, r * 2, r * 2);
 }
 OW.lampGlow = lampGlow;
