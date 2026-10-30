@@ -52,7 +52,7 @@ layer({
     for (const [i, sn] of racers.entries()) {
       sn.pos += dt * (sn.sp * (1 + Math.sin(t * 0.3 + i * 2) * 0.4) + RACE.surge * (0.012 + i * 0.002 + Math.sin(t * 1.3 + i) * 0.004));
       if (sn.pos >= 1) { if (RACE.won < 0) { RACE.won = i; RACE.wonT = 0; F.spawn({ kind: 'word', text: 'by a head!', x: RACE.x1, y: RACE.y - 90, vy: -12, life: 2, size: 1 }); } sn.pos = 1; }
-      F.stepStalks(sn, dt, t);
+      F.stepStalks(sn, dt, t, L);
       F.stepFolk(sn.jockey, dt);
     }
     if (RACE.won >= 0 && (RACE.wonT += dt) > 5) { RACE.won = -1; racers.forEach((sn, i) => (sn.pos = [0.12, 0.05, 0.15][i])); }

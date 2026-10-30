@@ -301,6 +301,6 @@
     breeze, wind, setWind,
     circ, ell, rect, seg, quad, poly, curve,
     style, ink, grad, radial, tube, lumps, blinker,
-    st, P, layer, onLayout, sprite, blit, start,
+    st, P, layer, pick, onLayout, sprite, blit, start,
   };
 })();

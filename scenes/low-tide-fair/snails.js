@@ -154,12 +154,12 @@ function drawStalk(g, sn, s, bx, by, t, far) {
   // the eye: a dark bulb at the tip, with a glint, the pupil drifting toward the pointer
   const er = L * 0.018 * (0.8 + s.len * 0.2);
   ink(g, circ(ex, ey, er), far ? '#3d2c43' : '#4b3650', sn.lw * 0.8);
-  g.fillStyle = '#20141f'; g.fill(circ(ex + s.lx * er * 0.35, ey + s.ly * er * 0.35, er * 0.6));
+  g.fillStyle = '#20141f'; g.fill(circ(ex + s.lx * er * 0.35, ey + s.ly * er * 0.35, er * (0.6 + 0.18 * (sn.seen || 0))));
   g.fillStyle = 'rgba(255,255,255,0.9)'; g.fill(circ(ex - er * 0.3 * sn.dir, ey - er * 0.35, er * 0.3));
   s.tip = [ex, ey];
 }
 // eyestalk attention: aim at the pointer (in snail space), flinch on fast movement
-function stepStalks(sn, dt, t) {
+function stepStalks(sn, dt, t, layer) {
   const S = sn.S;
   const lx = (P.x - sn.x) / (S * sn.dir), ly = (P.y - sn.y) / S;
   const head = sn.headAt || [sn.L * 0.44, -sn.L * 0.2];
@@ -167,19 +167,22 @@ function stepStalks(sn, dt, t) {
   const attend = P.inside ? clamp(1.25 - dist / 900, 0, 1) : 0;
   const near = P.inside ? clamp(1.3 - dist / 700, 0, 1) : 0;
   sn.flinch = Math.max(sn.flinch * Math.exp(-0.9 * dt), F.startle * near);
+  // with ?gaze, the snail you are looking at looks back out of the picture at you
+  const looked = window.Gaze && Gaze.on && P.inside ? Math.max(clamp(1.6 - dist / (0.5 * sn.L * S), 0, 1), layer && Gaze.seen === layer ? 1 : 0) : 0;
+  sn.seen = ease(sn.seen || 0, looked, looked > (sn.seen || 0) ? 2.5 : 1.2, dt);
   sn.act.step(dt);
   for (const [i, s] of sn.stalks.entries()) {
     const base = -1.25 + i * -0.22 + Math.sin(t * 0.35 + s.ph) * 0.18 + sn.act.b('look') * sn.act.side * 0.5;
     const toP = Math.atan2(ly - (head[1] - sn.L * 0.07), lx - head[0]);
     let d = toP - base; d = Math.atan2(Math.sin(d), Math.cos(d));
     const lower = sn.lower || 0;
-    const target = base + clamp(d, -0.9, 0.9) * attend * 0.75 + lower * 0.7;
+    const target = base + clamp(d, -0.9, 0.9) * attend * 0.75 * (1 - sn.seen) + lower * 0.7 + (i ? -0.18 : 0.18) * sn.seen;
     s.a = ease(s.a, target, 2.2, dt);
     const tuck = Math.max(sn.flinch, sn.act.b('tuck') * (i === (sn.act.side > 0 ? 0 : 1) ? 1 : 0.6));
-    s.len = ease(s.len, 1 - tuck * 0.72, tuck > s.lenT ? 12 : 1.4, dt);
+    s.len = ease(s.len, (1 - tuck * 0.72) * (1 - 0.16 * sn.seen), tuck > s.lenT ? 12 : 1.4, dt);
     s.lenT = tuck;
-    s.lx = ease(s.lx, clamp(Math.cos(toP), -1, 1) * attend, 4, dt);
-    s.ly = ease(s.ly, clamp(Math.sin(toP), -1, 1) * attend, 4, dt);
+    s.lx = ease(s.lx, clamp(Math.cos(toP), -1, 1) * attend * (1 - sn.seen), 4, dt);
+    s.ly = ease(s.ly, clamp(Math.sin(toP), -1, 1) * attend * (1 - sn.seen), 4, dt);
   }
 }
 function makeSnail(o) {
@@ -521,7 +524,7 @@ let lateWave = 0;
 layer({
   id: 'latecomers', z: F.zOf(472),
   hit: (x, y) => late.some((sn) => Math.abs(x - sn.x) < 70 && y > sn.y - 90 && y < sn.y + 6),
-  update(dt, t, L) { for (const sn of late) stepStalks(sn, dt, t); lateWave = ease(lateWave, L.hovered ? 1 : 0, 3, dt); for (const b of lateRiders) b.step(dt); for (const sn of late) sn.lower = -lateWave * 0.4; },
+  update(dt, t, L) { for (const sn of late) stepStalks(sn, dt, t, L); lateWave = ease(lateWave, L.hovered ? 1 : 0, 3, dt); for (const b of lateRiders) b.step(dt); for (const sn of late) sn.lower = -lateWave * 0.4; },
   draw(g, t) {
     late.forEach((sn, i) => {
       const S = sn.S;
@@ -586,7 +589,7 @@ function snailLayer(sn, z, extra) {
       if (!sn.hitPath) { sn.hitPath = new Path2D(); if (sn.sp) { for (const w of sn.sp.ws) sn.hitPath.addPath(F.bandPath(w)); const [ax, ay] = sn.sp.apex; sn.hitPath.rect(ax - 30, ay - 70, 60, 80); } else sn.hitPath.addPath(sn.gl.outline); }
       return hitCtx.isPointInPath(sn.hitPath, lx, ly) || hitCtx.isPointInPath(sn.hitPath, lx + 8, ly) || hitCtx.isPointInPath(sn.hitPath, lx - 8, ly) || (sx > -sn.L * 0.5 && sx < sn.L * 0.55 && ly > -sn.L * 0.3 && ly < 4);
     },
-    update(dt, t, L) { stepStalks(sn, dt, t); if (extra.tick) extra.tick(dt, t, L); },
+    update(dt, t, L) { stepStalks(sn, dt, t, L); if (extra.tick) extra.tick(dt, t, L); },
     draw(g, t, L) {
       const S = sn.S, bob = Math.sin(t * 0.9 + sn.ph) * 0.8;
       g.save(); g.translate(sn.x, sn.y); g.scale(S * sn.dir, S);
