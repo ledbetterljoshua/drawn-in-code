@@ -164,3 +164,14 @@ Five worst (mine, at thumbnail size):
 4. **Snowfall invisible at full frame.** → flakes 2× bigger, plus 26 near, soft, big flakes.
 5. **Cabinets float on the rock.** → shelves of harder stone run partway round between cabinet rows
    (first try ran one all the way round: a wedding-cake ring; now broken into pieces).
+
+## Round 7
+
+Five worst (mine):
+1. **Bats read as dark drips** — a named story beat lost. → 1.5× bigger, a lilac belly and a blue lamp
+   rim so they separate from the dark face; generous hit area.
+2. **Bedding seams ran round like barrel hoops** (the strongest "built tower" cue left). → seams wander
+   (two octaves of noise), come in shorter broken lengths, softer except the hard beds.
+3. **Rock lips over cabinet corners still read as blots.** → removed; the ledges do that job better.
+4. **Foreground slabs had flat box bottoms on the phone.** → run off the bottom of any screen.
+5. **Snow strip on every cabinet top** (critic's copy-paste note). → about 60%, drifted.

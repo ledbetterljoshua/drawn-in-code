@@ -422,8 +422,9 @@ function bat(g, s, a, d, H) {
     }
   }
   const body = curve([[0, 2.5 * s], [5 * s, 6 * s], [5.4 * s, 14 * s], [2.4 * s, 20 * s], [-2.4 * s, 20 * s], [-5.4 * s, 14 * s], [-5 * s, 6 * s]]);
-  ink(g, body, '#3e2e3c', lw);
-  g.fillStyle = '#5a4456'; g.fill(ell(1.6 * s, 10 * s, 2 * s, 6 * s));
+  ink(g, body, '#4a3848', lw);
+  g.fillStyle = '#7a6490'; g.fill(ell(2 * s, 10 * s, 2.2 * s, 6.4 * s));
+  g.fillStyle = 'rgba(170,190,255,0.45)'; g.fill(ell(-3 * s, 11 * s, 1.4 * s, 6 * s));
   // folded wing ribs
   g.lineWidth = 0.6; g.strokeStyle = '#1e1420';
   g.beginPath(); g.moveTo(-3 * s, 5 * s); g.lineTo(-2 * s, 17 * s); g.moveTo(3 * s, 5 * s); g.lineTo(2 * s, 17 * s); g.stroke();
@@ -594,7 +595,7 @@ for (const d of D) {
   layer({
     id: 'drawer-' + d.i, z: 20 + d.i * 0.001,
     hit(x, y) {
-      if (d.guest === 'bat' && d.handle) return Math.abs(x - d.handle[0]) < 14 * d.hs + 6 && y > d.handle[1] - 4 && y < d.handle[1] + 34 * d.hs + 6 || inQ(d.q, x, y, 0, 0);
+      if (d.guest === 'bat' && d.handle) return Math.abs(x - d.handle[0]) < 16 && y > d.handle[1] - 4 && y < d.handle[1] + 44 || inQ(d.q, x, y, 0, 0);
       return inQ(d.q, x, y, 1, d.o > 0.1 ? 18 * d.hs + 8 : 2);
     },
     onEnter() { d.sv += clamp(P.vx * 0.003, -0.8, 0.8); d.stir = 1; },
@@ -695,7 +696,7 @@ for (const d of D) {
         const H = OW.qat(r.f, 0.5, 0.66);
         if (d.hasTag) drawTag(g, d, H, d.hs * 1.05, d.read, t);
       } else {
-        if (d.guest === 'bat' && d.handle) bat(g, clamp(d.w / 70, 0.6, 1.2), anim, d, [d.handle[0], d.handle[1] + 2]);
+        if (d.guest === 'bat' && d.handle) bat(g, clamp(d.w / 50, 0.9, 1.6), anim, d, [d.handle[0], d.handle[1] + 2]);
         if (d.hasTag && d.handle) drawTag(g, d, d.handle, d.hs * 1.05, d.read, t);
       }
       g.restore();

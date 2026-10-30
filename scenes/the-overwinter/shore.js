@@ -243,7 +243,7 @@ layer({
     for (const [x, y, w, h] of rocks) {
       // angular slabs of the same bedded stone as the stack, tilted, with flat tops
       const tilt = (R() - 0.5) * 0.3;
-      const pts = [[x - w, y + h], [x - w * 0.95, y - h * 0.3], [x - w * 0.7, y - h * 0.85], [x - w * 0.2, y - h - tilt * w], [x + w * 0.35, y - h * 0.95 + tilt * w * 0.5], [x + w * 0.8, y - h * 0.6 + tilt * w], [x + w, y - h * 0.1], [x + w, y + h]];
+      const pts = [[x - w, y + 3000], [x - w * 0.95, y - h * 0.3], [x - w * 0.7, y - h * 0.85], [x - w * 0.2, y - h - tilt * w], [x + w * 0.35, y - h * 0.95 + tilt * w * 0.5], [x + w * 0.8, y - h * 0.6 + tilt * w], [x + w, y - h * 0.1], [x + w, y + 3000]];
       const p = poly(pts.map(([px, py]) => [px + (R() - 0.5) * 6, py + (R() - 0.5) * 4]));
       ink(g, p, '#120e1a', 3.4);
       g.save(); g.clip(p);

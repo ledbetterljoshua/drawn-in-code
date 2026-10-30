@@ -84,7 +84,7 @@ function drawRock(g) {
     v += th;
   }
   OW.beds = beds;
-  const line = (vv, ua = -0.5, ub = 1.5) => { const pts = []; for (let u = ua; u <= ub; u += 0.05) { const p = drum(u, vv + noise(u * 6 + vv * 40) * 0.004); p[1] += OW.dip(u, vv); pts.push(p); } return pts; };
+  const line = (vv, ua = -0.5, ub = 1.5) => { const pts = []; for (let u = ua; u <= ub; u += 0.05) { const p = drum(u, vv + noise(u * 6 + vv * 40) * 0.011 + noise(u * 19 + vv * 90) * 0.004); p[1] += OW.dip(u, vv); pts.push(p); } return pts; };
   for (const [v0, v1, r] of beds) {
     const top = line(v1), bot = line(v0);
     const y = (top[20][1] + bot[20][1]) / 2;
@@ -95,11 +95,11 @@ function drawRock(g) {
     const ua = -0.5 + R() * 0.5;
     let u = ua;
     while (u < 1.5) {
-      const len = 0.1 + R() * 0.45;
-      if (R() < 0.75) {
+      const len = 0.06 + R() * 0.3;
+      if (R() < 0.6) {
         const seam = line(v0, u, u + len);
         if (seam.length > 1) {
-          g.lineWidth = hard ? 2.4 : 1.2; g.strokeStyle = 'rgba(16,10,24,0.65)'; g.stroke(curve(seam, false));
+          g.lineWidth = hard ? 2.2 : 1.1; g.strokeStyle = `rgba(16,10,24,${hard ? 0.55 : 0.35})`; g.stroke(curve(seam, false));
           if (hard) { g.lineWidth = 1.3; g.strokeStyle = `rgba(230,160,150,${0.1 + OW.warmAt(y) * 0.32})`; g.stroke(curve(seam.map(([x, yy]) => [x, yy + 2.2]), false)); }
         }
       }
@@ -250,14 +250,14 @@ function drawCabinet(g, cab) {
     ink(g, qpath(ext), T.lit, 1.4);
   }
   for (const d of cab.drawers) drawDrawerClosed(g, d, R);
-  // snow lodged along the cabinet's top, thicker at one end where it drifted
-  {
+  // snow lodged along the cabinet's top, thicker at one end where it drifted (not every one)
+  if (R() < 0.6) {
     const a = q[0], b = q[1], dir = R() < 0.5 ? 1 : -1, n = 8, pts = [], bot = [];
     for (let i = 0; i <= n; i++) { const t = i / n, th = (1.2 + (dir > 0 ? t : 1 - t) * 3.5) * (0.7 + R() * 0.6); pts.push([lerp(a[0], b[0], t), lerp(a[1], b[1], t) - th]); bot.push([lerp(a[0], b[0], t), lerp(a[1], b[1], t) + 1.4]); }
     ink(g, curve(pts.concat(bot.reverse())), C.snow, 0.8, C.snowShade);
   }
   // the rock creeps over the cabinet's edge in places: a lip of stone over a corner
-  if (R() < 0.55) {
+  if (false) {
     const side = R() < 0.5 ? 0 : 1, c = side ? q[1] : q[0], w = 14 + R() * 18, h = 10 + R() * 16, sx = side ? -1 : 1;
     const lump = curve([[c[0] - sx * 10, c[1] - 6], [c[0] + sx * w * 0.6, c[1] - 4], [c[0] + sx * w, c[1] + h * 0.3], [c[0] + sx * w * 0.5, c[1] + h * 0.6], [c[0] + sx * 3, c[1] + h], [c[0] - sx * 8, c[1] + h * 0.7]]);
     g.save(); g.shadowColor = 'rgba(6,4,12,0.5)'; g.shadowBlur = 5; g.shadowOffsetY = 3; ink(g, lump, mix(rockAt(c[1]), '#4a3e5c', 0.45), 1.2); g.restore();
