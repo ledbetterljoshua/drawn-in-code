@@ -340,7 +340,7 @@ layer({
 
 // ============================================================ the wrack bank in the near right corner
 layer({
-  id: 'wrack', z: 41.5, still: true,
+  id: 'wrack', z: 40.5, still: true,
   draw(g) {
     const v = st.view;
     const bank = curve([[1860, 1130], [1900, 1095], [1990, 1076], [2100, 1068], [2220, 1060], [v.x1 + 40, 1058], [v.x1 + 40, 1130]], true);
@@ -382,3 +382,34 @@ layer({
 });
 })();
 
+
+// the near bar: a low ridge of dry, warm sand along the very front, where we're standing
+(() => {
+const D = Drawn, F = Fair;
+const { grad, curve, ell, rng, ink, st, layer } = D;
+layer({
+  id: 'near-bar', z: 39.5, still: true,
+  draw(g) {
+    const v = st.view, r = rng(61);
+    const crest = [];
+    for (let x = v.x0 - 40; x <= v.x1 + 80; x += 60) crest.push([x, 1092 + Math.sin(x * 0.006) * 10 + Math.sin(x * 0.017 + 1) * 5]);
+    const bar = new Path2D(); bar.moveTo(v.x0 - 40, v.y1 + 20); crest.forEach(([x, y]) => bar.lineTo(x, y)); bar.lineTo(v.x1 + 80, v.y1 + 20); bar.closePath();
+    g.fillStyle = grad(g, 0, 1080, 0, v.y1, ['#d5a874', '#c08e5e', '#a87a54']); g.fill(bar);
+    // the lit crest facing the sun, and the cool lee where it drops toward the wet sand
+    g.save(); g.clip(bar);
+    g.fillStyle = 'rgba(255,226,180,0.55)'; for (const [x, y] of crest) g.fill(ell(x, y + 4, 40, 4));
+    g.fillStyle = 'rgba(90,60,70,0.25)'; g.fillRect(v.x0, v.y1 - 30, v.x1 - v.x0, 40);
+    // wind-blown dry ripples, a trail of footprints, a few big shells
+    g.strokeStyle = 'rgba(140,96,70,0.35)'; g.lineWidth = 1.4;
+    for (let i = 0; i < 40; i++) { const x = v.x0 + r() * (v.x1 - v.x0), y = 1100 + r() * 50; g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + 20, y - 4, x + 40 + r() * 30, y + 1); g.stroke(); }
+    for (let k = 0; k < 16; k++) { const x = 600 + k * 34, y = 1112 + Math.sin(k * 0.7) * 6 + (k % 2) * 8; g.fillStyle = 'rgba(120,80,64,0.35)'; g.fill(ell(x, y, 5, 2.4)); }
+    for (const [x, y, c] of [[980, 1118, '#f3d3c0'], [1560, 1126, '#e9e1d2'], [250, 1130, '#efcfb6']]) {
+      F.contact(g, x, y + 3, 14, 0.5);
+      ink(g, curve([[x - 12, y + 2], [x - 10, y - 8], [x, y - 12], [x + 10, y - 8], [x + 12, y + 2]]), c, 1.4);
+      g.strokeStyle = 'rgba(150,100,100,0.5)'; g.lineWidth = 0.8; for (let k = -2; k <= 2; k++) { g.beginPath(); g.moveTo(x, y + 1); g.lineTo(x + k * 5, y - 10 + Math.abs(k) * 2); g.stroke(); }
+    }
+    g.restore();
+    g.lineWidth = 1.2; g.strokeStyle = 'rgba(150,104,80,0.5)'; g.beginPath(); crest.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.stroke();
+  },
+});
+})();

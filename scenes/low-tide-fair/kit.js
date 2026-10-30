@@ -21,7 +21,7 @@ F.far = (y) => clamp(1 - (y - F.HZ) / 330, 0, 1) ** 1.6;
 
 // the sun is low on the left and a little in front of us; shadows run right and slightly away
 F.SUN = { x: -900, y: 120 };
-F.SHX = 1.45; F.SHY = 0.16;
+F.SHX = 0.95; F.SHY = 0.12;
 
 const LINE = (D.style.line = '#3b2433');
 F.LINE = LINE;
@@ -183,7 +183,7 @@ F.folk = (g, x, y, o) => {
   const sc = o.sc, dir = o.dir || 1, px = 30 * sc; // px: height on screen
   const tiny = px < 16, small = px < 26;
   const line = o.line || F.inkAt(hz);
-  const lw = (clamp(0.8 + sc * 0.75, 0.7, 2.4) / sc) * (o.lwk || 1);
+  const lw = (clamp(0.8 + sc * 0.9, 0.7, 2.8) / sc) * (o.lwk || 1);
   const coat = hz ? F.mix(o.coat || '#d65a4a', F.HAZE, hz) : (o.coat || '#d65a4a');
   const coatSh = F.mix(coat, '#4a3a6a', 0.38);
   const acc = o.acc ? (hz ? F.mix(o.acc, F.HAZE, hz) : o.acc) : null;

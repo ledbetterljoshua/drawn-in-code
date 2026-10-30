@@ -53,9 +53,15 @@ function skinNet(g, sn, x0, x1, y0, y1, ang, n, seed) {
     g.translate(0, -L * 0.004); g.lineWidth = Math.max(0.4, L * 0.003); g.strokeStyle = F.rgba(sk.lit, 0.55); g.stroke(); g.translate(0, L * 0.004);
   }
 }
-function drawFoot(g, sn, t) {
+function drawFoot(g, sn, t, mode = 'all') {
   const L = sn.L, sk = sn.skin;
-  const br = 1 + Math.sin(t * 0.9 + sn.ph) * 0.025;
+  if (mode === 'live') {
+    // only the muscle waves running forward along the skirt, over the cached body
+    g.strokeStyle = F.rgba(sk.shade, 0.6); g.lineWidth = Math.max(0.5, L * 0.003);
+    for (let i = 0; i < 26; i++) { const x = -L * 0.5 + (i / 26) * L + ((t * 0.02 * L) % (L / 26)); g.beginPath(); g.moveTo(x, -L * 0.003); g.lineTo(x + L * 0.006, -L * 0.022); g.stroke(); }
+    return;
+  }
+  const br = mode === 'static' ? 1 : 1 + Math.sin(t * 0.9 + sn.ph) * 0.025;
   const body = snailBodyPath(L, br, sn.fat || 1);
   ink(g, body, sk.base, sn.lw * 1.15);
   g.save(); g.clip(body);
@@ -70,10 +76,10 @@ function drawFoot(g, sn, t) {
   g.beginPath(); g.moveTo(-L * 0.55, 2);
   for (let i = 0; i <= 40; i++) { const u = i / 40, x = lerp(-L * 0.53, L * 0.54, u); g.lineTo(x, -L * 0.024 - Math.sin(u * 26 - t * 2.4 + sn.ph) * L * 0.005); }
   g.lineTo(L * 0.6, 2); g.closePath(); g.fill();
-  g.strokeStyle = F.rgba(sk.shade, 0.6); g.lineWidth = Math.max(0.5, L * 0.003);
-  for (let i = 0; i < 26; i++) { const x = -L * 0.5 + (i / 26) * L + ((t * 0.02 * L) % (L / 26)); g.beginPath(); g.moveTo(x, -L * 0.003); g.lineTo(x + L * 0.006, -L * 0.022); g.stroke(); }
+  if (mode !== 'static') { g.strokeStyle = F.rgba(sk.shade, 0.6); g.lineWidth = Math.max(0.5, L * 0.003);
+  for (let i = 0; i < 26; i++) { const x = -L * 0.5 + (i / 26) * L + ((t * 0.02 * L) % (L / 26)); g.beginPath(); g.moveTo(x, -L * 0.003); g.lineTo(x + L * 0.006, -L * 0.022); g.stroke(); } }
   // mottling: soft darker patches the way a garden snail's skin is blotched
-  { const r = rng(sn.seed + 21); g.fillStyle = F.rgba(sk.spot, 0.22); for (let i = 0; i < 14; i++) g.fill(ell(-L * 0.48 + r() * L * 0.96, -L * 0.035 - r() * L * 0.07, L * (0.02 + r() * 0.03), L * (0.008 + r() * 0.01), undefined, (r() - 0.5) * 0.4)); }
+  { const r = rng(sn.seed + 21); g.fillStyle = F.rgba(sk.spot, 0.13); for (let i = 0; i < 14; i++) g.fill(ell(-L * 0.48 + r() * L * 0.96, -L * 0.035 - r() * L * 0.07, L * (0.02 + r() * 0.03), L * (0.008 + r() * 0.01), undefined, (r() - 0.5) * 0.4)); }
   skinNet(g, sn, -L * 0.48, L * 0.45, -L * 0.1, -L * 0.035, 0, 34, sn.seed);
   // a wet sheen along the back, and the cool shadow the shell throws onto the body
   g.strokeStyle = F.rgba(sk.sheen, 0.9); g.lineWidth = Math.max(1, L * 0.009);
@@ -82,15 +88,20 @@ function drawFoot(g, sn, t) {
   g.restore();
 }
 // head, neck and tentacles; eyestalks track the pointer and flinch at fast movement
-function drawHead(g, sn, t) {
+// mode 'neck' paints only the neck at rest (for the cache); 'live' paints the moving parts and calls
+// blitNeck(dx, dy) to lay the cached neck where the head has swayed to
+function drawHead(g, sn, t, mode = 'all', blitNeck) {
   const L = sn.L, sk = sn.skin, lw = sn.lw;
-  const sway = Math.sin(t * 0.6 + sn.ph) * L * 0.01 + sn.nod * L * 0.02;
-  const hx = L * 0.45 + sway, hy = -L * 0.215 + Math.sin(t * 0.9 + sn.ph) * L * 0.004 + sn.nod * L * 0.05;
+  const hx0 = L * 0.45, hy0 = -L * 0.215;
+  const sway = mode === 'neck' ? 0 : Math.sin(t * 0.6 + sn.ph) * L * 0.01 + sn.nod * L * 0.02;
+  const hx = hx0 + sway, hy = mode === 'neck' ? hy0 : hy0 + Math.sin(t * 0.9 + sn.ph) * L * 0.004 + sn.nod * L * 0.05;
   const neck = curve([
     [L * 0.16, -L * 0.1], [L * 0.3, -L * 0.165], [hx - L * 0.05, hy - L * 0.055], [hx + L * 0.015, hy - L * 0.075], [hx + L * 0.07, hy - L * 0.04],
     [hx + L * 0.085, hy + L * 0.015], [hx + L * 0.06, hy + L * 0.05], [L * 0.475, -L * 0.065], [L * 0.535, -L * 0.012], [L * 0.5, 0.5], [L * 0.28, 0.5],
   ]);
-  drawStalk(g, sn, sn.stalks[1], hx - L * 0.02, hy - L * 0.06, t, true);
+  if (mode !== 'neck') drawStalk(g, sn, sn.stalks[1], hx - L * 0.02, hy - L * 0.06, t, true);
+  if (mode === 'live') blitNeck(hx - hx0, hy - hy0);
+  else {
   ink(g, neck, sk.base, lw * 1.15);
   g.save(); g.clip(neck);
   const sx = -sn.dir;
@@ -103,11 +114,13 @@ function drawHead(g, sn, t) {
   g.beginPath(); g.moveTo(L * 0.25 - sx * L * 0.0, -L * 0.07); g.quadraticCurveTo(L * 0.36, -L * 0.13, hx - L * 0.0, hy + L * 0.0); g.stroke();
   g.strokeStyle = 'rgba(240,190,150,0.35)'; g.lineWidth = L * 0.018;
   g.beginPath(); g.moveTo(L * 0.42, -L * 0.03); g.quadraticCurveTo(L * 0.48, -L * 0.05, hx + L * 0.06, hy + L * 0.05); g.stroke();
-  { const r = rng(sn.seed + 23); g.fillStyle = F.rgba(sk.spot, 0.22); for (let i = 0; i < 9; i++) g.fill(ell(L * 0.24 + r() * L * 0.22, -L * 0.05 - r() * L * 0.15, L * (0.015 + r() * 0.022), L * (0.01 + r() * 0.01), undefined, -0.6)); }
+  { const r = rng(sn.seed + 23); g.fillStyle = F.rgba(sk.spot, 0.12); for (let i = 0; i < 9; i++) g.fill(ell(L * 0.24 + r() * L * 0.22, -L * 0.05 - r() * L * 0.15, L * (0.015 + r() * 0.022), L * (0.01 + r() * 0.01), undefined, -0.6)); }
   skinNet(g, sn, L * 0.22, hx + L * 0.04, hy - L * 0.03, -L * 0.04, -0.55, 18, sn.seed + 9);
   g.strokeStyle = F.rgba(sk.sheen, 0.8); g.lineWidth = Math.max(0.8, L * 0.008);
   g.beginPath(); g.moveTo(L * 0.27, -L * 0.135); g.quadraticCurveTo(hx - L * 0.06, hy - L * 0.06, hx + L * 0.01, hy - L * 0.065); g.stroke();
   g.restore();
+  }
+  if (mode === 'neck') return;
   // lower tentacles: two short soft feelers testing the sand
   for (const [k, ph, far] of [[1, 0, false], [0.75, 1.7, true]]) {
     const bx = hx + L * (far ? 0.055 : 0.07), by = hy + L * 0.04, a = 0.75 + Math.sin(t * 1.3 + ph + sn.ph) * 0.18;
@@ -177,6 +190,19 @@ function makeSnail(o) {
   sn.act = F.actor(sn.seed + 40, [['look', 3], ['tuck', 1.6], ['look', 2.4]], [3, 9]);
   return sn;
 }
+// a bitmap drawn in a snail's own (flipped) local units, blitted back inside that same transform
+function localSprite(sn, lx0, ly0, lw_, lh, fn) {
+  const R = st.R * sn.S, c = document.createElement('canvas');
+  c.width = Math.max(1, Math.ceil(lw_ * R)); c.height = Math.max(1, Math.ceil(lh * R));
+  const g = c.getContext('2d'); g.setTransform(R, 0, 0, R, -lx0 * R, -ly0 * R); g.lineJoin = g.lineCap = 'round';
+  fn(g);
+  return { c, x0: lx0, y0: ly0, w: lw_, h: lh };
+}
+function bakeBody(sn) {
+  const L = sn.L;
+  sn.footSp = localSprite(sn, -L * 0.6, -L * 0.25, L * 1.2, L * 0.26, (g) => drawFoot(g, sn, 0, 'static'));
+  sn.neckSp = localSprite(sn, L * 0.1, -L * 0.36, L * 0.56, L * 0.38, (g) => drawHead(g, sn, 0, 'neck'));
+}
 // local snail space → artboard
 const toArt = (sn, lx, ly) => [sn.x + lx * sn.S * sn.dir, sn.y + ly * sn.S];
 
@@ -203,8 +229,8 @@ function drawShadow(g, sn, a = 0.4) {
 }
 
 // ============================================================ the grandmother
-const gran = makeSnail({ id: 'gran', x: 800, y: 790, dir: 1, k: 1, L: 470, skin: 'gran', seed: 11, shellX: -0.08, fat: 1.35 });
-gran.sp = F.spire({ x: -36, y: -66, w: 290, h: 112, n: 9, rw: 0.8, rh: 0.84, lean: -5, body: 1.4, slope: 0.1, lw: 2.6, eyeY: (HZ - 790) / pxu(790) });
+const gran = makeSnail({ id: 'gran', x: 800, y: 790, dir: 1, k: 1, L: 480, skin: 'gran', seed: 11, shellX: -0.08, fat: 1.6 });
+gran.sp = F.spire({ x: -36, y: -84, w: 290, h: 112, n: 9, rw: 0.8, rh: 0.84, lean: -5, body: 1.4, slope: 0.17, lw: 2.6, eyeY: (HZ - 790) / pxu(790) });
 gran.trail = [[700, 430], [640, 520], [600, 610], [640, 700], [700, 770], [760, 793]];
 gran.trailW = 110;
 const SHELL_GRAN = { lit: '#fff3dd', base: '#f0d9bd', shade: '#c49ea6', bounce: '#e4b395', band: '#c0623f', band2: '#8a4752', growth: '#a98272', line: '#3b2433' };
@@ -229,7 +255,11 @@ function granTown(g) {
     const w = ws[i];
     const [x, y, k] = F.bandAt(w, a, v);
     const sz = clamp(w.h * 0.26, 9, 30);
+    // windows tilt with the suture, which climbs the helix to the right
+    const tilt = -Math.atan2(2 * w.s, 2 * w.rb) * 0.85 * k;
+    g.save(); g.translate(x, y); g.rotate(tilt); g.translate(-x, -y);
     F.window(g, x, y, sz, sz * 1.35, k, { shutters: r() < 0.6 ? ['#5d8aa0', '#7a9c6a', '#c46a5a', '#e2b45a'][i % 4] : null, box: r() < 0.5 ? ['#e07f62', '#f2c95c', '#f4efe6'][i % 3] : null });
+    g.restore();
     gran.winSpots.push([x, y, sz * Math.max(0.25, k), sz * 1.35, i]);
   }
   // ledges along the sutures: a boardwalk with posts and a rope rail, and stairs between them
@@ -302,11 +332,11 @@ function granTown(g) {
   gran.bellAt = [ax, cy - ch + 4];
   gran.flagAt = [ax, cy - ch - 20];
 }
-gran.box = [-270, -730, 220, 20];
+gran.box = [-270, -760, 220, 20];
 
 // ============================================================ the tea-house
 const tea = makeSnail({ id: 'tea', x: 1470, y: 690, dir: -1, k: 1.22, L: 300, skin: 'tea', seed: 23, shellX: -0.05 });
-tea.gl = F.globe({ x: 20, y: -30, R: 118, turns: 2.7, apex: [32, -26], spin: 0.6, lw: 2.6 });
+tea.gl = F.globe({ x: 20, y: -30, R: 118, turns: 2.7, apex: [32, -26], spin: 0.6, lw: 2.4 });
 tea.trail = [[1640, 404], [1590, 470], [1530, 560], [1490, 630], [1480, 690]];
 tea.trailW = 100;
 const SHELL_TEA = { lit: '#fbe7c6', base: '#e9be8c', shade: '#ad7f84', bounce: '#e8a582', band: '#8a4a3d', band2: '#c76d48', growth: '#9b6a55', line: '#3b2433' };
@@ -363,7 +393,7 @@ tea.box = [-170, -270, 160, 10];
 
 // ============================================================ the bookbinder
 const book = makeSnail({ id: 'book', x: 345, y: 585, dir: 1, k: 0.95, L: 310, skin: 'book', seed: 37, shellX: -0.1 });
-book.sp = F.spire({ eyeY: (HZ - 585) / (pxu(585) * 0.95), x: -30, y: -38, w: 230, h: 86, n: 5, rw: 0.7, rh: 0.8, lean: -4, body: 1.25, slope: 0.12, lw: 2.8 });
+book.sp = F.spire({ eyeY: (HZ - 585) / (pxu(585) * 0.95), x: -30, y: -44, w: 230, h: 86, n: 5, rw: 0.7, rh: 0.8, lean: -4, body: 1.25, slope: 0.16, lw: 2.2 });
 book.trail = [[180, 404], [230, 470], [300, 540], [330, 585]];
 book.trailW = 90;
 const SHELL_BOOK = { lit: '#f4ead2', base: '#d9cba7', shade: '#9e92a2', bounce: '#d8b292', band: '#6b7a5c', band2: '#a3603f', growth: '#8a7d70', line: '#3b2433' };
@@ -397,7 +427,7 @@ book.box = [-200, -380, 160, 10];
 
 // ============================================================ the fishmonger
 const fish = makeSnail({ id: 'fish', x: 1905, y: 512, dir: -1, k: 1, L: 320, skin: 'fish', seed: 51, shellX: -0.05 });
-fish.gl = F.globe({ x: 10, y: -28, R: 100, turns: 3.4, apex: [14, -10], spin: 1.0, lw: 2.8 });
+fish.gl = F.globe({ x: 10, y: -28, R: 100, turns: 3.4, apex: [14, -10], spin: 1.0, lw: 2.0 });
 fish.trail = [[2120, 400], [2060, 440], [1980, 480], [1920, 512]];
 fish.trailW = 90;
 const SHELL_FISH = { lit: '#f3e6d6', base: '#d8c0b6', shade: '#9c8aa6', bounce: '#d9ab98', rib: '#a07c88', growth: '#8a7080', line: '#3b2433' };
@@ -429,7 +459,7 @@ fish.box = [-140, -260, 140, 10];
 // ============================================================ the youngster
 const young = makeSnail({ id: 'young', x: 1720, y: 985, dir: -1, k: 1.05, L: 140, skin: 'young', seed: 67, shellX: -0.05 });
 young.gl = F.globe({ x: 6, y: -12, R: 44, turns: 2.4, apex: [12, -10], spin: 0.3, lw: 1.6 });
-young.trail = [[1500, 470], [1540, 560], [1620, 700], [1690, 850], [1720, 985]];
+young.trail = [[2200, 900], [2060, 930], [1900, 960], [1800, 978]];
 young.trailW = 40;
 const SHELL_YOUNG = { lit: '#fff0dc', base: '#f2c9a2', shade: '#c08f96', bounce: '#f0b18f', band: '#d9785a', band2: '#a75c6a', growth: '#b27e70', line: '#3b2433' };
 function youngTown(g) {
@@ -451,7 +481,7 @@ young.box = [-70, -130, 80, 10];
 
 // ============================================================ the sleeper
 const sleep = makeSnail({ id: 'sleep', x: 120, y: 520, dir: 1, k: 0.9, L: 200, skin: 'gran', seed: 71 });
-sleep.gl = F.globe({ x: 0, y: -4, R: 82, turns: 2.8, apex: [-18, -14], spin: 0.2, lw: 2.8 });
+sleep.gl = F.globe({ x: 0, y: -4, R: 82, turns: 2.8, apex: [-18, -14], spin: 0.2, lw: 2.0 });
 sleep.trail = [[60, 404], [90, 470], [118, 520]];
 sleep.trailW = 70;
 const SHELL_SLEEP = { lit: '#efe2cf', base: '#d3c0ad', shade: '#988aa0', bounce: '#d2a892', band: '#7b6a8a', band2: '#a3705a', growth: '#8a7a7a', line: '#3b2433' };
@@ -511,6 +541,7 @@ F.SNAILS = [gran, tea, book, fish, young, sleep, ...late];
 F.gran = gran; F.tea = tea; F.young = young; F.fishSnail = fish; F.book = book;
 
 onLayout(() => {
+  for (const sn of [gran, tea, book, fish, young]) bakeBody(sn);
   bakeShell(gran, gran.box, (g) => { F.paintSpire(g, gran.sp, SHELL_GRAN, 11); granTown(g); });
   bakeShell(tea, tea.box, (g) => { F.paintGlobe(g, tea.gl, SHELL_TEA, 23); teaTown(g); });
   bakeShell(book, book.box, (g) => { F.paintSpire(g, book.sp, SHELL_BOOK, 37); bookTown(g); });
@@ -523,13 +554,13 @@ onLayout(() => {
 
 // ------------------------------------------------------------ shadows and reflections (one layer each, under everything that stands)
 layer({
-  id: 'snail-shadows', z: 7, still: true,
+  id: 'snail-shadows', z: 5.2, still: true,
   draw(g) {
-    for (const sn of F.SNAILS) drawShadow(g, sn, 0.5);
+    for (const sn of F.SNAILS) drawShadow(g, sn, sn === gran ? 0.62 : 0.52);
   },
 });
 layer({
-  id: 'reflections', z: 6.5, still: true,
+  id: 'reflections', z: 5.1, still: true,
   draw(g) {
     g.save(); g.clip(F.water);
     for (const sn of [gran, tea, young, book]) {
@@ -551,12 +582,15 @@ function snailLayer(sn, z, extra) {
     draw(g, t, L) {
       const S = sn.S, bob = Math.sin(t * 0.9 + sn.ph) * 0.8;
       g.save(); g.translate(sn.x, sn.y); g.scale(S * sn.dir, S);
-      drawFoot(g, sn, t);
+      const fs = sn.footSp, br = 1 + Math.sin(t * 0.9 + sn.ph) * 0.025;
+      g.drawImage(fs.c, fs.x0, fs.y0 + fs.h * (1 - br) * 0.9, fs.w, fs.h * (1 + (br - 1) * 0.9));
+      drawFoot(g, sn, t, 'live');
       g.restore();
       if (extra.behind) extra.behind(g, t, L);
       blit(g, sn.shell, 0, bob * S * 0.6);
       g.save(); g.translate(sn.x, sn.y); g.scale(S * sn.dir, S);
-      drawHead(g, sn, t);
+      const ns = sn.neckSp;
+      drawHead(g, sn, t, 'live', (dx, dy) => g.drawImage(ns.c, ns.x0 + dx * 0.6, ns.y0 + dy * 0.6, ns.w, ns.h));
       g.restore();
       if (extra.front) { g.save(); g.translate(sn.x, sn.y + bob * S * 0.6); g.scale(S, S); extra.front(g, t, L); g.restore(); }
     },

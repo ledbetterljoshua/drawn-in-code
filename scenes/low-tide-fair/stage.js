@@ -357,7 +357,7 @@
     requestAnimationFrame(frame);
   }
 
-  window.__drawn = { ready: readyP };
+  window.__drawn = { ready: readyP, layers };
   window.Drawn = {
     TAU, clamp, lerp, ease, rng, hash, noise, reduced,
     breeze, wind, setWind,

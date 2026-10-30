@@ -65,7 +65,7 @@ F.paintSpire = (g, sp, pal, seed = 1) => {
   // silhouette first, heavy, around the whole stack
   const all = new Path2D();
   for (const w of sp.ws) all.addPath(F.bandPath(w));
-  g.lineWidth = lw * 2.1; g.strokeStyle = pal.line || LINE; g.stroke(all);
+  g.lineWidth = lw * 1.6; g.strokeStyle = pal.line || LINE; g.stroke(all);
   for (const w of sp.ws) {
     const p = F.bandPath(w), { cx, yb, yt, rb, rt, h, s } = w;
     g.save(); g.clip(p);
@@ -147,7 +147,7 @@ F.globe = (o) => {
 F.paintGlobe = (g, gl, pal, seed = 1) => {
   const r = rng(seed), { cx, cy, R, ax, ay } = gl;
   const lw = gl.o.lw || 2.4;
-  g.lineWidth = lw * 2.1; g.strokeStyle = pal.line || LINE; g.stroke(gl.outline);
+  g.lineWidth = lw * 1.6; g.strokeStyle = pal.line || LINE; g.stroke(gl.outline);
   g.save(); g.clip(gl.outline);
   // a sphere lit from the low left
   g.fillStyle = radial(g, cx - R * 0.45, cy - R * 0.25, R * 0.05, R * 1.5, [[0, pal.lit], [0.35, pal.base], [0.75, pal.shade], [1, pal.shade]]);

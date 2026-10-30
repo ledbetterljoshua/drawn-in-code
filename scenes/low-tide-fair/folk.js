@@ -25,7 +25,7 @@ F.zOf = (y) => 8 + (y - HZ) / 40;
 
 let seaLook = 0;
 // resting arm angles [front, back]: hanging, hands on hips, hands behind, arms folded
-const REST = { hang: [-0.08, 0.12], hips: [0.55, -0.5], behind: [-0.55, 0.6], fold: [-1.15, -0.9] };
+const REST = { hang: [-0.08, 0.12], hips: [0.45, -0.4], behind: [-0.45, 0.5], swing: [0.18, -0.15] };
 D.on('tide-bell', () => { seaLook = 3.2; });
 
 // a folk: position, species, clothes, and its own clocks
@@ -35,7 +35,7 @@ function folk(o) {
   f.blinkC = F.blinker(nSeed * 3 + 1);
   // each has its own way of standing about, and its own build
   const rr = rng(nSeed * 97 + 5);
-  f.rest = o.rest || ['hang', 'hips', 'behind', 'hang', 'fold', 'behind'][Math.floor(rr() * 6)];
+  f.rest = o.rest || ['hang', 'hips', 'behind', 'hang', 'swing', 'behind'][Math.floor(rr() * 6)];
   f.wide = o.wide || 0.88 + rr() * 0.3; f.tall = o.tall || 0.92 + rr() * 0.16;
   f.act = F.actor(nSeed * 5 + 2, o.acts || [['look', 1.8], ['shift', 1.4], ['look', 2.4], ['scratch', 1.2]], [2, 7]);
   nSeed++;
@@ -122,6 +122,7 @@ layer({
     const audience = (front) => band.crowd.forEach((d, i) => {
       if ((d.y > band.y + 30) !== front) return;
       const c = Math.sin(b * Math.PI * 2 + i) * clap;
+      d.dir = d.x < band.x ? 1 : -1;
       drawFolk(g, d, t, clap > 0.05 ? { armR: lerp(REST[d.rest][0], -1.3 + c * 0.5, clap), armL: lerp(REST[d.rest][1], -1.1 - c * 0.5, clap), happy: clap > 0.5, bob: -Math.max(0, Math.sin(b * Math.PI + i)) * clap * 1.5, look: [d.dir * 0.5, 0] } : { look: [d.dir * 0.5, 0] });
     });
     audience(false);

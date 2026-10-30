@@ -102,6 +102,7 @@ layer({
   },
 });
 function drawPunter(g, p, t) {
+  p.dir = p.x < (RACE.x0 + RACE.x1) / 2 ? 1 : -1;
   const c = RACE.cheer, jump = c * Math.max(0, Math.sin(t * 8 + p.ph)) * 3;
   F.drawFolk(g, p, t, c > 0.1 ? { bob: -jump, armR: -2.5 + Math.sin(t * 9 + p.ph) * 0.4, armL: -2.0, happy: true, mouth: 0.7, look: [p.dir, 0] } : { look: [0.8 * p.dir, 0] });
 }
@@ -162,14 +163,91 @@ layer({
   },
 });
 
+// ============================================================ the parcel cart, tipped over under the bunting
+const cart = { x: 1150, y: 694, up: 0, folks: [F.makeFolk({ sp: 'otter', coat: '#3f6aa1', acc: '#e7a43c', dir: 1, hat: F.HATS.cap('#3f6aa1') }), F.makeFolk({ sp: 'vole', coat: '#efe2c8', dir: -1 })] };
+const parcels = [[-30, 6, 9, '#d6b27a'], [-16, 10, 7, '#c99a5a'], [8, 12, 8, '#e0c79a'], [26, 4, 6, '#b98a5a'], [-4, -2, 10, '#d8b88a']];
+layer({
+  id: 'cart', z: F.zOf(cart.y + 8),
+  hit: (x, y) => Math.abs(x - cart.x) < 70 && y > cart.y - 40 && y < cart.y + 24,
+  update(dt, t, L) { cart.up = ease(cart.up, L.hovered ? 1 : 0, L.hovered ? 1.4 : 0.35, dt); for (const f of cart.folks) F.stepFolk(f, dt); },
+  draw(g, t) {
+    const s = pxu(cart.y), x = cart.x, y = cart.y, u = F.smooth(cart.up);
+    // the cart: a box on two wheels, tipped on its side; righted when you look
+    g.save(); g.translate(x + 10 * s, y); g.rotate(lerp(1.15, 0, u));
+    F.castShadow(g, 0, 0, (g) => g.fillRect(-16 * s, -14 * s, 32 * s, 14 * s), 0.4);
+    F.plank(g, [-20 * s, -10 * s], [20 * s, -10 * s], 14 * s, F.WOOD, 31, 1.2);
+    F.post(g, 24 * s, -30 * s, -8 * s, 2 * s, F.WOOD, 1);
+    ink(g, circ(-8 * s, -2 * s, 6 * s), '#8a5a3a', 1.2); ink(g, circ(-8 * s, -2 * s, 1.8 * s), '#3b2433', 0.8);
+    g.restore();
+    // parcels: strewn about, then stacked back in
+    parcels.forEach(([px, py, ps, c], i) => {
+      const k = clamp(u * 1.6 - i * 0.12, 0, 1);
+      const sx = lerp(x + px * s, x + (-10 + i * 6) * s, k), sy = lerp(y + py * s, y - 18 * s - (i % 2) * ps * s, k) - Math.sin(k * Math.PI) * 10 * s;
+      F.contact(g, sx, y + py * s * (1 - k), ps * s * 0.8, 0.4 * (1 - k));
+      ink(g, poly([[sx - ps * s / 2, sy], [sx + ps * s / 2, sy], [sx + ps * s / 2, sy - ps * s * 0.8], [sx - ps * s / 2, sy - ps * s * 0.8]]), c, 0.9);
+      g.strokeStyle = '#8a4a3a'; g.lineWidth = 0.8; g.beginPath(); g.moveTo(sx, sy); g.lineTo(sx, sy - ps * s * 0.8); g.moveTo(sx - ps * s / 2, sy - ps * s * 0.4); g.lineTo(sx + ps * s / 2, sy - ps * s * 0.4); g.stroke();
+    });
+    cart.folks.forEach((f, i) => {
+      const bend = (1 - u) * (0.5 + 0.5 * Math.sin(t * 2 + i * 2));
+      F.drawFolk(g, f, t, { x: x + (i ? 44 : -42) * s, y: y + (i ? 10 : 4) * s, crouch: bend * 0.8, lean: (i ? -1 : 1) * bend * 0.3, armR: 0.4 + bend * 0.6, armL: 0.2 + bend * 0.5, happy: u > 0.9, mouth: u > 0.9 ? 0.4 : 0, look: [i ? -1 : 1, 0.6] });
+    });
+  },
+});
+
+// ============================================================ a picnic between the bookbinder and the tower
+const picnic = { x: 585, y: 622, wave: 0, gull: 0, folks: [F.makeFolk({ sp: 'hare', coat: '#a8689b', dir: 1, hat: F.HATS.straw() }), F.makeFolk({ sp: 'mole', coat: '#f2c95c', dir: -1 }), F.makeFolk({ sp: 'shrew', coat: '#6f9d58', dir: -1, k: 0.8 })] };
+layer({
+  id: 'picnic', z: F.zOf(picnic.y + 6),
+  hit: (x, y) => Math.abs(x - picnic.x) < 70 && y > picnic.y - 40 && y < picnic.y + 18,
+  onEnter() { picnic.gull = 1; },
+  update(dt, t, L) { picnic.wave = ease(picnic.wave, L.hovered ? 1 : 0, 3, dt); picnic.gull = Math.max(0, picnic.gull - dt * 0.4); for (const f of picnic.folks) F.stepFolk(f, dt); },
+  draw(g, t) {
+    const s = pxu(picnic.y), x = picnic.x, y = picnic.y;
+    // a checked blanket lying on the sand
+    const bl = poly([[x - 40 * s, y + 6 * s], [x + 38 * s, y + 8 * s], [x + 30 * s, y - 6 * s], [x - 34 * s, y - 8 * s]]);
+    ink(g, bl, '#f4efe6', 1);
+    g.save(); g.clip(bl); g.fillStyle = 'rgba(214,90,74,0.7)'; for (let k = -6; k < 6; k++) { g.fillRect(x + k * 7 * s, y - 10 * s, 3.5 * s, 20 * s); } g.fillStyle = 'rgba(214,90,74,0.4)'; for (let k = -2; k < 2; k++) g.fillRect(x - 50 * s, y + k * 4 * s, 100 * s, 2 * s); g.restore();
+    ink(g, poly([[x - 6 * s, y], [x + 6 * s, y], [x + 5 * s, y - 7 * s], [x - 5 * s, y - 7 * s]]), '#c99a5a', 0.9);
+    g.strokeStyle = '#8a5a3a'; g.lineWidth = 1; g.beginPath(); g.arc(x, y - 7 * s, 4 * s, Math.PI, 0); g.stroke();
+    picnic.folks.forEach((f, i) => {
+      const w = picnic.wave * (i === 0 ? 1 : 0.6);
+      F.drawFolk(g, f, t, { x: x + [-26, 22, 6][i] * s, y: y + [2, 3, -5][i] * s, crouch: 1, noShadow: true, armR: -w * 2.6 + Math.sin(t * 8 + i) * w * 0.3 - (1 - w) * 0.5, happy: true, mouth: Math.sin(t * 3 + i * 2) > 0.6 ? 0.4 : 0, look: [i === 0 ? 1 : -1, 0] });
+    });
+    // a gull drops in to steal a sandwich
+    if (picnic.gull > 0) { const k = 1 - picnic.gull, gx = x + 10 * s + Math.sin(k * Math.PI) * 30 * s + k * 80 * s, gy = y - 10 * s - Math.sin(k * Math.PI) * 40 * s - k * 60 * s; F.gull(g, gx, gy, s * 0.9, t * 12, 1, 0); ink(g, poly([[gx + 10 * s, gy], [gx + 14 * s, gy - 1], [gx + 13 * s, gy + 2]]), '#e8c97a', 0.6); }
+  },
+});
+
+// ============================================================ shrimpers with push-nets in the creek
+const shrimp = { a: F.makeFolk({ sp: 'mole', coat: '#5a7b8c', dir: -1, hat: F.HATS.straw('#d9b866') }), b: F.makeFolk({ sp: 'otter', coat: '#d65a4a', dir: -1 }), lift: 0 };
+layer({
+  id: 'shrimpers', z: F.zOf(620),
+  hit: (x, y) => (Math.abs(x - 1700) < 50 && Math.abs(y - 615) < 40) || (Math.abs(x - 1850) < 40 && Math.abs(y - 548) < 34),
+  update(dt, t, L) { shrimp.lift = ease(shrimp.lift, L.hovered ? 1 : 0, 2.5, dt); F.stepFolk(shrimp.a, dt); F.stepFolk(shrimp.b, dt); },
+  draw(g, t) {
+    for (const [f, x, y, i] of [[shrimp.b, 1856, 552, 1], [shrimp.a, 1702, 626, 0]]) {
+      const s = pxu(y), push = Math.sin(t * 1.4 + i * 2) * 6 * s, lift = shrimp.lift * (i ? 0.6 : 1);
+      F.drawFolk(g, f, t, { x: x + push * 0.3, y, noShadow: true, lean: -0.2 * f.dir, armR: -0.9 - lift * 0.6, armL: -0.7 - lift * 0.5, happy: lift > 0.6 });
+      // the net: a pole running ahead into the water and a D-shaped frame with mesh
+      const hx = x + f.dir * 6 * s, hy = y - 18 * s, nx = x + f.dir * (34 * s) + push, ny = y - 2 * s - lift * 16 * s;
+      g.strokeStyle = LINE; g.lineWidth = 2.2; g.beginPath(); g.moveTo(hx, hy); g.lineTo(nx, ny); g.stroke(); g.strokeStyle = '#a77a58'; g.lineWidth = 1.1; g.stroke();
+      const net = new Path2D(); net.ellipse(nx, ny, 9 * s, 4 * s, 0, 0, TAU);
+      g.fillStyle = 'rgba(210,190,160,0.3)'; g.fill(net); g.strokeStyle = LINE; g.lineWidth = 1; g.stroke(net);
+      if (lift > 0.4) for (let k = 0; k < 5; k++) { g.fillStyle = '#e89a7a'; g.fill(ell(nx - 5 * s + k * 2.4 * s, ny - 1 * s + Math.sin(t * 9 + k) * s, 1.4 * s, 0.7 * s, undefined, 0.5)); }
+      g.strokeStyle = 'rgba(255,255,250,0.65)'; g.lineWidth = 1; g.beginPath(); g.ellipse(x, y, 7 * s, 1.6 * s, 0, 0, TAU); g.stroke();
+      if (lift < 0.3) { g.beginPath(); g.ellipse(nx, ny + 2 * s, (10 + Math.abs(push)) * s, 2 * s, 0, 0, TAU); g.stroke(); }
+    }
+  },
+});
+
 // ============================================================ the near edge: tufts of eelgrass and sea-rocket, swaying
 const tufts = [];
 {
   const r = rng(909);
-  for (const [x, y, k] of [[360, 1128, 2.0], [430, 1120, 1.3], [1210, 1134, 2.3], [1290, 1126, 1.4], [1800, 1130, 1.8]]) {
+  for (const [x, y, k, n, spread, cols, flowers] of [[440, 1124, 1.4, 14, 0.9, ['#6f7f45', '#879055', '#5d6b3e'], false], [1215, 1136, 2.2, 26, 1.4, ['#7c8a4c', '#a3a05a', '#6a7a44'], true], [1810, 1132, 1.7, 18, 0.7, ['#5d6b3e', '#4f5f3a', '#879055'], false]]) {
     const blades = [];
-    for (let i = 0; i < 22; i++) blades.push({ a: -Math.PI / 2 + (r() - 0.5) * 1.1, L: (30 + r() * 46) * k, w: (2 + r() * 2.5) * k, c: ['#6f7f45', '#879055', '#5d6b3e', '#a3a05a'][Math.floor(r() * 4)], ph: r() * TAU });
-    tufts.push({ x, y, k, blades, flowers: r() < 0.6 });
+    for (let i = 0; i < n; i++) blades.push({ a: -Math.PI / 2 + (r() - 0.5) * spread, L: (24 + r() * 52) * k * (1 - Math.abs(i / n - 0.5) * 0.6), w: (1.8 + r() * 2.6) * k, c: cols[Math.floor(r() * cols.length)], ph: r() * TAU });
+    tufts.push({ x, y, k, blades, flowers });
   }
 }
 layer({

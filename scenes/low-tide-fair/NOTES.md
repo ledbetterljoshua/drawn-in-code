@@ -147,3 +147,34 @@ seal, sleeper's door, bell, hermit swap, kite, laundry, castle flag). Found and 
 4. **The tea-house neck** was a flat brown slab with a thick pair of rods. Smaller foot, thinner
    stalks, core shadow and mottling.
 5. **The creek's meander** had a hairpin by the tea-house that looked drawn with a ruler: smoothed.
+
+## Round 5
+
+Performance first: the grandmother's foot and neck were filled live every frame (gradients through
+clips over a large area), 4.6 ms of a phone frame. Each snail's foot and neck are now cached
+sprites; only the skirt's muscle waves, feelers, mouth and eyestalks draw live, and the neck sprite
+slides with the head's sway. Still layers re-ordered so shadows, reflections and the flats bake into
+one bitmap. Headless Chromium now holds 60 fps (p90 16.8 ms) at desktop and phone sizes.
+
+**Critic, second pass (fresh eyes, screenshots only):** (1) the middle band is still empty sand
+with specks; (2) the foreground wet sand is a mauve tangle of white hairlines, darker and dirtier
+than the sand behind, so the light dies where the characters stand; (3) poses still read as one arm
+held straight out, and crowds don't look at their event; (4) the tower reads as stacked rings, not a
+helix, and the snails' feet don't visibly carry their shells; (5) the tower's shadow is a long
+unexplained purple band across the middle; (6) reed clumps stamped on round sand islands;
+(7) scale questions; (8) no colour focus; (9) shells still out-line the figures; (10) the young
+snail's silver trail reads as a white shaft from nowhere, the creek as a ski run.
+
+My five worst, from that:
+
+1. **Arms out.** The "folded arms" rest pose is a straight limb swung forward: it *is* the
+   sleepwalker. *Fix:* drop it; crowds face the thing they're watching.
+2. **Shadows too long to read.** A shear of 1.45 throws the tower's shadow two thirds of the way
+   across the frame, so it reads as an unsourced band. *Fix:* 0.95, darker; shorter shadows that
+   visibly start at their objects.
+3. **The near sand.** *Fix:* fewer, softer ripples near the viewer; the near wet sand mirrors the
+   sky (lighter, cooler) instead of darkening.
+4. **The tower as rings.** *Fix:* steeper suture slope so the helix reads; windows tilt with it;
+   shell seated higher so a thick fleshy foot shows under the whole shell.
+5. **Empty middle.** *Fix:* a toppled parcel cart under the bunting, a picnic between the book
+   snail and the tower, shrimpers with push-nets in the creek right of the tea-house.

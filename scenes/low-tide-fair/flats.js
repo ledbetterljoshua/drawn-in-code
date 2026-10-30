@@ -82,7 +82,8 @@ layer({
       const y = y0 + r() ** 0.9 * (v.y1 - y0 + 40), s = pxu(y), x = v.x0 - 200 + r() * (v.x1 - v.x0 + 400);
       const w = (160 + r() * 420) * s, h = Math.max(2, w * flat(y) * (0.18 + r() * 0.22));
       const near = clamp((y - 700) / 400, 0, 1);
-      g.fillStyle = r() < 0.62 + near * 0.3 ? `rgba(${lerp(118, 104, near) | 0},${lerp(88, 74, near) | 0},${lerp(110, 80, near) | 0},${0.2 + near * 0.08})` : 'rgba(240,222,200,0.22)';
+      // near the viewer the wet sand mirrors the high sky: cooler and lighter, not darker
+      g.fillStyle = r() < 0.62 ? `rgba(${lerp(118, 170, near) | 0},${lerp(88, 168, near) | 0},${lerp(110, 196, near) | 0},${0.2 + near * 0.06})` : 'rgba(240,222,200,0.22)';
       g.fill(ell(x, y, w, h, undefined, (r() - 0.5) * 0.04));
     }
     // standing water films: thin sheets that mirror the sky in long horizontal strokes
@@ -109,7 +110,7 @@ layer({
         const pts = [];
         for (let x = fx - half; x <= fx + half; x += Math.max(4, 10 * ss)) pts.push([x, yy + (x - fx) * tilt + Math.sin(x * 0.03 / Math.max(0.3, ss) + ph0 + yy * 0.05) * sp * 0.35]);
         if (pts.length < 3) continue;
-        const fade = (1 - vy * vy) * 0.8;
+        const fade = (1 - vy * vy) * 0.8 * (1 - clamp((fy - 820) / 320, 0, 0.75));
         const drawRidge = (dy, w, col) => { g.beginPath(); pts.forEach(([x, y], k) => (k ? g.lineTo(x, y + dy) : g.moveTo(x, y + dy))); g.lineWidth = w; g.strokeStyle = col; g.stroke(); };
         drawRidge(0, Math.max(0.6, 1.4 * ss), `rgba(140,108,118,${0.26 * fade})`);
         drawRidge(-Math.max(0.7, 1.3 * ss), Math.max(0.5, 0.9 * ss), `rgba(252,230,196,${0.42 * fade})`);
