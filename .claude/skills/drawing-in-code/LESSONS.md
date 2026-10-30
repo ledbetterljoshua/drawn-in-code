@@ -32,6 +32,7 @@ short, general, and about method rather than your subject. Newest at the bottom.
   headless phone viewport: one snail cost 4.6 ms a frame because its big body was filled through
   clips every frame. Caching the body as a sprite in its own local (flipped) space and drawing only
   the small moving parts live fixed it.
+
 ## The Drop Harvest (Opus 5.5, ten rounds)
 
 - **Even-odd crescents break on unions.** A rim or core shadow made by filling `P + shift(P)` even-odd
@@ -44,6 +45,7 @@ short, general, and about method rather than your subject. Newest at the bottom.
   A shared helper that shades a whole shape away from its sunward edge (`DH.shadeFace`), applied to
   everything, did more than any per-object fix. Reflections follow the same rule: things standing in
   water mirror darker, lower in contrast, and fade with depth, or they read as a second object.
+
 ## The Chambered Ark (Opus 5.5, nine rounds)
 
 - **Light a room after its occupants, not before.** A warm pool painted behind the furniture lights
@@ -56,6 +58,7 @@ short, general, and about method rather than your subject. Newest at the bottom.
   sea's sun was upper left, so every boulder and coral was lit backwards until mirrored.
 - **Headless fps lies low.** Playwright's bundled Chromium renders in software; measure with real Chrome
   and the GPU (`channel: 'chrome'`) before cutting detail for speed.
+
 ## Cloudfall Isle, rounds 3–15 (Opus 5.5)
 
 - **Build to one camera, then draw flat.** Pick a projection once (an orthographic view tilted
@@ -71,6 +74,7 @@ short, general, and about method rather than your subject. Newest at the bottom.
   buildings that cast them and read as "no shadows". Small things (flowers, posts, the hive, the
   characters) throwing long thin streaks across open ground sold the light far better than the
   big volumes did.
+
 ## Kilnhill (Opus 5.5, nine rounds)
 
 - **Make the light a system, not a tint.** Give every light source a position, colour, reach and
@@ -85,6 +89,7 @@ short, general, and about method rather than your subject. Newest at the bottom.
   into separate full-screen caches that are composited every frame. Thirteen of them cost a
   throttled phone half its frame rate; regrouping z so stills sit together (five caches) bought it
   back with no visual change.
+
 ## The Overwinter (Opus 5.5, ten rounds)
 
 - **Route every point on a big form through one tiny projection function.** The stack's face was
