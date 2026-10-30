@@ -5,12 +5,12 @@
    few poses of their own. Line weight scales down with size but never below a hairline. */
 (() => {
 const { TAU, clamp, lerp, circ, ell, curve, poly, seg } = Drawn;
-const A = window.ARK, LINE = A.LINE;
+const A = window.ARK;
 const crew = (A.crew = {});
 
 function ink(g, path, fill, lw) {
   if (fill) { g.fillStyle = fill; g.fill(path); }
-  if (lw) { g.lineWidth = lw; g.strokeStyle = LINE; g.stroke(path); }
+  if (lw) { g.lineWidth = lw; g.strokeStyle = A.LINE; g.stroke(path); }
 }
 crew.ink = ink;
 // a tapering limb along a polyline: width w0 at the root, w1 at the tip, inked
@@ -52,15 +52,15 @@ function eye(g, x, y, r, o = {}) {
   const open = o.blink == null ? 1 : o.blink, lk = o.look || [0, 0], lw = o.lw || 1;
   if (open < 0.2) {
     g.beginPath(); g.moveTo(x - r, y); g.quadraticCurveTo(x, y + r * 0.6, x + r, y);
-    g.lineWidth = lw; g.strokeStyle = LINE; g.stroke();
+    g.lineWidth = lw; g.strokeStyle = A.LINE; g.stroke();
     return;
   }
   const W = ell(x, y, r, r * (o.tall || 1.05));
   ink(g, W, o.white || '#fffaf0', lw);
   g.save(); g.clip(W);
   const px = x + lk[0] * r * 0.42, py = y + lk[1] * r * 0.4;
-  g.fillStyle = o.iris || LINE; g.fill(ell(px, py, r * (o.pupil || 0.6), r * (o.pupil || 0.6) * 1.05));
-  if (o.iris) { g.fillStyle = LINE; g.fill(circ(px, py, r * 0.32)); }
+  g.fillStyle = o.iris || A.LINE; g.fill(ell(px, py, r * (o.pupil || 0.6), r * (o.pupil || 0.6) * 1.05));
+  if (o.iris) { g.fillStyle = A.LINE; g.fill(circ(px, py, r * 0.32)); }
   g.fillStyle = '#fff'; g.fill(circ(px + r * 0.22, py - r * 0.26, r * 0.22));
   if (open < 1) { g.fillStyle = o.lid || '#c66'; g.fillRect(x - r * 1.2, y - r * 1.3, r * 2.4, r * 2.3 * (1 - open)); }
   if (o.sleepy) { g.fillStyle = o.lid || '#c66'; g.fillRect(x - r * 1.2, y - r * 1.3, r * 2.4, r * 1.1 * o.sleepy); }
@@ -91,7 +91,7 @@ crew.hermit = (g, x, y, s = 1, o = {}) => {
   for (let i = 0; i < 6; i++) { const a = -2.4 + i * 0.62; g.beginPath(); g.moveTo(Math.cos(a) * 6, Math.sin(a) * 6); g.lineTo(Math.cos(a + 0.25) * 19, Math.sin(a + 0.25) * 19); g.stroke(); }
   g.restore();
   g.beginPath(); for (let i = 0; i < 40; i++) { const a = i * 0.28, r = 1 + i * 0.32; i ? g.lineTo(Math.cos(a) * r - 2, Math.sin(a) * r - 1) : g.moveTo(-2, -1); }
-  g.lineWidth = lw; g.strokeStyle = LINE; g.stroke();
+  g.lineWidth = lw; g.strokeStyle = A.LINE; g.stroke();
   g.restore();
   // head and front body
   const B = ell(8, -18 + bob, 11, 9);
@@ -101,7 +101,7 @@ crew.hermit = (g, x, y, s = 1, o = {}) => {
   const bl = o.blink == null ? 1 : o.blink, lk = o.look || [0.3, 0];
   for (const [ex, ey] of [[10, -34], [16, -32]]) {
     const sx = ex + (o.stalk || 0) * 2;
-    A.line(g, ex - 2, -24 + bob, sx, ey + bob, 2.8 + lw * 2, LINE); A.line(g, ex - 2, -24 + bob, sx, ey + bob, 2.6, c.body);
+    A.line(g, ex - 2, -24 + bob, sx, ey + bob, 2.8 + lw * 2, A.LINE); A.line(g, ex - 2, -24 + bob, sx, ey + bob, 2.6, c.body);
     eye(g, sx, ey + bob, 3.6, { blink: bl, look: lk, lw: lw * 0.8, lid: c.body, pupil: 0.62 });
   }
   // antennae
@@ -148,7 +148,7 @@ crew.crab = (g, x, y, s = 1, o = {}) => {
     A.line(g, ex, -20 + b, ex * 1.2, -27 + b, 2.4 + lw * 2); A.line(g, ex, -20 + b, ex * 1.2, -27 + b, 2.2, c.body);
     eye(g, ex * 1.2, -28 + b, 3.4, { blink: bl, look: lk, lw: lw * 0.8, lid: c.body });
   }
-  if (o.smile !== false) { g.beginPath(); g.moveTo(-3, -14 + b); g.quadraticCurveTo(0, -12 + b + (o.smile || 1), 3, -14 + b); g.lineWidth = lw * 0.8; g.strokeStyle = LINE; g.stroke(); }
+  if (o.smile !== false) { g.beginPath(); g.moveTo(-3, -14 + b); g.quadraticCurveTo(0, -12 + b + (o.smile || 1), 3, -14 + b); g.lineWidth = lw * 0.8; g.strokeStyle = A.LINE; g.stroke(); }
   // claws: [angleL, angleR] raise, o.snip opens them
   const ca = o.claws || [0, 0];
   for (const sd of [-1, 1]) {
@@ -220,7 +220,7 @@ crew.shrimp = (g, x, y, s = 1, o = {}) => {
   for (let i = 1; i < 6; i++) {
     const [px, py] = spine[i];
     const k = Math.sin(t * 9 + i) * (o.legs || 0.3) * 3;
-    A.line(g, px, py + 4, px - 1 + k, py + 10, lw * 1.4, LINE);
+    A.line(g, px, py + 4, px - 1 + k, py + 10, lw * 1.4, A.LINE);
   }
   // body segments, head first, each a little smaller
   for (let i = 6; i >= 0; i--) {
@@ -275,7 +275,7 @@ crew.seahorse = (g, x, y, s = 1, o = {}) => {
   g.save(); g.clip(Hd); g.fillStyle = c.lit; g.fill(ell(2, -6, 5, 2.5)); g.restore();
   // coronet
   ink(g, poly([[-3, -8], [-4, -14], [0, -10], [2, -15], [3, -8]]), c.body, lw * 0.8);
-  if (o.sleep) { g.beginPath(); g.moveTo(-1, -3); g.quadraticCurveTo(2, -1, 5, -3); g.lineWidth = lw; g.strokeStyle = LINE; g.stroke(); }
+  if (o.sleep) { g.beginPath(); g.moveTo(-1, -3); g.quadraticCurveTo(2, -1, 5, -3); g.lineWidth = lw; g.strokeStyle = A.LINE; g.stroke(); }
   else eye(g, 2, -3, 3.3, { blink: o.blink, look: o.look, lw: lw * 0.8, lid: c.body });
   g.restore();
   g.restore();
@@ -303,7 +303,7 @@ crew.snail = (g, x, y, s = 1, o = {}) => {
     for (const [ex, ey] of eyes) { g.beginPath(); g.arc(ex, ey, 4.2, 0, TAU); g.stroke(); }
     g.beginPath(); g.moveTo(eyes[0][0] + 4.2, eyes[0][1]); g.lineTo(eyes[1][0] - 4.2, eyes[1][1]); g.stroke();
   }
-  g.beginPath(); g.moveTo(hx + 1, hy + 4); g.quadraticCurveTo(hx + 4, hy + 6, hx + 6, hy + 4); g.lineWidth = lw * 0.8; g.strokeStyle = LINE; g.stroke();
+  g.beginPath(); g.moveTo(hx + 1, hy + 4); g.quadraticCurveTo(hx + 4, hy + 6, hx + 6, hy + 4); g.lineWidth = lw * 0.8; g.strokeStyle = A.LINE; g.stroke();
   // shell: a coiled cone sitting on the back
   g.save(); g.translate(-6, -16); g.rotate(-0.15 + (o.rock || 0));
   const S = circ(0, 0, 15);
@@ -314,7 +314,7 @@ crew.snail = (g, x, y, s = 1, o = {}) => {
   g.fillStyle = c.shellLt; g.fill(ell(4, -7, 6, 3, undefined, -0.4));
   g.restore();
   g.beginPath(); for (let i = 0; i < 36; i++) { const a = -i * 0.3, r = 14 - i * 0.37; i ? g.lineTo(Math.cos(a) * r, Math.sin(a) * r) : g.moveTo(14, 0); }
-  g.lineWidth = lw * 0.9; g.strokeStyle = LINE; g.stroke();
+  g.lineWidth = lw * 0.9; g.strokeStyle = A.LINE; g.stroke();
   g.beginPath(); for (let i = 0; i < 30; i++) { const a = -i * 0.3, r = 11 - i * 0.33; i ? g.lineTo(Math.cos(a) * r, Math.sin(a) * r) : g.moveTo(11, 0); }
   g.lineWidth = 1.6; g.strokeStyle = c.band; g.stroke();
   g.restore();
@@ -389,7 +389,7 @@ crew.puffer = (g, x, y, s = 1, o = {}) => {
   ink(g, poly([[-rx + 2, cy], [-rx - 9, cy - 6 + tw], [-rx - 9, cy + 6 + tw]]), c.fin, lw * 0.9);
   // spines
   if (pf > 0.1) {
-    g.lineWidth = lw; g.strokeStyle = LINE;
+    g.lineWidth = lw; g.strokeStyle = A.LINE;
     for (let i = 0; i < 18; i++) {
       const a = (i / 18) * TAU, r0x = Math.cos(a) * rx, r0y = Math.sin(a) * ry;
       g.beginPath(); g.moveTo(r0x * 0.95, cy + r0y * 0.95); g.lineTo(r0x * (1 + 0.25 * pf), cy + r0y * (1 + 0.25 * pf)); g.stroke();
@@ -408,7 +408,7 @@ crew.puffer = (g, x, y, s = 1, o = {}) => {
   ink(g, ell(1, cy + 3, 4, 2.5 + ff * 0.3, undefined, 0.6), c.fin, lw * 0.8);
   eye(g, rx * 0.5, cy - ry * 0.25, 3.6, { blink: o.blink, look: o.look, lw: lw * 0.8, lid: c.body });
   if (o.blow) ink(g, circ(rx + 1, cy + 2, 2 + o.blow * 1.5), c.shade, lw * 0.8);
-  else { g.beginPath(); g.moveTo(rx - 3, cy + 3); g.quadraticCurveTo(rx, cy + 5, rx + 1, cy + 2); g.lineWidth = lw * 0.8; g.strokeStyle = LINE; g.stroke(); }
+  else { g.beginPath(); g.moveTo(rx - 3, cy + 3); g.quadraticCurveTo(rx, cy + 5, rx + 1, cy + 2); g.lineWidth = lw * 0.8; g.strokeStyle = A.LINE; g.stroke(); }
   g.restore();
 };
 
@@ -427,7 +427,7 @@ crew.goby = (g, x, y, s = 1, o = {}) => {
   for (const [sx, sy] of [[-14, -6], [-8, -8], [-2, -6], [4, -9], [-11, -3]]) g.fill(circ(sx, sy, 1.4)); g.restore();
   ink(g, ell(2, -1, 6, 2.2, undefined, 0.3), c.fin, lw * 0.7);
   eye(g, 8, -13, 3.6, { blink: o.blink, look: o.look, lw: lw * 0.8, lid: c.body });
-  g.beginPath(); g.moveTo(13, -5); g.quadraticCurveTo(15, -4, 16, -6); g.lineWidth = lw * 0.8; g.strokeStyle = LINE; g.stroke();
+  g.beginPath(); g.moveTo(13, -5); g.quadraticCurveTo(15, -4, 16, -6); g.lineWidth = lw * 0.8; g.strokeStyle = A.LINE; g.stroke();
   g.restore();
 };
 })();

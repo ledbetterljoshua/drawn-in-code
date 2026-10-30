@@ -1,3 +1,51 @@
+/* The Chambered Ark — a giant nautilus drifting over a sunlit reef, sliced along its midplane so we
+   see its spiral of chambers and the small crew who keep it afloat, inside and outside at once.
+
+   Files, in load order: kit.js (this: geometry, palettes, the bob, helpers) · sea.js (water, reef,
+   kelp, eels) · shell.js (the shell's two sprites, bubble-mail, the wrasse) · crew.js (rigs) ·
+   rooms.js (outer rooms + the room kit) · rooms-inner.js (inner rooms, the pearl) · animal.js (the
+   nautilus) · visitors.js (turtle, school, jellies) · life.js (particles, grade).
+
+   Reactions (hover unless it says otherwise; "linger" is a second beat after staying):
+    1  wheelhouse: the captain spins the wheel hard over and the whole ark swings with the turn
+    2  wheelhouse, linger: he calls down the speaking tube, a bubble runs the siphuncle, the nautilus blinks
+    3  galley: the octopus juggles a pan, a fish cake and a jar
+    4  galley, linger: a sand-dollar pancake flipped high, hearts
+    5  pump room: the shrimp runs the treadwheel, the gauge climbs and the whole ark rises in the water
+    6  pump room, linger: the engineer pulls the whistle, a gout of bubbles
+    7  observatory: the telescope through the roof swings to follow the pointer (also when it's near)
+    8  observatory, linger: the goby sees something and jumps, a spark at the lens
+    9  library: the snail turns a page and looks up over her spectacles
+   10  library, linger: a bookworm rears out of the top shelf
+   11  garden: the anemones open and wave, the nudibranch waters them with bubbles
+   12  garden, linger: a tiny shrimp peeks out of the pink anemone
+   13  bunk room: one seahorse wakes, yawns and looks at you; the perch sways
+   14  band room: the puffer blows the conch, the crab drums, notes rise
+   15  band room, linger: the long note puffs the puffer up, spines out
+   16  lamp room: every jelly in every jar pulses brighter and swims faster
+   17  bath: the crab scrubs, bubbles; linger: ducks under
+   18  laundry: the line bounces; linger: a sock blows off
+   19  post room: the stamp hammers faster and letters go out along the tube
+   20  studio: the squid paints; linger: an inky sneeze
+   21  nursery: the scallop cradle rocks; tea room: two cups clink
+   22  storeroom: the isopod freezes, then sneaks another lick of jam
+   23  net loft: the shuttle flies; cupboard: the octopus in the jar opens an eye
+   24  parlour: the old snail rocks faster and the yarn rolls off; study: the candle gutters
+   25  pearl room: the found pearls shine in turn; hammock: it swings
+   26  the first pearl: a chime, and a ring of light runs out along the spiral, every lamp in turn
+   27  the nautilus: her eye follows the pointer everywhere; hover: the cirri reach and curl round it
+   28  the nautilus, linger (or tap): a slow blink and a jet from her funnel that nudges the ark back
+   29  the cleaner wrasse darts off the shell and comes back to work
+   30  the turtle stops rowing and turns its head to look; linger: a slow blink
+   31  moon jellies pulse hard and dart upward
+   32  untouched: garden eels duck into the sand when the pointer comes near
+   33  untouched: the fusilier school scatters from the pointer
+   34  untouched: kelp fronds are pushed along by the pointer moving past
+   35  untouched: the pointer trails bubbles when it moves fast through open water
+   Idle, everywhere: the ark bobs on its buoyancy, bubble-mail rides the siphuncle, every creature
+   blinks and has its own idle (stirring, reading, snoring z's, steam, the jellies swimming), one
+   current leans the kelp, eels, grass and bubbles, caustics wobble on the sand and the shell. */
+
 /* kit.js — what every part of the Chambered Ark shares: the shell's spiral geometry (one logarithmic
    spiral, the septa and the chamber outlines every room is clipped to), the palettes, the ark's bob
    (the whole shell rises and sinks on its buoyancy, and everything inside it moves with it), and the
@@ -11,6 +59,9 @@ const A = (window.ARK = {});
 
 // ------------------------------------------------------------------ palette
 A.LINE = Drawn.style.line = '#33213a';
+A.INK = '#33213a';         // the drawing's ink
+A.INK_IN = '#4e3346';      // inside the shell: a lighter, warmer ink, so the rooms don't turn to mush
+A.withInk = (ink, fn) => { const was = A.LINE; A.LINE = ink; try { fn(); } finally { A.LINE = was; } };
 A.SEA = { top: '#bfe6d8', hi: '#86cfc6', mid: '#3c9ea5', low: '#246f86', deep: '#183f63', fog: '#5fb0b2' };
 A.SAND = { lit: '#f1d9a4', base: '#d9b98a', shade: '#9e8f86', deep: '#6d6f7c', ripple: '#c7a77d' };
 A.SHELL = { lit: '#fff7e8', base: '#f2e3c9', shade: '#c8b9a6', deep: '#8f8b8f', stripe: '#b5552f', stripeDk: '#843a26', stripeLt: '#d77a48' };
@@ -116,17 +167,21 @@ A.stepBob = (dt, t) => {
   A.dx += A.dxV * dt;
 };
 // draw something in shell space (bobbing with the ark)
+// The ark is drawn in its own "shell space" (the geometry above) and placed on the artboard a little
+// larger and higher (A.SC, A.OFF). Translate and scale only: rotating the shell's big sprites every
+// frame costs more than the rest of the frame.
+A.SC = 1.12; A.OFF = [-28, -12];
+const shellX = () => A.C[0] + A.OFF[0] + Math.round((A.dx + A.tiltT * 400) * 4) / 4;
+const shellY = () => A.C[1] + A.OFF[1] + Math.round(A.bob * 4) / 4;
 A.inShell = (g, fn) => {
-  // translate only: rotating the shell's big sprites every frame costs more than the whole frame
   g.save();
-  g.translate(Math.round((A.dx + A.tiltT * 400) * 4) / 4, Math.round(A.bob * 4) / 4);
+  g.translate(shellX(), shellY()); g.scale(A.SC, A.SC); g.translate(-A.C[0], -A.C[1]);
   fn();
   g.restore();
 };
-// a pointer position (artboard) in shell space
-A.toShell = (x, y) => {
-  return [x - Math.round((A.dx + A.tiltT * 400) * 4) / 4, y - Math.round(A.bob * 4) / 4];
-};
+// a pointer position (artboard) in shell space, and back
+A.toShell = (x, y) => [(x - shellX()) / A.SC + A.C[0], (y - shellY()) / A.SC + A.C[1]];
+A.fromShell = (x, y) => [(x - A.C[0]) * A.SC + shellX(), (y - A.C[1]) * A.SC + shellY()];
 A.hitIn = (path) => (x, y) => { const [sx, sy] = A.toShell(x, y); return A.hitCtx.isPointInPath(path, sx, sy); };
 A.hitCtx = document.createElement('canvas').getContext('2d');
 
@@ -161,12 +216,14 @@ A.rr = (x, y, w, h, r, p = new Path2D()) => {
   p.moveTo(x + r, y); p.arcTo(x + w, y, x + w, y + h, r); p.arcTo(x + w, y + h, x, y + h, r); p.arcTo(x, y + h, x, y, r); p.arcTo(x, y, x + w, y, r); p.closePath();
   return p;
 };
-A.stroke = (g, pts, lw, color = A.LINE, closed = false) => {
+A.stroke = (g, pts, lw, color, closed = false) => {
+  color = color || A.LINE;
   g.beginPath(); pts.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y)));
   if (closed) g.closePath();
   g.lineWidth = lw; g.strokeStyle = color; g.stroke();
 };
-A.line = (g, x0, y0, x1, y1, lw, color = A.LINE) => { g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.lineWidth = lw; g.strokeStyle = color; g.stroke(); };
+A.line = (g, x0, y0, x1, y1, lw, color) => {
+  color = color || A.LINE; g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.lineWidth = lw; g.strokeStyle = color; g.stroke(); };
 
 // the engine's lumps() is lit from the upper right; this sea is lit from the upper left, so mirror it
 A.lumps = (g, circles, col, flatY) => {

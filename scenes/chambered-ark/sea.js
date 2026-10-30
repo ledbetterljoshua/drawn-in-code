@@ -31,7 +31,7 @@ layer({
     g.fillRect(v.x0, S, v.x1 - v.x0, v.y1 - S);
     // sky above the surface (phone): a pale late-afternoon sky
     if (v.y0 < S) {
-      g.fillStyle = grad(g, 0, v.y0, 0, S, ['#9cc7e0', '#f2e6cc', '#ffe8c0']);
+      g.fillStyle = grad(g, 0, v.y0, 0, S, ['#7fb6d6', '#bcdbe0', '#e8eedc']);
       g.fillRect(v.x0, v.y0, v.x1 - v.x0, S - v.y0 + 1);
     }
     // the sun's glow through the water, high on the left
@@ -275,10 +275,10 @@ layer({
   id: 'ark-shadow', z: 12,
   draw(g) {
     const up = clamp(-A.bob / 40, -0.5, 1.5);
-    const cx = A.C[0] + 170 + A.dx, cy = A.BED + 26, rx = 420 * (1 + up * 0.1), ry = 26 * (1 + up * 0.1);
+    const cx = A.C[0] + 150 + A.dx, cy = A.BED + 24, rx = 470 * (1 + up * 0.1), ry = 28 * (1 + up * 0.1);
     g.save();
     for (let i = 0; i < 5; i++) {
-      g.fillStyle = `rgba(28,60,80,${(0.13 - up * 0.02) * (1 - i * 0.1)})`;
+      g.fillStyle = `rgba(30,56,78,${(0.16 - up * 0.025) * (1 - i * 0.08)})`;
       g.fill(ell(cx, cy, rx * (1 - i * 0.16), ry * (1 - i * 0.16)));
     }
     g.restore();
@@ -300,6 +300,17 @@ function rock(g, x, y, w, h, seed) {
   g.save(); g.beginPath(); g.rect(x - w * 2, y - h * 3, w * 4, h * 3 + 2); g.clip();
   A.lumps(g, circles, { line: LINE, lw: 1.8, shade: '#5f5a72', base: '#8a8090', lit: '#b6a89e', union: true });
   g.restore();
+  // strata and cracks, following the mound
+  g.save();
+  const U = new Path2D(); for (const [cx, cy, cr] of circles) U.arc(cx, cy, cr, 0, TAU), U.moveTo(cx + cr, cy);
+  g.clip(U);
+  g.lineWidth = Math.max(1, h * 0.012); g.strokeStyle = 'rgba(60, 52, 76, 0.4)';
+  for (let i = 0; i < 6; i++) { const yy = y - h * (0.15 + i * 0.16); g.beginPath(); for (let k = 0; k <= 12; k++) { const xx = x - w + (k / 12) * w * 2; g.lineTo(xx, yy + Math.sin(k * 1.7 + i * 3 + seed) * h * 0.04 + (xx - x) * 0.08); } g.stroke(); }
+  for (let i = 0; i < 5; i++) { const cx = x + (r() - 0.5) * w * 1.6, cy = y - r() * h * 0.8; A.stroke(g, [[cx, cy], [cx + (r() - 0.5) * 20, cy + 12 + r() * 14], [cx + (r() - 0.5) * 24, cy + 26 + r() * 20]], 1.2, 'rgba(50, 42, 66, 0.5)'); }
+  // the sun's warmth on the upper left of the mound
+  g.fillStyle = radial(g, x - w * 0.4, y - h * 1.1, 0, w * 1.2, [[0, 'rgba(255, 230, 190, 0.35)'], [1, 'rgba(255, 230, 190, 0)']]);
+  g.fillRect(x - w * 2, y - h * 3, w * 4, h * 3);
+  g.restore();
   // coralline crusts and pits
   for (let i = 0; i < 26; i++) { const [cx, cy, cr] = circles[Math.floor(r() * circles.length)]; const a = -Math.PI / 2 + (r() - 0.5) * 2; g.fillStyle = r() < 0.5 ? 'rgba(60,50,70,0.3)' : 'rgba(240,160,170,0.55)'; g.fill(ell(cx + Math.cos(a) * cr * 0.6, cy + Math.sin(a) * cr * 0.6, 1.5 + r() * 3.5, 1 + r() * 2)); }
   return circles;
@@ -310,7 +321,7 @@ layer({
     const v = st.view, r = rng(91);
     // seagrass meadow tufts, painted (the swaying ones are in 'grass')
     // big rocks at both corners, with their coral
-    const groups = [[60, 1135, 190, 90, 1], [1530, 1140, 200, 95, 2], [1280, 1330, 150, 70, 4], [420, 1720, 560, 260, 5]];
+    const groups = [[60, 1135, 190, 90, 1], [1530, 1140, 200, 95, 2], [1280, 1330, 150, 70, 4], [300, 1930, 640, 300, 5]];
     for (const [x, y, w, h, sd] of groups) {
       if (y - h > v.y1 + 20) continue;
       const cs = rock(g, x, y, w, h, sd);
@@ -393,7 +404,7 @@ layer({
 // a strand: a stem rooted at (x, y) rising h, gas floats and long blades along it, swaying with the
 // current — stronger near the top. Colours fogged by depth.
 const KELP = { stem: '#6b5326', blade: '#a8873a', bladeLt: '#e8cf6a', bladeSh: '#6d5a22', under: '#c9b25a', float: '#c9a548' };
-function kelpStrand(seed, x, y, h, fog, lw) {
+function kelpStrand(seed, x, y, h, fog, lw, lean) {
   const r = rng(seed), c = {};
   for (const k in KELP) c[k] = mix(KELP[k], FOG, fog);
   const blades = [];
@@ -402,22 +413,22 @@ function kelpStrand(seed, x, y, h, fog, lw) {
     blades.push({ u, side: r() < 0.7 ? 1 : -1, len, w: len * (0.13 + r() * 0.08) + 5, ph: r() * 6, tw: 0.6 + r() * 1.4, tph: r() * 3 });
   }
   c.line = mix('#3e2a1a', FOG, fog * 0.85);
-  return { x, y, h, c, blades, lw, ph: r() * 10, push: 0, pv: 0 };
+  return { x, y, h, c, blades, lw, ph: r() * 10, push: 0, pv: 0, lean: lean != null ? lean : 40 + r() * 120, sw: 3 + r() * 3.5 };
 }
 function stemPts(k, t) {
   const pts = [], n = 14;
   const w = wind(t, k.x);
   for (let i = 0; i <= n; i++) {
     const u = i / n;
-    const sway = (w * 70 + Math.sin(t * 0.6 + k.ph - u * 2.5) * 30 + k.push) * Math.pow(u, 1.4);
+    const sway = (k.lean + w * 90 + Math.sin(t * 0.6 + k.ph - u * 2.5) * 34 + k.push) * Math.pow(u, 1.5);
     pts.push([k.x + sway + Math.sin(u * 4 + k.ph) * 18 * u, k.y - k.h * u]);
   }
   return pts;
 }
 function drawKelp(g, k, t) {
   const pts = stemPts(k, t);
-  if (k.lw) A.stroke(g, pts, 4 + k.lw * 2, k.c.line);
-  A.stroke(g, pts, 4, k.c.stem);
+  if (k.lw) A.stroke(g, pts, k.sw + k.lw * 2, k.c.line);
+  A.stroke(g, pts, k.sw, k.c.stem);
   for (const b of k.blades) {
     const i = Math.min(pts.length - 2, Math.floor(b.u * (pts.length - 1)));
     const f = b.u * (pts.length - 1) - i;
@@ -462,7 +473,7 @@ function drawKelp(g, k, t) {
   }
 }
 const kelpBack = [kelpStrand(1, 90, 990, 1450, 0.6, 0), kelpStrand(2, 250, 1060, 760, 0.35, 1), kelpStrand(3, 1490, 1000, 1150, 0.55, 0), kelpStrand(4, 1390, 1040, 620, 0.38, 1)];
-const kelpFront = [kelpStrand(6, -70, 1200, 1800, 0, 1.4), kelpStrand(7, 390, 1240, 560, 0, 1.4), kelpStrand(8, 1690, 1220, 900, 0, 1.4)];
+const kelpFront = [kelpStrand(6, -70, 1200, 1800, 0, 1.4), kelpStrand(7, 300, 1240, 600, 0, 1.4, -30), kelpStrand(8, 1690, 1220, 900, 0, 1.4)];
 A.kelp = [...kelpBack, ...kelpFront];
 function kelpUpdate(list, dt, t) {
   for (const k of list) {

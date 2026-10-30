@@ -27,21 +27,24 @@ const EYE = { ring: '#cbb8ae', dark: '#24182a' };
 const r = rng(808);
 // the cirri grow in bunches, each from a soft sheath on the face; back bunches darker, front lighter
 const cirri = [], sheaths = [];
-const BUNCH = [[146, 200, -0.05, 0], [124, 214, 0.15, 1], [140, 226, 0.25, 2], [100, 234, 0.4, 0], [120, 244, 0.45, 1], [136, 258, 0.6, 2], [86, 262, 0.7, 0], [108, 270, 0.75, 2], [74, 284, 0.95, 1], [96, 292, 1.05, 2]];
-for (const [bu, bv, ba, layer] of BUNCH) {
-  const sl = 16 + r() * 8;
+// four clusters, each curling its own way: one reaching forward and up, one streaming in the
+// current, one hanging, one tucked under toward the funnel
+const BUNCH = [[146, 204, -0.1, 2, 9, -1.4, 1.05], [126, 236, 0.3, 1, 9, 0.6, 1.15], [138, 262, 0.62, 2, 8, 1.6, 0.9], [96, 286, 1.0, 1, 7, 2.2, 0.75]];
+for (const [bu, bv, ba, layer, n, cv, lm] of BUNCH) {
+  const sl = 18 + r() * 6;
   sheaths.push({ u: bu, v: bv, a: ba, len: sl, layer });
-  const n = 4 + Math.floor(r() * 3);
-  for (let i = 0; i < n; i++) {
+  // a darker back row behind each cluster gives it depth
+  for (let i = 0; i < n + 3; i++) {
+    const back = i >= n, f = back ? r() : i / (n - 1);
     cirri.push({
-      root: [bu + Math.cos(ba) * sl + (r() - 0.5) * 4, bv + Math.sin(ba) * sl + (r() - 0.5) * 6],
-      a: ba + (i / (n - 1) - 0.5) * 0.5 + (r() - 0.5) * 0.1, len: (120 + r() * 90) * (layer === 2 ? 1 : 0.85),
-      curl: (r() - 0.4) * 2, ph: r() * TAU + layer, w: layer === 2 ? 4.6 + r() : 3.8 + r(), layer, back: layer === 0,
+      root: [bu + Math.cos(ba) * sl + (r() - 0.5) * 8, bv + Math.sin(ba) * sl + (r() - 0.5) * 10],
+      a: ba + (f - 0.5) * 0.55 + (r() - 0.5) * 0.08, len: (100 + Math.pow(r(), 0.6) * 130) * lm * (back ? 0.85 : 1),
+      curl: cv * (0.7 + r() * 0.6), ph: bu * 0.1 + r() * 0.8, w: back ? 3.2 : layer === 2 ? 4.8 + r() * 0.8 : 4 + r() * 0.8, layer: back ? 0 : layer, back,
     });
   }
 }
 cirri.sort((p, q) => p.layer - q.layer);
-const S = { look: [0, 0], blink: Drawn.blinker(3, 6), slow: 0, puff: 0, puffT: 9, breathe: 0, reach: 0, curlOn: 0 };
+const S = { alert: 0, look: [0, 0], blink: Drawn.blinker(3, 6), slow: 0, puff: 0, puffT: 9, breathe: 0, reach: 0, curlOn: 0 };
 
 function cirrusPts(c, t, hov, tx, ty) {
   const w = wind(t, Pi[0]);
@@ -52,7 +55,7 @@ function cirrusPts(c, t, hov, tx, ty) {
     pts.push([x, y]);
     const u = i / n;
     // stream in the current and wave; when hovered, bend toward the pointer and curl at the tip
-    let da = (c.curl * 0.09 * u * u * 3 + Math.sin(t * 1.1 + c.ph + u * 4.2) * 0.12) * (0.4 + u);
+    let da = (c.curl * 0.06 * u * u * 3 + Math.sin(t * 1.1 + c.ph + u * 3.2) * 0.09) * (0.4 + u);
     if (hov > 0.01) {
       const want = Math.atan2(ty - y, tx - x);
       let d = want - a; while (d > Math.PI) d -= TAU; while (d < -Math.PI) d += TAU;
@@ -95,6 +98,7 @@ layer({
     const k = P.inside ? clamp(d / 220, 0, 1) : 0;
     S.look[0] = Drawn.ease(S.look[0], (dx / d) * k, 6, dt);
     S.look[1] = Drawn.ease(S.look[1], (dy / d) * k, 6, dt);
+    S.alert = Drawn.ease(S.alert, L.hovered || P.sp > 400 ? 1 : 0, 3, dt);
     S.curlOn = Drawn.ease(S.curlOn, L.hovered && L.since > 0.5 ? 1 : 0, 3, dt);
     // a slow blink, then a puff, when you stay
     if (L.hovered && L.since > 1.2 && S.puffT > 6) { S.puffT = 0; S.puffBig = 0; }
@@ -131,8 +135,11 @@ layer({
       const head = curve(headPts);
       ink(g, head, '#d8a690', 2.8);
       g.save(); g.clip(head);
-      g.fillStyle = '#c18a80'; g.fill(ell(30, 240, 90, 90));
-      g.fillStyle = '#f2cdb8'; g.fill(ell(150, 190, 26, 60));
+      // the face: in the hood's shadow at the top, rounding away into the aperture, a lit cheek
+      g.fillStyle = grad(g, 180, 150, 20, 290, [[0, 'rgba(250, 214, 190, 0.6)'], [0.5, 'rgba(216, 166, 144, 0)'], [1, 'rgba(120, 70, 80, 0.55)']]);
+      g.fillRect(-100, 100, 320, 220);
+      g.fillStyle = 'rgba(255, 226, 206, 0.55)'; g.fill(ell(150, 220, 22, 34, undefined, -0.3));
+      g.fillStyle = 'rgba(120, 60, 70, 0.18)'; g.fill(ell(60, 150, 90, 16));
       // the hood: the upper half of the head, leathery tan, mottled and rough
       const hoodEdge = [[-100, 90], [-20, 112], [60, 130], [140, 128], [200, 108]];
       const hood = curve([[-120, -80], [220, -80], ...hoodEdge.slice().reverse()]);
@@ -152,7 +159,7 @@ layer({
       g.fillRect(-80, -80, 300, 220);
       // tubercles: small raised bumps, cream on top
       for (let i = 0; i < 80; i++) {
-        const x = -90 + hm() * 270, y = -24 + hm() * 140, s = 1.2 + hm() * 2.2;
+        const cl = Math.floor(hm() * 7), x = -80 + cl * 38 + (hm() - 0.5) * 40, y = -10 + ((cl * 37) % 90) + (hm() - 0.5) * 40, s = 0.8 + Math.pow(hm(), 2) * 3;
         g.fillStyle = 'rgba(90, 40, 40, 0.4)'; g.fill(circ(x + s * 0.3, y + s * 0.4, s));
         g.fillStyle = '#f8ead6'; g.fill(circ(x - s * 0.15, y - s * 0.2, s * 0.75));
       }
@@ -163,6 +170,7 @@ layer({
       g.restore();
       // the eye: big, silver, set in a fleshy socket under the hood's brim
       const ex = 112, ey = 168, er = 29;
+      ink(g, curve([[ex - 44, ey - 30], [ex - 8, ey - 44 + S.alert * -4], [ex + 34, ey - 38], [ex + 44, ey - 26], [ex + 6, ey - 34], [ex - 30, ey - 24]]), '#cf9a84', 1.6);
       ink(g, ell(ex, ey, er + 9, er + 7), '#d6ac98', 2);
       g.save(); g.clip(ell(ex, ey, er + 9, er + 7)); g.fillStyle = '#b8877a'; g.fill(ell(ex - 4, ey + 9, er + 9, er)); g.restore();
       const bl = Math.min(S.blink(t), 1 - S.slow);
@@ -177,9 +185,12 @@ layer({
         g.fillStyle = EYE.dark; g.fill(circ(px, py, er * 0.62));
         g.fillStyle = 'rgba(110, 150, 170, 0.5)'; g.fill(circ(px - 4, py + 5, er * 0.4));
         g.fillStyle = '#fff'; g.fill(circ(px + er * 0.26, py - er * 0.3, er * 0.18)); g.fill(circ(px - er * 0.2, py + er * 0.2, er * 0.07));
-        // the brim's shadow across the top of the eye
-        g.fillStyle = 'rgba(60, 30, 40, 0.3)'; g.fill(ell(ex, ey - er * 0.95, er * 1.2, er * 0.4));
-        if (bl < 1) { g.fillStyle = '#c99a86'; g.fillRect(ex - er - 4, ey - er - 6, er * 2 + 8, (er * 2 + 8) * (1 - bl)); }
+        // the lid: resting a third of the way down (calm), lifting when something interests her
+        const lid = clamp(0.32 - S.alert * 0.26 + (1 - bl), 0, 1);
+        const ly = ey - er + lid * er * 2;
+        g.fillStyle = '#c99a86'; g.beginPath(); g.moveTo(ex - er - 4, ey - er - 6); g.lineTo(ex + er + 4, ey - er - 6); g.lineTo(ex + er + 4, ly - 4); g.quadraticCurveTo(ex, ly + 6, ex - er - 4, ly - 4); g.closePath(); g.fill();
+        g.lineWidth = 2.2; g.strokeStyle = LINE; g.beginPath(); g.moveTo(ex + er + 2, ly - 4); g.quadraticCurveTo(ex, ly + 6, ex - er - 2, ly - 4); g.stroke();
+        g.lineWidth = 1; g.strokeStyle = 'rgba(255,230,210,0.7)'; g.beginPath(); g.moveTo(ex + er * 0.7, ly - 2); g.quadraticCurveTo(ex, ly + 3, ex - er * 0.6, ly - 2); g.stroke();
         g.restore();
       }
       for (const sh of sheaths) {

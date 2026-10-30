@@ -20,7 +20,7 @@
    rooms z40–49 (rooms.js has the kit). */
 (() => {
 const { TAU, lerp, clamp, rng, circ, ell, curve, poly, grad, radial, P, layer } = Drawn;
-const A = window.ARK, LINE = A.LINE, C = A.crew, ink = C.ink, K = A.rk, look = A.look;
+const A = window.ARK, C = A.crew, ink = C.ink, K = A.rk, look = A.look;
 const ch = (k) => A.chambers[k];
 
 // the flare that runs out along the spiral from the centre (the pearl's chime): each room's lamp
@@ -54,7 +54,7 @@ A.room({
     ink(g, cup, '#f6f0e6', 1.2);
     g.save(); g.clip(cup); g.fillStyle = '#d9cfe0'; g.fill(ell(947, 606, 22, 6)); g.fillStyle = '#6aa3c8'; g.fillRect(930, 597, 34, 2); g.restore();
     ink(g, ell(947, 586, 19, 2.6), '#cfeaf0', 1);
-    g.lineWidth = 2.4; g.strokeStyle = LINE; g.beginPath(); g.arc(968, 593, 4.5, -1.2, 1.3); g.stroke();
+    g.lineWidth = 2.4; g.strokeStyle = A.LINE; g.beginPath(); g.arc(968, 593, 4.5, -1.2, 1.3); g.stroke();
     g.lineWidth = 1.2; g.strokeStyle = '#f6f0e6'; g.stroke();
     for (let i = 0; i < 5; i++) ink(g, circ(932 + i * 7 + Math.sin(t * 2 + i) * 1.5, 584 - (i % 2) * 2, 2.6 + (i % 3)), 'rgba(255,255,255,0.9)', 0.6);
   },
@@ -232,8 +232,8 @@ A.room({
     const B = ell(0, 0, 7, 3.6);
     ink(g, B, '#9a94a8', 0.8);
     g.save(); g.clip(B); g.lineWidth = 0.5; g.strokeStyle = '#6a6478'; for (let i = -2; i <= 2; i++) { g.beginPath(); g.moveTo(i * 2.5, -4); g.lineTo(i * 2.5, 4); g.stroke(); } g.restore();
-    g.fillStyle = LINE; g.fill(circ(5.5, -0.5, 0.8 + f * 0.5));
-    if (f > 0.4) { g.fillStyle = '#fff'; g.fill(circ(5.5, -0.5, 0.9)); g.fillStyle = LINE; g.fill(circ(5.8, -0.5, 0.45)); }
+    g.fillStyle = A.LINE; g.fill(circ(5.5, -0.5, 0.8 + f * 0.5));
+    if (f > 0.4) { g.fillStyle = '#fff'; g.fill(circ(5.5, -0.5, 0.9)); g.fillStyle = A.LINE; g.fill(circ(5.8, -0.5, 0.45)); }
     A.line(g, 7, -1, 10, -3, 0.5); A.line(g, 7, 0, 10, 1, 0.5);
     g.restore();
   },
@@ -272,7 +272,7 @@ A.room({
     g.save(); g.clip(J);
     C.octopus(g, 843, 474, 0.3 * br, { t: t * 0.4, blink: R.peek > 0.5 ? 1 : 0.05, look: look(843, 462), c: { body: '#e6a05a', shade: '#b5703a', lit: '#f6c890', spot: '#c07a3a' }, arms(i, tt) { return [-0.2 + (i / 7) * (Math.PI + 0.4), 2.4 * (i < 4 ? -1 : 1), 22]; } });
     g.restore();
-    g.lineWidth = 1; g.strokeStyle = LINE; g.stroke(J);
+    g.lineWidth = 1; g.strokeStyle = A.LINE; g.stroke(J);
     ink(g, A.rr(833, 449, 20, 4, 1.5), '#b98a4a', 0.8);
     g.fillStyle = 'rgba(255,255,255,0.5)'; g.fillRect(837, 456, 1.4, 12);
   },
@@ -289,7 +289,7 @@ A.room({
     const a = Math.sin(R.rock) * 0.15;
     g.save(); g.translate(852, 496); g.rotate(a);
     // the rocking chair
-    g.lineWidth = 1.8; g.strokeStyle = LINE; g.beginPath(); g.arc(0, -20, 20, Math.PI * 0.32, Math.PI * 0.68); g.stroke();
+    g.lineWidth = 1.8; g.strokeStyle = A.LINE; g.beginPath(); g.arc(0, -20, 20, Math.PI * 0.32, Math.PI * 0.68); g.stroke();
     g.lineWidth = 1; g.strokeStyle = K.WOOD.front; g.stroke();
     A.line(g, -6, -4, -9, -22, 1.4, K.WOOD.dark); A.line(g, 6, -4, 5, -10, 1.2, K.WOOD.dark); A.line(g, -9, -10, 6, -10, 1.6, K.WOOD.front);
     C.snail(g, 0, -10, 0.3, { t, blink: Math.min(R.blink(t), 0.6), look: [1, 0.5], reach: -0.1, c: { shell: '#c8c0a8', shellSh: '#988f78', shellLt: '#e8e2d0', band: '#f6f0e0' } });

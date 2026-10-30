@@ -23,7 +23,7 @@
    rooms z40–49, between the shell's back (z30) and its cut face (z55). */
 (() => {
 const { TAU, lerp, clamp, rng, noise, circ, ell, curve, poly, grad, radial, P, layer, wind } = Drawn;
-const A = window.ARK, LINE = A.LINE, C = A.crew, ink = C.ink;
+const A = window.ARK, C = A.crew, ink = C.ink;
 const EYE = A.C[1]; // eye level: the horizon of the whole drawing
 
 // ------------------------------------------------------------------ the room kit
@@ -54,7 +54,7 @@ K.deck = (g, ch, y, o = {}) => {
     x += w;
   }
   if (d < 0) { g.fillStyle = W.dark; g.fillRect(x0 - 10, y + th, x1 - x0 + 20, -d); }
-  g.lineWidth = 1.6; g.strokeStyle = LINE; g.beginPath(); g.moveTo(x0 - 10, y + th); g.lineTo(x1 + 10, y + th); g.stroke();
+  g.lineWidth = 1.6; g.strokeStyle = A.LINE; g.beginPath(); g.moveTo(x0 - 10, y + th); g.lineTo(x1 + 10, y + th); g.stroke();
   g.beginPath(); g.moveTo(x0 - 10, y - Math.max(0, d)); g.lineTo(x1 + 10, y - Math.max(0, d)); g.lineWidth = 1.2; g.stroke();
   g.restore();
   return [x0, x1];
@@ -77,7 +77,7 @@ K.porthole = (g, x, y, rad) => {
   g.fillStyle = 'rgba(255,255,240,0.35)'; g.fill(poly([[x - rad, y - rad * 0.2], [x - rad * 0.2, y - rad], [x + rad * 0.1, y - rad], [x - rad, y + rad * 0.15]]));
   g.fillStyle = 'rgba(30,80,100,0.45)'; g.fill(ell(x + rad * 0.3, y + rad * 0.5, rad * 0.25, rad * 0.1));
   g.restore();
-  g.lineWidth = rad * 0.28 + 2.4; g.strokeStyle = LINE; g.stroke(O);
+  g.lineWidth = rad * 0.28 + 2.4; g.strokeStyle = A.LINE; g.stroke(O);
   g.lineWidth = rad * 0.28; g.strokeStyle = '#d2a456'; g.stroke(O);
   g.lineWidth = 1; g.strokeStyle = '#f5dc98'; g.beginPath(); g.arc(x, y, rad, Math.PI * 1.05, Math.PI * 1.6); g.stroke();
   for (let i = 0; i < 6; i++) { const a = (i / 6) * TAU + 0.3; g.fillStyle = '#7d5a2c'; g.fill(circ(x + Math.cos(a) * rad, y + Math.sin(a) * rad, 1.2)); }
@@ -103,7 +103,7 @@ K.lampJar = (g, x, y, s, t, k = 0, bright = 0) => {
     g.lineWidth = 0.7; g.strokeStyle = 'rgba(255,200,120,0.9)';
     for (let j = -1; j <= 1; j++) { g.beginPath(); g.moveTo(jx + j * 2 * s, jy + 1.5 * s); g.quadraticCurveTo(jx + j * 2.5 * s + Math.sin(t * 3 + j) * 1.5, jy + 5 * s, jx + j * 2 * s, jy + 7 * s); g.stroke(); }
   }
-  g.lineWidth = 1.3; g.strokeStyle = LINE; g.stroke(J);
+  g.lineWidth = 1.3; g.strokeStyle = A.LINE; g.stroke(J);
   ink(g, A.rr(x - jw * 0.8, y - jh - 3 * s, jw * 1.6, 4 * s, 1.5), '#b98a4a', 1.1);
   g.fillStyle = 'rgba(255,255,255,0.6)'; g.fillRect(x - jw * 0.7, y - jh * 0.7, 1.6 * s, jh * 1.1);
 };
@@ -134,7 +134,7 @@ A.rooms = [];
 A.room = (def) => {
   const ch = A.chambers[def.k];
   const R = Object.assign({ ch, k: def.k }, def.state ? def.state() : {});
-  A.furnish((g) => {
+  A.furnish((g) => A.withInk(A.INK_IN, () => {
     g.save(); g.clip(ch.path);
     if (def.floor != null) { const [x0, x1] = K.deck(g, ch, def.floor, { near: def.near }); R.fx0 = x0; R.fx1 = x1; }
     if (def.furnish) def.furnish(g, R);
@@ -149,7 +149,7 @@ A.room = (def) => {
       g.globalCompositeOperation = 'source-over';
     }
     g.restore();
-  }, def.k);
+  }), def.k);
   if (def.floor != null) { const [x0, x1] = A.span(ch.poly, def.floor, def.near); R.fx0 = x0; R.fx1 = x1; R.fy = def.floor; }
   const L = layer({
     id: 'room-' + (def.id || def.k), z: 40 + def.k * 0.01,
@@ -159,7 +159,7 @@ A.room = (def) => {
     update(dt, t, L) { if (def.update) def.update(dt, t, L, R); },
     draw(g, t, L) {
       if (!def.draw) return;
-      A.inShell(g, () => {
+      A.inShell(g, () => A.withInk(A.INK_IN, () => {
         g.save(); g.clip(ch.path);
         def.draw(g, t, L, R);
         // the jelly-light pools warm over the room and everyone in it, breathing with the jellies
@@ -168,7 +168,7 @@ A.room = (def) => {
           const f = 0.85 + 0.1 * Math.sin(t * 2.3 + def.k) + 0.05 * Math.sin(t * 5.1 + def.k * 3) + L.hover * 0.2 + (A.flare ? A.flare(def.k) * 0.8 : 0);
           g.globalCompositeOperation = 'lighter';
           for (const [x, y, rad, a] of def.glow) {
-            const al = a * 0.42 * f * hero, rr = rad * 1.2;
+            const al = a * 0.55 * f * hero, rr = rad * 1.25;
             g.fillStyle = radial(g, x, y, 0, rr, [[0, `rgba(255, 190, 110, ${al})`], [0.4, `rgba(240, 140, 70, ${al * 0.45})`], [1, 'rgba(200, 100, 60, 0)']]);
             g.fillRect(x - rr, y - rr, rr * 2, rr * 2);
           }
@@ -176,7 +176,7 @@ A.room = (def) => {
         }
         g.restore();
         if (def.over) def.over(g, t, L, R);
-      });
+      }));
     },
   });
   A.rooms.push(L);
@@ -209,7 +209,7 @@ A.room({
     A.line(g, 1200, 410, 1206, 404, 1.2, '#7a3022');
     // the speaking tube, brass, down through the floor toward the nautilus
     const tube = [[1083, 520], [1083, 486], [1088, 470], [1100, 462]];
-    A.stroke(g, tube, 8.4, LINE); A.stroke(g, tube, 6, '#d2a456'); A.stroke(g, tube.map(([x, y]) => [x - 1.5, y]), 1.5, '#f5dc98');
+    A.stroke(g, tube, 8.4, A.LINE); A.stroke(g, tube, 6, '#d2a456'); A.stroke(g, tube.map(([x, y]) => [x - 1.5, y]), 1.5, '#f5dc98');
     ink(g, poly([[1098, 455], [1112, 452], [1112, 472], [1098, 469]]), '#d2a456', 1.3);
     ink(g, ell(1112, 462, 3, 10), '#5a3a2a', 1.2);
     // the wheel's pedestal and a little crate for the captain to stand on
@@ -237,7 +237,7 @@ A.room({
     // the wheel: driftwood spokes round a hub
     g.save(); g.translate(1169, 462); g.rotate(R.wheel);
     for (let i = 0; i < 8; i++) { const a = (i / 8) * TAU; ink(g, poly([[Math.cos(a - 0.08) * 6, Math.sin(a - 0.08) * 6], [Math.cos(a) * 33, Math.sin(a) * 33], [Math.cos(a + 0.08) * 6, Math.sin(a + 0.08) * 6]]), K.WOOD.front, 1.2); ink(g, circ(Math.cos(a) * 34, Math.sin(a) * 34, 2.8), K.WOOD.top, 1); }
-    g.lineWidth = 7.4; g.strokeStyle = LINE; g.beginPath(); g.arc(0, 0, 24, 0, TAU); g.stroke();
+    g.lineWidth = 7.4; g.strokeStyle = A.LINE; g.beginPath(); g.arc(0, 0, 24, 0, TAU); g.stroke();
     g.lineWidth = 5; g.strokeStyle = K.WOOD.front; g.stroke();
     g.lineWidth = 1.2; g.strokeStyle = K.WOOD.lit; g.beginPath(); g.arc(0, 0, 25, Math.PI, Math.PI * 1.6); g.stroke();
     ink(g, circ(0, 0, 6), '#d2a456', 1.3);
@@ -365,13 +365,13 @@ A.room({
     // the gauge: a brass dial with a red zone
     ink(g, circ(1108, 205, 15), '#f6ead6', 1.6);
     g.lineWidth = 2.2; g.strokeStyle = '#d24a3a'; g.beginPath(); g.arc(1108, 205, 11, -0.6, 0.2); g.stroke();
-    g.lineWidth = 0.9; g.strokeStyle = LINE; for (let i = 0; i <= 6; i++) { const a = Math.PI * 0.85 + i * 0.42; g.beginPath(); g.moveTo(1108 + Math.cos(a) * 9, 205 + Math.sin(a) * 9); g.lineTo(1108 + Math.cos(a) * 12, 205 + Math.sin(a) * 12); g.stroke(); }
+    g.lineWidth = 0.9; g.strokeStyle = A.LINE; for (let i = 0; i <= 6; i++) { const a = Math.PI * 0.85 + i * 0.42; g.beginPath(); g.moveTo(1108 + Math.cos(a) * 9, 205 + Math.sin(a) * 9); g.lineTo(1108 + Math.cos(a) * 12, 205 + Math.sin(a) * 12); g.stroke(); }
     g.lineWidth = 3.4; g.strokeStyle = '#c9a258'; g.stroke(circ(1108, 205, 15));
     // pipes: from the wheel's bellows down into the siphuncle, and up to the whistle
     const p1 = [[985, 292], [975, 300], [968, 326]];
-    A.stroke(g, p1, 7, LINE); A.stroke(g, p1, 4.8, '#c9a258');
+    A.stroke(g, p1, 7, A.LINE); A.stroke(g, p1, 4.8, '#c9a258');
     const p2 = [[1090, 205], [1080, 190], [1080, 172]];
-    A.stroke(g, p2, 6, LINE); A.stroke(g, p2, 4, '#c9a258');
+    A.stroke(g, p2, 6, A.LINE); A.stroke(g, p2, 4, '#c9a258');
     ink(g, A.rr(1075, 160, 10, 13, 2), '#d2a456', 1.2);
     A.line(g, 1086, 164, 1096, 170, 0.8); // the whistle cord
     // the treadwheel's axle post
@@ -396,7 +396,7 @@ A.room({
     // the treadwheel
     const wx = 1000, wy = 262, wr = 38;
     g.save(); g.translate(wx, wy);
-    g.lineWidth = 6.2; g.strokeStyle = LINE; g.beginPath(); g.arc(0, 0, wr, 0, TAU); g.stroke();
+    g.lineWidth = 6.2; g.strokeStyle = A.LINE; g.beginPath(); g.arc(0, 0, wr, 0, TAU); g.stroke();
     g.lineWidth = 4; g.strokeStyle = K.WOOD.front; g.stroke();
     g.save(); g.rotate(R.wheel);
     for (let i = 0; i < 16; i++) { const a = (i / 16) * TAU; A.line(g, Math.cos(a) * (wr - 2), Math.sin(a) * (wr - 2), Math.cos(a) * (wr - 6), Math.sin(a) * (wr - 6), 1.6, K.WOOD.dark); }
@@ -458,19 +458,19 @@ A.room({
     const a = R.aim, [px, py] = SCOPE.pivot;
     const ex = px - Math.cos(a) * 70, ey = py - Math.sin(a) * 70;
     const tube = [[ex, ey], [px, py]];
-    A.stroke(g, tube, 13, LINE); A.stroke(g, tube, 10.5, '#c9a258'); A.stroke(g, tube.map(([x, y]) => [x - 2, y - 1]), 2, '#f5dc98');
+    A.stroke(g, tube, 13, A.LINE); A.stroke(g, tube, 10.5, '#c9a258'); A.stroke(g, tube.map(([x, y]) => [x - 2, y - 1]), 2, '#f5dc98');
     ink(g, circ(ex, ey, 4), '#5a3a2a', 1);
     // the goby on the stool at the eyepiece
     const j = R.jump.live ? A.bump(R.jump.u) : 0, wipe = R.act.is('wipe');
     C.goby(g, 900, 300 - j * 16, 0.9, { t, blink: R.blink(t), look: j > 0 ? [1, -1] : wipe >= 0 ? [-0.5, 0.5] : [Math.cos(a + Math.PI) * -0.6, -0.8], rot: -0.35 - j * 0.2, wag: j * 6 });
-    if (j > 0.5) { g.fillStyle = LINE; g.font = 'bold 14px Georgia'; g.fillText('!', 908, 268 - j * 16); }
+    if (j > 0.5) { g.fillStyle = A.LINE; g.font = 'bold 14px Georgia'; g.fillText('!', 908, 268 - j * 16); }
   },
   over(g, t, L, R) {
     // outside: the objective end pokes out through the shell's roof and moves with the aim
     const a = R.aim, [px, py] = SCOPE.pivot;
     const ox = px + Math.cos(a) * 58, oy = py + Math.sin(a) * 58;
     const tube = [[px, py], [ox, oy]];
-    A.stroke(g, tube, 13, LINE); A.stroke(g, tube, 10.5, '#c9a258'); A.stroke(g, tube.map(([x, y]) => [x - 2, y - 1]), 2, '#f5dc98');
+    A.stroke(g, tube, 13, A.LINE); A.stroke(g, tube, 10.5, '#c9a258'); A.stroke(g, tube.map(([x, y]) => [x - 2, y - 1]), 2, '#f5dc98');
     g.save(); g.translate(ox, oy); g.rotate(a);
     ink(g, A.rr(-4, -8, 10, 16, 2), '#d2a456', 1.3);
     g.fillStyle = 'rgba(200,240,255,0.8)'; g.fill(ell(6, 0, 1.8, 6));
@@ -536,7 +536,7 @@ A.room({
       const wx = 790, wy = 224;
       const pts = []; for (let i = 0; i < 6; i++) pts.push([wx + Math.sin(i * 0.9 + t * 5) * 1.5 * up, wy - i * 2.6 * up]);
       C.limb(g, pts, 3.8, 3, '#f2a3b0', 0.8);
-      if (up > 0.6) { g.fillStyle = LINE; g.fill(circ(pts[5][0] + 1, pts[5][1], 0.7)); }
+      if (up > 0.6) { g.fillStyle = A.LINE; g.fill(circ(pts[5][0] + 1, pts[5][1], 0.7)); }
     }
   },
 });
@@ -592,7 +592,7 @@ A.room({
     g.save(); g.translate(744, 388 - w * 6); g.rotate(-0.3 - w * 0.5);
     ink(g, A.rr(-7, -6, 14, 12, 3), '#6aa3c8', 1.1);
     ink(g, poly([[-7, -2], [-18, -9], [-19, -7], [-7, 2]]), '#6aa3c8', 1);
-    g.lineWidth = 1.2; g.strokeStyle = LINE; g.beginPath(); g.arc(2, -6, 5, Math.PI, 0); g.stroke();
+    g.lineWidth = 1.2; g.strokeStyle = A.LINE; g.beginPath(); g.arc(2, -6, 5, Math.PI, 0); g.stroke();
     g.restore();
   },
 });
@@ -628,7 +628,7 @@ A.room({
       const awake = i === 1 ? wk : 0;
       C.seahorse(g, x + R.sway * 3, 496, s, { t, ph: i * 2, c, sleep: awake < 0.3, look: look(x, 470), nod: Math.sin(t * 0.9 + i) * 0.06 + (sh >= 0 && i === 2 ? A.bump(sh) * 0.2 : 0) - awake * 0.5, rot: R.sway * 0.08 + (i - 1) * 0.06 });
       if (awake > 0.3 && awake < 0.85) { // a yawn
-        g.fillStyle = LINE; g.fill(circ(x + 12 + R.sway * 3, 459 - awake * 4, 1.8 * awake));
+        g.fillStyle = A.LINE; g.fill(circ(x + 12 + R.sway * 3, 459 - awake * 4, 1.8 * awake));
       }
     }
   },
@@ -664,7 +664,7 @@ A.room({
     g.save(); g.translate(hx + 2, hy + 1); g.rotate(-0.2 + Math.sin(t * 3) * 0.05 * p);
     ink(g, curve([[0, -3], [14, -8], [24, -12], [26, 0], [20, 6], [10, 4], [0, 3]]), '#f4d8c2', 1.2);
     g.save(); g.clip(curve([[0, -3], [14, -8], [24, -12], [26, 0], [20, 6], [10, 4], [0, 3]])); g.fillStyle = '#e69a8a'; g.fill(ell(24, -3, 6, 8)); g.restore();
-    g.beginPath(); for (let i = 0; i < 20; i++) { const a = i * 0.5, rr = 5 - i * 0.22; g.lineTo(16 + Math.cos(a) * rr, -2 + Math.sin(a) * rr); } g.lineWidth = 0.8; g.strokeStyle = LINE; g.stroke();
+    g.beginPath(); for (let i = 0; i < 20; i++) { const a = i * 0.5, rr = 5 - i * 0.22; g.lineTo(16 + Math.cos(a) * rr, -2 + Math.sin(a) * rr); } g.lineWidth = 0.8; g.strokeStyle = A.LINE; g.stroke();
     g.restore();
     // the crab drummer, two sticks
     const beat = p > 0.2 ? Math.sin(t * 12) : tap >= 0 ? Math.sin(t * 7) * 0.5 : 0;

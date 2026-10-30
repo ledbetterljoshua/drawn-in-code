@@ -25,7 +25,7 @@ const skin = (() => {
 })();
 // the siphuncle runs just off the inner wall of every chamber
 A.siphR = (th) => lerp(A.ri(th), A.ro(th), 0.14);
-A.siphPts = arc(thMin + 0.25, th0 + 0.05, A.siphR, 300);
+A.siphPts = arc(th0 - A.dTh * 12.5, th0 + 0.05, A.siphR, 200);
 // distance along the siphuncle, for bubbles riding it
 A.siphLen = (() => { let L = 0; const d = [0]; for (let i = 1; i < A.siphPts.length; i++) { L += Math.hypot(A.siphPts[i][0] - A.siphPts[i - 1][0], A.siphPts[i][1] - A.siphPts[i - 1][1]); d.push(L); } A.siphD = d; return L; })();
 A.siphAt = (u) => {
@@ -41,7 +41,7 @@ function chamberHollow(g, ch, r) {
   g.save(); g.clip(ch.path);
   // the far wall: nacre in shadow (it's recessed), cooler toward the inner whorl
   const [ix, iy] = A.pt(ch.thm, ch.rIn), [ox, oy] = A.pt(ch.thm, ch.rOut);
-  g.fillStyle = grad(g, ix, iy, ox, oy, ['#6f6c92', '#8b84a6', '#a093aa']);
+  g.fillStyle = grad(g, ix, iy, ox, oy, ['#6d6886', '#8c8094', '#a39098']);
   g.fill(ch.path);
   // the sheen of nacre: soft bands following the curve of the whorl
   for (let i = 0; i < 3; i++) {
@@ -110,13 +110,16 @@ function paintFace(g) {
   }
   for (const ch of A.chambers) { g.lineWidth = clamp(ch.size * 0.009, 0.5, 1.4); g.strokeStyle = 'rgba(51, 33, 58, 0.7)'; g.stroke(ch.path); }
   // the siphuncle: a pearl tube, cut open, collared where it passes each septum
+  // drawn in short pieces so it thins toward its start, where it disappears into the older wall
   const sp = A.siphPts;
-  A.stroke(g, sp, 8, LINE);
-  A.stroke(g, sp, 5.8, '#e9d6c6');
-  A.stroke(g, sp, 2.6, '#9a7f88');
-  A.stroke(g, sp.map(([x, y]) => [x - 1.4, y - 1.6]), 1.3, '#fff6ec');
+  for (let i = 0; i < sp.length - 1; i++) {
+    const f = i / sp.length, seg = [sp[i], sp[i + 1]];
+    g.globalAlpha = clamp(f * 2.2, 0, 1);
+    A.stroke(g, seg, 3 + f * 5, LINE); A.stroke(g, seg, 1.8 + f * 4, '#e9d6c6'); A.stroke(g, seg, 0.8 + f * 1.8, '#9a7f88');
+  }
+  g.globalAlpha = 1;
   for (const s of A.septa) {
-    if (s.th < thMin + 0.25 || s.th > th0 + 0.05) continue;
+    if (s.th < th0 - A.dTh * 9 || s.th > th0 + 0.05) continue;
     const [x, y] = A.pt(s.th, A.siphR(s.th)), w = Math.max(1.6, A.R(s.th) * 0.02), hgt = Math.min(11, 4 + A.R(s.th) * 0.03);
     g.save(); g.translate(x, y); g.rotate(s.th + Math.PI / 2);
     crewInk(g, A.rr(-w * 0.6, -hgt / 2, w * 1.2, hgt, 1.5), '#e7d4c2', 0.9);
@@ -170,15 +173,21 @@ function paintBody(g, r) {
     const S = curve([...L, ...Rr.reverse()]);
     g.globalAlpha = 0.9 * fade;
     g.fillStyle = SH.stripe; g.fill(S);
+    // some flames fork near the coil
+    if (r() < 0.45) {
+      const j = 5 + Math.floor(r() * 4), base = L[j], tip = A.pt(thS - 0.28 - r() * 0.1, lerp(A.ri(thS), A.R(thS), reach * 0.75));
+      A.stroke(g, [base, [lerp(base[0], tip[0], 0.5) + 4, lerp(base[1], tip[1], 0.5)], tip], wid * A.R(thS) * 0.35, SH.stripe);
+    }
     g.save(); g.clip(S); g.globalAlpha = 0.55 * fade; g.fillStyle = SH.stripeDk; g.translate(4, 5); g.fill(S); g.restore();
     g.globalAlpha = 1;
   }
   // the whorl's roundness: the sun on the upper left, the keel turning away into shade
   g.fillStyle = grad(g, A.C[0] - 200, A.C[1] + 100, A.C[0] + 250, A.C[1] + 560, [[0, 'rgba(255, 250, 235, 0.3)'], [0.5, 'rgba(255, 250, 235, 0)'], [1, 'rgba(70, 90, 120, 0.35)']]);
   g.fill(W);
-  // a glossy highlight where the sun hits the shoulder of the whorl
-  const hi = A.toPath([...arc(th0 + 0.2, A.thE - 0.15, (th) => lerp(A.ri(th), A.R(th), 0.3), 30), ...arc(A.thE - 0.15, th0 + 0.2, (th) => lerp(A.ri(th), A.R(th), 0.4), 30)]);
-  g.fillStyle = 'rgba(255, 252, 240, 0.35)'; g.fill(hi);
+  // the belly of the whorl turns away from the sun into the water's blue
+  const belly = A.toPath([...arc(th0, A.thE, A.R, 50), ...arc(A.thE, th0, (th) => A.R(th) * 0.8, 50)]);
+  g.fillStyle = grad(g, A.C[0], A.C[1] + 250, A.C[0] + 150, A.C[1] + 560, [[0, 'rgba(60, 110, 150, 0)'], [1, 'rgba(60, 110, 150, 0.35)']]);
+  g.fill(belly);
   g.restore();
   // the near wall's sawn edge along the cut, a band showing its two layers
   const e0 = A.pt(th0, A.ri(th0)), e1 = A.pt(th0, A.R(th0));
@@ -199,9 +208,18 @@ const box = (() => {
   return { x0: x0 - pad, y0: y0 - pad - 60, w: x1 - x0 + pad * 2, h: y1 - y0 + pad * 2 + 60 };
 })();
 A.shellBox = box;
+// the engine's sprite() at the shell's own scale, so the ark stays crisp when drawn larger
+function hiSprite(x0, y0, w, h, fn) {
+  const R = st.R * A.SC, c = document.createElement('canvas');
+  c.width = Math.ceil(w * R); c.height = Math.ceil(h * R);
+  const g = c.getContext('2d');
+  g.setTransform(R, 0, 0, R, -x0 * R, -y0 * R); g.lineJoin = g.lineCap = 'round';
+  fn(g);
+  return { c, x0, y0, w, h };
+}
 onLayout(() => {
-  back = sprite(box.x0, box.y0, box.w, box.h, paintBack);
-  face = sprite(box.x0, box.y0, box.w, box.h, paintFace);
+  back = hiSprite(box.x0, box.y0, box.w, box.h, paintBack);
+  face = hiSprite(box.x0, box.y0, box.w, box.h, paintFace);
 });
 
 layer({
@@ -220,7 +238,7 @@ layer({
     A.inShell(g, () => {
       g.save(); g.clip(A.wedgePath); g.globalCompositeOperation = 'lighter';
       const b = A.shellBox, off = (t * 9) % 700;
-      g.globalAlpha = 0.09 + 0.03 * Math.sin(t * 0.7);
+      g.globalAlpha = 0.05 + 0.02 * Math.sin(t * 0.7);
       const S = 1.9, off2 = (t * 9) % (700 * S);
       for (let x = b.x0 - 700 * S + off2; x < b.x0 + b.w; x += 700 * S) g.drawImage(A.cau.c, x, b.y0 + 300 + Math.sin(t * 0.4) * 6, 700 * S, b.h);
       g.restore();
@@ -232,7 +250,7 @@ layer({
 A.faceItem((g) => {
   const r = rng(808);
   for (let i = 0; i < 14; i++) {
-    const th = 1.15 + Math.pow(r(), 1.5) * 0.4, rad = A.R(th) * (0.93 + r() * 0.05), [x, y] = A.pt(th, rad), s = 5 + r() * 6;
+    const th = 1.15 + Math.pow(r(), 1.5) * 0.4, rad = A.R(th) * (0.92 + r() * 0.06), [x, y] = A.pt(th, rad), s = 2.5 + Math.pow(r(), 2) * 9;
     // a volcano of plates seen from the side of the shell, its little door shut
     g.fillStyle = 'rgba(70, 60, 80, 0.35)'; g.fill(ell(x + 1.5, y + 2, s * 1.1, s * 0.8));
     crewInk(g, ell(x, y, s, s * 0.78, undefined, th), i % 3 ? '#e9e1d4' : '#d4c7b8', 1);

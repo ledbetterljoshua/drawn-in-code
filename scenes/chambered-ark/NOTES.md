@@ -118,3 +118,30 @@ Worst five:
 3. Sheaths on the face read as popcorn cups → lower contrast, lighter line, closer to the face colour.
 4. (kept) values are mid-everywhere; the cut face's whites carry the read. Watching.
 5. (kept) the eel colony is a picket line at full frame. Watching.
+
+## Round 6 — after the second critic
+The second critic: the rooms don't read at desktop size (an inventory, not a scene); the coil reads as
+a concentric bullseye; the head is a salmon box with a bowling-ball eye; interiors cold lilac, no
+belly shadow on the shell; broom tentacles; kelp as wallpaper; procedural textures (Voronoi on the
+shell, evenly sprinkled dots, identical barnacles, a translucent gloss band over the stripes); one line
+weight; flat midground cutouts; a phone crop that floats the shell in a third and gives the bottom to a
+grey rock.
+
+Two of those I'd have argued with (the spiral *is* logarithmic) until I looked again: the siphuncle,
+run all the way in along the inner wall of every whorl, drew a ring per turn, and that is the bullseye.
+
+Did:
+- The ark is drawn 12% larger and a little higher (A.SC / A.OFF: shell space scaled onto the artboard,
+  sprites painted at the higher resolution, hit tests and particles mapped through it).
+- The siphuncle now runs only through the last turn and a half and thins into the wall; no rings.
+- Interiors warmer (less lilac in the nacre), amber pools stronger; everything inside the shell is
+  inked in a lighter, warmer ink (A.INK_IN) so the rooms stop turning to mush; the silhouette keeps
+  the heavy dark line.
+- The whorl's belly turns blue away from the sun; the gloss band over the stripes is gone; some
+  flame stripes fork; caustics on the shell barely there; barnacles vary from specks to big ones.
+- The eye has a lid resting a third down (calm), lifting when you come near or move fast, and a brow
+  fold: she has an attitude now. The face is shaded (hood shadow, a lit cheek, falling into the aperture).
+- Cirri in four clusters, each curling its own way, a darker back row behind each.
+- Kelp bows downstream in the current with its own lean and thickness per strand; the front strand
+  moved off the face.
+- Phone: sky above the surface cooler, the big near rock pushed down so it's cropped.

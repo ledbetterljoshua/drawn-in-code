@@ -26,8 +26,9 @@ layer({
     for (const p of A.fx) {
       const u = p.age / p.life, a = Math.min(1, u * 6, (1 - u) * 3);
       g.save();
-      if (p.shell) { g.translate(0, A.bob); }
-      g.translate(p.x, p.y); g.globalAlpha = a;
+      if (p.shell) { const [sx, sy] = A.fromShell(p.x, p.y); g.translate(sx, sy); g.scale(A.SC, A.SC); }
+      else g.translate(p.x, p.y);
+      g.globalAlpha = a;
       if (p.kind === 'bubble') {
         const s = p.size * (1 + u * 0.3);
         g.lineWidth = Math.max(0.8, s * 0.22); g.strokeStyle = 'rgba(240,255,250,0.85)'; g.fillStyle = 'rgba(220,250,245,0.18)';
