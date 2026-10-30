@@ -355,9 +355,22 @@ function drawerFront(g, d, q, R, lit = 0) {
 // label holder + card + pull (cup, bar, ring, knob, string)
 function drawHardware(g, d, q, R) {
   const s = clamp(d.h / 70, 0.5, 1.4);
-  const L = OW.qat(q, 0.5, d.pull === 'string' ? 0.32 : 0.3);
-  const lw = 18 * s * (d.w > 60 ? 1 : 0.8), lh = 9 * s;
-  if (d.pull !== 'string') {
+  // labels vary: most in a brass holder (centred or set to the left), some chalked straight on the
+  // front, a few with a paper slip tucked in the gap
+  const RH = rng(d.seed + 7), style = RH(), left = RH() < 0.35;
+  const L = OW.qat(q, left ? 0.24 : 0.5, d.pull === 'string' ? 0.32 : 0.28 + RH() * 0.06);
+  const lw = 18 * s * (d.w > 60 ? 1 : 0.8) * (0.8 + RH() * 0.45), lh = 9 * s;
+  if (d.pull !== 'string' && style < 0.18) {
+    g.strokeStyle = 'rgba(230,226,240,0.55)'; g.lineWidth = 1.1 * s;
+    g.beginPath(); let x = L[0] - lw / 2; g.moveTo(x, L[1]);
+    while (x < L[0] + lw / 2) { x += 2.6 * s; g.lineTo(x, L[1] + Math.sin(x * 1.7) * 1.6 * s); }
+    g.stroke();
+  } else if (d.pull !== 'string' && style < 0.3) {
+    const a = (RH() - 0.5) * 0.3;
+    g.save(); g.translate(q[0][0] + d.w * (0.15 + RH() * 0.6), q[0][1] + 1); g.rotate(a);
+    ink(g, poly([[-5 * s, -6 * s], [5 * s, -5 * s], [4 * s, 3 * s], [-4 * s, 3 * s]]), '#d8ccb6', 0.7);
+    g.restore();
+  } else if (d.pull !== 'string') {
     // brass frame, cream card, a scrawl of ink
     ink(g, Drawn.rect(L[0] - lw / 2 - 1.5 * s, L[1] - lh / 2 - 1.2 * s, lw + 3 * s, lh + 2.4 * s), C.brass.base, 0.9);
     const lit = clamp(lampAt(L[0], L[1]) + OW.warmAt(L[1]) * 0.3, 0, 1);

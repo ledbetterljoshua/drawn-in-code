@@ -257,7 +257,7 @@ for (const p of PORTERS) {
       drawLadder(g, G);
       const k = clamp(p.rung + p.rungOff, 0.05, 0.9);
       const fx = lerp(G.tx, G.bx, k), fy = lerp(G.ty, G.by, k);
-      const s = OW.scaleAt(fy) * 1.6;
+      const s = OW.scaleAt(fy) * 1.85;
       const grip = [lerp(G.tx, G.bx, k - 0.18) - p.face * G.wt * 0.5, lerp(G.ty, G.by, k - 0.18)];
       let hand = [fx + p.face * 16 * s, fy - 30 * s];
       const frozen = p.freeze > 0.15;

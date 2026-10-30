@@ -70,6 +70,8 @@ for (const d of D) {
   d.breathRate = 0.22 + R() * 0.14;
   d.snoreAt = 2 + R() * 12;
   d.flip = (d.cx > PX ? -1 : 1) * (R() < 0.75 ? 1 : -1);
+  d.bottle = d.rest > 0 && d.guest !== 'bear' && d.guest !== 'tortoise' && R() < 0.3;
+  if (d.guest === 'dormouse') { const socks = [['#c7a8c8', '#6e86b8'], ['#e0c070', '#c3343c'], ['#a8c0a0', '#e8e2ec'], ['#d8a0b0', '#7a5a9a']][Math.floor(R() * 4)]; d.sockA = socks[0]; d.sockB = socks[1]; }
 }
 
 // ------------------------------------------------------------ particles: paper Zs, breath vapour
@@ -522,6 +524,12 @@ function drawOpen(g, d, o, a, noFront) {
     g.translate(lx, ly + (below ? 4 : 0)); g.rotate(Math.atan2(lipR[1] - lipL[1], lipR[0] - lipL[0]));
     if (d.flip < 0) g.scale(-1, 1);
     RIGS[d.guest](g, s, a, d);
+    if (d.bottle) {
+      const bx = -22 * s * (d.flip < 0 ? -1 : 1) * (d.flip < 0 ? -1 : 1), by = -3 * s;
+      ink(g, curve([[bx - 4 * s, by + 4 * s], [bx - 5 * s, by - 4 * s], [bx - 2 * s, by - 9 * s], [bx + 2 * s, by - 9 * s], [bx + 5 * s, by - 4 * s], [bx + 4 * s, by + 4 * s]]), '#d4c4a8', 1);
+      g.fillStyle = '#8a6a4a'; g.fillRect(bx - 5 * s, by - 3 * s, 10 * s, 2 * s);
+      ink(g, Drawn.rect(bx - 1.4 * s, by - 12 * s, 2.8 * s, 3.4 * s), '#6a4a34', 0.7);
+    }
     g.restore();
   }
   // below eye level we look down onto the drawer's side boards running back into the cabinet;
@@ -624,7 +632,7 @@ for (const d of D) {
         d.lift = Math.max(0, (d.lift || 0) - dt * 2.5);
         const target = d.rest + bump(1 - d.lift) * 0.06 * (d.lift > 0 ? 1 : 0) + (L.hovered ? 0.04 : 0);
         d.o = ease(d.o, target, 4, dt);
-        anim.rise = ease(anim.rise, 0, 2, dt); anim.yawn = ease(anim.yawn, 0, 3, dt); anim.eye = ease(anim.eye, 0, 4, dt);
+        anim.rise = ease(anim.rise, d.focal ? 0.38 : 0, 2, dt); anim.yawn = ease(anim.yawn, 0, 3, dt); anim.eye = ease(anim.eye, 0, 4, dt);
         anim.spin = ease(anim.spin, 0, 2, dt);
       } else if (d.state === 'wake') {
         // 0–0.6 out and up · 0.6–1.8 squint at the tag · 1.8–3.2 the yawn · 3.2–4.6 back down

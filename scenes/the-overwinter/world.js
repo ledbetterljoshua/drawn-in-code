@@ -89,7 +89,7 @@ OW.fx = (u, y) => { const k = (OW.FB - y) / (OW.FB - OW.FT); return lerp(lerp(XL
 // The face also wraps round the stack like a drum (θ across). Seen from below, the sides are
 // farther away, so above eye level every horizontal arcs down toward the edges and the cabinets
 // there narrow; at eye level the arc flattens out.
-const TH = 1.0, RZ = 0.14; // half-angle of the face (rad), drum radius / distance
+const TH = 1.0, RZ = 0.17; // half-angle of the face (rad), drum radius / distance
 const zf = (th) => 1 / (1 + RZ * (1 - Math.cos(th)));
 const ZE = zf(TH), SE = Math.sin(TH) * ZE;
 OW.at = (u, v) => {

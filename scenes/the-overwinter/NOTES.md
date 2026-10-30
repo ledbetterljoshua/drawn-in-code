@@ -196,3 +196,15 @@ Fixed:
 - Fixed lamps 1.4× bigger on visible brackets, so every pool has a source.
 - Kettle rope a real rope (ink edge); ladder rails heavier.
 - Wrack as flat fronds with a midrib; foreground slabs as boulders with sloped sides (no boxes).
+
+## Round 9
+
+Five worst (mine):
+1. **Porters still small for the story.** → 1.85× (from 1.6×).
+2. **The drum wrap too subtle; critics keep calling the drawers front-on.** → RZ back up to 0.17 now
+   that the rails are segments — edge cabinets visibly narrow and their rows arc.
+3. **Every label holder identical.** → per drawer: brass holder centred or set left, varying widths;
+   some chalked straight on the front; some with a paper slip tucked in the gap.
+4. **Every open drawer the same sleeping lump.** → sock linings in four colourways; stoneware
+   hot-water bottles tucked in beside about a third of the sleepers (the bottle porter's work).
+5. **The focal dormouse sank out of sight.** → it dozes half sat up, nose raised to the feather.
