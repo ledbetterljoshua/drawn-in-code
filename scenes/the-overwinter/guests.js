@@ -453,7 +453,15 @@ function drawTag(g, d, H, s, read, t) {
   g.lineWidth = 0.8; g.strokeStyle = C.tag.string;
   g.beginPath(); g.moveTo(H[0], H[1] + 1); g.quadraticCurveTo(lerp(H[0], ex, 0.5) + 2, lerp(H[1], ey, 0.5) + 2, ex, ey); g.stroke();
   const k = lerp(1, 4.2, sstep(0, 1, read)) * s;
-  const w = 15 * k, h = 7.5 * k;
+  let w = 15 * k;
+  const h = 7.5 * k;
+  if (read > 0.4) {
+    // wide enough for what's written on it
+    const words = d.tagText.split('. '), fs = h * 0.24;
+    g.font = `600 ${fs}px Georgia, serif`; let tw = g.measureText(words[0] + '.').width;
+    g.font = `italic ${fs * 0.92}px Georgia, serif`; tw = Math.max(tw, g.measureText(words.slice(1).join('. ')).width);
+    w = Math.max(w, lerp(w, tw + h * 1.3, sstep(0.4, 0.8, read)));
+  }
   g.save(); g.translate(ex, ey); g.rotate(ang * 0.6 + Math.PI / 2 - lerp(0.25, Math.PI / 2 - 0.08, sstep(0, 1, read)));
   if (read > 0.02) { g.shadowColor = 'rgba(10,6,20,0.5)'; g.shadowBlur = 8 * read; g.shadowOffsetY = 3 * read; }
   ink(g, tagPath(w, h), mix(C.tag.shade, C.tag.base, 0.4 + read * 0.6), clamp(0.8 * k / 2, 0.7, 1.4));
@@ -470,7 +478,7 @@ function drawTag(g, d, H, s, read, t) {
     const x0 = h * 0.85;
     if (words.length > 1) {
       g.font = `600 ${fs}px Georgia, serif`; g.fillText(words[0] + '.', x0, h * 0.32);
-      g.font = `italic ${fs * 0.92}px Georgia, serif`; g.fillText(words.slice(1).join('. '), x0, h * 0.66, w - x0 - h * 0.3);
+      g.font = `italic ${fs * 0.92}px Georgia, serif`; g.fillText(words.slice(1).join('. '), x0, h * 0.66);
     } else g.fillText(d.tagText, x0, h * 0.5, w - x0 - h * 0.3);
     g.fillStyle = '#c3343c'; g.fillRect(x0, h * 0.84, w * 0.3, h * 0.03);
     g.globalAlpha = 1;
@@ -702,15 +710,22 @@ for (const d of D) {
         s = r.s;
         // the handle moves with the front
         const H = OW.qat(r.f, 0.5, 0.66);
-        if (d.hasTag) drawTag(g, d, H, d.hs * 1.05, d.read, t);
+        if (d.hasTag) (d.read > 0.05 ? TOP.push([d, H, d.hs * 1.05, d.read]) : drawTag(g, d, H, d.hs * 1.05, d.read, t));
       } else {
         if (d.guest === 'bat' && d.handle) bat(g, clamp(d.w / 50, 0.9, 1.6), anim, d, [d.handle[0], d.handle[1] + 2]);
-        if (d.hasTag && d.handle) drawTag(g, d, d.handle, d.hs * 1.05, d.read, t);
+        if (d.hasTag && d.handle) (d.read > 0.05 ? TOP.push([d, d.handle, d.hs * 1.05, d.read]) : drawTag(g, d, d.handle, d.hs * 1.05, d.read, t));
       }
       g.restore();
     },
   });
 }
+
+// tags being read, drawn above everything
+const TOP = [];
+layer({
+  id: 'reading-tags', z: 33,
+  draw(g, t) { g.save(); g.translate(OW.shake.x, OW.shake.y); for (const [d, H, s, read] of TOP) drawTag(g, d, H, s, read, t); g.restore(); TOP.length = 0; },
+});
 
 // queued yawns go off on time
 layer({

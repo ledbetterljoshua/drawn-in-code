@@ -41,7 +41,7 @@ layer({
     const v = st.view, X0 = v.x0 - 20, X1 = v.x1 + 20, Y1 = v.y1 + 20;
     const R = rng(616);
     // wet sand: a mirror, so it carries the sky upside down — bright at the shore, darker near us
-    g.fillStyle = grad(g, 0, SHORE, 0, Math.max(Y1, 1600), [[0, '#d4949a'], [0.04, '#a87590'], [0.14, '#6e5680'], [0.35, '#4a4068'], [0.7, '#342e52'], [1, '#26223e']]);
+    g.fillStyle = grad(g, 0, SHORE, 0, Math.max(Y1, 1600), [[0, '#5a4a7a'], [0.03, '#7a5c86'], [0.12, '#664e80'], [0.35, '#4a4068'], [0.7, '#342e52'], [1, '#26223e']]);
     g.fillRect(X0, SHORE, X1 - X0, Y1 - SHORE);
     g.save(); g.translate(OW.SUNX, SHORE); g.scale(1, 0.16);
     g.fillStyle = radial(g, 0, 0, 0, 1300, [[0, 'rgba(255,214,180,0.75)'], [0.2, 'rgba(250,170,150,0.4)'], [0.6, 'rgba(200,120,150,0.12)'], [1, 'rgba(200,120,150,0)']]);

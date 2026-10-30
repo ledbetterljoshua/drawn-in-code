@@ -320,11 +320,10 @@ function drawerFront(g, d, q, R, lit = 0) {
     g.strokeStyle = mix(base, '#c8d0cc', 0.25); g.stroke(qpath(ip.map(([x, y]) => [x + 0.8, y + 1])));
     for (let i = 0; i < 3; i++) { g.globalAlpha = 0.4; g.fillStyle = '#7a4a34'; g.fill(ell(q[0][0] + R() * ww, q[0][1] + R() * hh, 1 + R() * 4, 0.8 + R() * 2)); }
     // a cold sheen down the pressed steel, and a dent or two catching it
-    g.globalAlpha = 0.16; g.fillStyle = '#d8e4ff'; g.fill(poly([OW.qat(q, 0.62, 0), OW.qat(q, 0.7, 0), OW.qat(q, 0.58, 1), OW.qat(q, 0.5, 1)]));
     if (R() < 0.5) { const c = OW.qat(q, 0.2 + R() * 0.6, 0.3 + R() * 0.5); g.globalAlpha = 0.35; g.fillStyle = '#0c1014'; g.fill(ell(c[0], c[1], 3, 1.6, undefined, -0.4)); g.fillStyle = '#c8d4e0'; g.fill(ell(c[0] - 1, c[1] - 1.4, 2.4, 0.8, undefined, -0.4)); }
   } else if (make === 'ox') {
     for (let i = 0; i < 5; i++) { g.globalAlpha = 0.6; g.fillStyle = '#c4a088'; const x = q[0][0] + R() * ww, y = q[0][1] + R() * hh; g.fill(poly([[x, y], [x + 2 + R() * 5, y + R() * 2], [x + R() * 3, y + 2 + R() * 3]])); }
-    g.globalAlpha = 0.18; g.fillStyle = '#fff'; g.fillRect(q[0][0], q[0][1] + hh * 0.12, ww, hh * 0.08);
+    g.globalAlpha = 0.06; g.fillStyle = '#fff'; g.fillRect(q[0][0], q[0][1] + hh * 0.12, ww, hh * 0.06);
   } else if (make === 'walnut') {
     g.globalAlpha = 0.3; g.strokeStyle = '#1a0e12'; g.lineWidth = 0.7;
     for (let i = 0; i < 5; i++) { const y = q[0][1] + hh * (0.15 + i * 0.17); g.beginPath(); g.moveTo(q[0][0], y); g.bezierCurveTo(q[0][0] + ww * 0.3, y - 3, q[0][0] + ww * 0.6, y + 4, q[1][0], y + (R() - 0.5) * 4); g.stroke(); }
@@ -336,7 +335,7 @@ function drawerFront(g, d, q, R, lit = 0) {
     // kraft-faced oak: fibres and a soft crease or two
     g.globalAlpha = 0.18; g.strokeStyle = '#3a2830'; g.lineWidth = 0.6;
     for (let i = 0; i < 6; i++) { const x = q[0][0] + R() * ww, y = q[0][1] + R() * hh; g.beginPath(); g.moveTo(x, y); g.lineTo(x + 4 + R() * 10, y + (R() - 0.5) * 2); g.stroke(); }
-    if (R() < 0.5) { g.globalAlpha = 0.22; g.strokeStyle = '#f0d8c8'; g.lineWidth = 0.9; const x = q[0][0] + ww * (0.1 + R() * 0.8); g.beginPath(); g.moveTo(x, q[0][1]); g.lineTo(x + (R() - 0.5) * 8, q[0][1] + hh * (0.3 + R() * 0.5)); g.stroke(); }
+    if (R() < 0.3) { g.globalAlpha = 0.1; g.strokeStyle = '#f0d8c8'; g.lineWidth = 0.9; const x = q[0][0] + ww * (0.1 + R() * 0.8); g.beginPath(); g.moveTo(x, q[0][1]); g.lineTo(x + (R() - 0.5) * 8, q[0][1] + hh * (0.3 + R() * 0.5)); g.stroke(); }
   }
   // water stains, tide marks and snow-damp at the bottom edge
   g.globalAlpha = 0.16; g.fillStyle = '#1e1220';

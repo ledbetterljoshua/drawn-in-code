@@ -66,8 +66,8 @@ const deckY = (x) => 380 + 120 * noise(x * 0.0022 + 4) + 70 * noise(x * 0.006 + 
       const near = clamp(1 - Math.abs(x + 40 - SUNX) / 1300, 0, 1) ** 1.4 * clamp((deckY(x + 40) - 200) / 220, 0, 1);
       if (near < 0.03) continue;
       const p = new Path2D();
-      for (let xx = x - 20; xx <= x + 100; xx += 10) (xx === x - 20 ? p.moveTo(xx, deckY(xx) - 6) : p.lineTo(xx, deckY(xx) - 6));
-      soft(p, `rgba(255,${Math.round(150 + near * 50)},${Math.round(140 + near * 20)},${0.12 + near * 0.5})`, 16, 10 + near * 8);
+      for (let xx = x - 30; xx <= x + 110; xx += 10) (xx === x - 30 ? p.moveTo(xx, deckY(xx) - 18) : p.lineTo(xx, deckY(xx) - 18));
+      soft(p, `rgba(255,${Math.round(150 + near * 50)},${Math.round(140 + near * 20)},${0.06 + near * 0.22})`, 34, 30 + near * 26);
     }
     // soft folds inside the deck, so it isn't a flat lid
     for (let i = 0; i < 30; i++) {
@@ -195,7 +195,7 @@ layer({
   id: 'sea', z: 3, still: true,
   draw(g) {
     const v = st.view, X0 = v.x0 - 20, X1 = v.x1 + 20;
-    g.fillStyle = grad(g, 0, HZ, 0, SHORE + 40, [[0, '#6c5a86'], [0.15, '#4a3f6c'], [0.6, C.sea.mid], [1, C.sea.near]]);
+    g.fillStyle = grad(g, 0, HZ, 0, SHORE + 40, [[0, '#6c5a86'], [0.2, '#55477a'], [0.7, '#4a3e6c'], [1, '#52436e']]);
     g.fillRect(X0, HZ, X1 - X0, SHORE + 40 - HZ);
     // the afterglow laid on the water: a broad warm path under where the sun went down
     g.save(); g.translate(SUNX, HZ); g.scale(1, 0.09);

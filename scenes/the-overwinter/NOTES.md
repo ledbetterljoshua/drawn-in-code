@@ -208,3 +208,26 @@ Five worst (mine):
 4. **Every open drawer the same sleeping lump.** → sock linings in four colourways; stoneware
    hot-water bottles tucked in beside about a third of the sleepers (the bottle porter's work).
 5. **The focal dormouse sank out of sight.** → it dozes half sat up, nose raised to the feather.
+
+## Round 10 (fourth fresh critic, then fixes)
+
+The critic, asked which of its ten a viewer would notice at full-frame size, named seven: the cloud's
+lit edge reads as a rope; the stack is still "a tube with a sheet of drawers" (outline too even);
+the crown is a dead dark mass; the story's small figures; drawers read as glass (glare streaks) and
+far ones aren't dark enough; the foot sits on the flats like a sticker; a hard step between far sea
+and near flats.
+
+Fixed: the cloud's lit edge is now a broad, low, heavily blurred band set back up into the cloud;
+the glare streaks on steel and lacquer are gone and kraft creases softened (matte); the far sea and
+the flats now meet at one value. Also: reading tags draw on their own top layer (lower drawers were
+painting over them) and size themselves to their text (it was truncating).
+
+## Still wrong (for whoever picks this up)
+
+- **The outline is still too even a taper.** It reads as a tube at thumbnail size. It needs one big
+  erosional event: a bite out of one side at mid-height, a secondary spire, or a real lean.
+- **The crown is dark and empty.** The top 25% carries no story. Either crop the stack lower, or
+  put something up there (the bats' roost under the brow, a porter on the cupola's ladder).
+- **Story scale.** Stoats and sleepers away from the focal drawer are still small at desktop size,
+  and the drawer-interior cheat makes the eye level inconsistent from drawer to drawer. A bigger
+  second vignette low on the face (the bear's minder) would help.
