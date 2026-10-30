@@ -76,7 +76,7 @@ function ladderGeom(p) {
 }
 function drawLadder(g, L) {
   const { tx, ty, bx, by, s, wt, wb } = L;
-  const lw = 1.4;
+  const lw = 1.7;
   const W = { base: '#6a4a3a', lit: '#9a6e52', shade: '#3e2a26' };
   for (const side of [-1, 1]) {
     const p = poly([[tx + side * wt / 2 - 1.6 * s, ty - 4 * s], [tx + side * wt / 2 + 1.6 * s, ty - 4 * s], [bx + side * wb / 2 + 2 * s, by], [bx + side * wb / 2 - 2 * s, by]]);
@@ -335,8 +335,8 @@ layer({
     g.globalCompositeOperation = 'source-over';
     // the fixed lamps themselves, hung on brackets
     FIXED.forEach(([x, y], i) => {
-      const s = OW.scaleAt(y) * 1.3, fl = 0.86 + 0.14 * Math.sin(t * 7 + i * 2) * Math.sin(t * 4.1 + i);
-      g.lineWidth = 1.4 * s; g.strokeStyle = '#2a2236'; g.beginPath(); g.moveTo(x - 10 * s, y - 16 * s); g.lineTo(x, y - 16 * s); g.lineTo(x, y - 12 * s); g.stroke();
+      const s = OW.scaleAt(y) * 1.8, fl = 0.86 + 0.14 * Math.sin(t * 7 + i * 2) * Math.sin(t * 4.1 + i);
+      g.lineWidth = 1.6 * s; g.strokeStyle = '#2a2236'; g.beginPath(); g.moveTo(x - 12 * s, y - 16 * s); g.lineTo(x, y - 16 * s); g.lineTo(x, y - 12 * s); g.stroke(); g.fillStyle = '#4a4058'; g.fill(Drawn.circ(x - 12 * s, y - 16 * s, 1.6 * s));
       OW.hushLamp(g, x, y - 2 * s, s, fl);
     });
     g.restore();
@@ -367,7 +367,9 @@ layer({
     // the rope down the face (it hangs clear of the drawers, past the right-hand chimney)
     const len = 590 + K.drop * 40;
     K.x = wx + 5 + Math.sin(K.sw) * len * 0.12; K.y = wy + Math.cos(K.sw) * len;
-    g.lineWidth = 1.3; g.strokeStyle = '#a89070';
+    g.lineWidth = 3.2; g.strokeStyle = LINE;
+    const rope = new Path2D(); rope.moveTo(wx + 5, wy); rope.quadraticCurveTo(wx + 6 + Math.sin(K.sw) * len * 0.1, wy + len * 0.5, K.x, K.y - 16); g.stroke(rope);
+    g.lineWidth = 1.6; g.strokeStyle = '#b89a70';
     g.beginPath(); g.moveTo(wx + 5, wy); g.quadraticCurveTo(wx + 6 + Math.sin(K.sw) * len * 0.1, wy + len * 0.5, K.x, K.y - 16); g.stroke();
     // a copper kettle, blackened on the bottom, steaming
     const kx = K.x, ky = K.y;

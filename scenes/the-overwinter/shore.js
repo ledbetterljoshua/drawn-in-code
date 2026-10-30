@@ -221,13 +221,13 @@ layer({
       // a snow cap on the bigger ones
       if (w > 20) ink(g, curve([[x - w * 0.6, y - h * 0.78], [x - w * 0.1, y - h * 1.08], [x + w * 0.5, y - h * 0.86], [x + w * 0.1, y - h * 0.72]]), C.snow, 1, C.snowShade);
     }
-    // kelp strands draped over the stones and the foot
-    g.lineCap = 'round';
-    for (let i = 0; i < 26; i++) {
-      const x = 300 + R() * 900, y = 1250 + R() * 18;
-      const l = 14 + R() * 30;
-      g.lineWidth = 2 + R() * 2.5; g.strokeStyle = R() < 0.5 ? '#3c3a2a' : '#4c4630';
-      g.beginPath(); g.moveTo(x, y - l * 0.4); g.bezierCurveTo(x + 6, y - l * 0.2, x - 4, y, x + (R() - 0.5) * l, y + 6); g.stroke();
+    // wrack draped over the stones and the foot: flat ribbon fronds with a midrib, not squiggles
+    for (let i = 0; i < 22; i++) {
+      const x = 260 + R() * 900, y = 1246 + R() * 18, l = 12 + R() * 24, dir = R() < 0.5 ? -1 : 1, w = 2.4 + R() * 2;
+      const pts = [[x, y - l * 0.5], [x + dir * l * 0.3, y - l * 0.15], [x + dir * l * 0.2, y + l * 0.2], [x + dir * l * 0.5, y + l * 0.4]];
+      const L = pts.map(([px, py]) => [px - w / 2, py]), Rr = pts.map(([px, py]) => [px + w / 2, py]).reverse();
+      ink(g, curve(L.concat(Rr)), R() < 0.5 ? '#3c3824' : '#4c4428', 0.8);
+      g.lineWidth = 0.6; g.strokeStyle = 'rgba(200,170,120,0.35)'; g.stroke(curve(pts, false));
     }
   },
 });
@@ -239,23 +239,23 @@ layer({
   id: 'foreground', z: 36, still: true,
   draw(g) {
     const R = rng(909);
-    const rocks = [[-420, 1520, 190, 110], [-150, 1560, 170, 90], [30, 1590, 110, 70], [-40, 1488, 34, 16], [1100, 1620, 160, 70], [1330, 1560, 120, 70]];
+    const rocks = [[-430, 1530, 200, 110], [-170, 1572, 170, 86], [10, 1610, 90, 54], [-40, 1494, 30, 14], [130, 1640, 60, 30]];
     for (const [x, y, w, h] of rocks) {
       // angular slabs of the same bedded stone as the stack, tilted, with flat tops
       const tilt = (R() - 0.5) * 0.3;
-      const pts = [[x - w, y + 3000], [x - w * 0.95, y - h * 0.3], [x - w * 0.7, y - h * 0.85], [x - w * 0.2, y - h - tilt * w], [x + w * 0.35, y - h * 0.95 + tilt * w * 0.5], [x + w * 0.8, y - h * 0.6 + tilt * w], [x + w, y - h * 0.1], [x + w, y + 3000]];
+      const pts = [[x - w * 1.5, y + h * 1.4], [x - w * 1.05, y + h * 0.4], [x - w * 0.95, y - h * 0.3], [x - w * 0.7, y - h * 0.85], [x - w * 0.2, y - h - tilt * w], [x + w * 0.35, y - h * 0.95 + tilt * w * 0.5], [x + w * 0.8, y - h * 0.6 + tilt * w], [x + w, y - h * 0.1], [x + w * 1.08, y + h * 0.5], [x + w * 1.6, y + h * 1.4]];
       const p = poly(pts.map(([px, py]) => [px + (R() - 0.5) * 6, py + (R() - 0.5) * 4]));
       ink(g, p, '#120e1a', 3.4);
       g.save(); g.clip(p);
       // the top plane catches the glow; bedding lines run across the face
-      g.fillStyle = 'rgba(240,150,150,0.16)'; g.fill(poly([pts[1], pts[2], pts[3], pts[4], pts[5], [pts[5][0], pts[5][1] + h * 0.18], [pts[1][0], pts[1][1] + h * 0.14]]));
+      g.fillStyle = 'rgba(240,150,150,0.16)'; g.fill(poly([pts[2], pts[3], pts[4], pts[5], pts[6], [pts[6][0], pts[6][1] + h * 0.18], [pts[2][0], pts[2][1] + h * 0.14]]));
       g.strokeStyle = 'rgba(8,4,14,0.6)'; g.lineWidth = 1.6;
       for (let k = 1; k < 4; k++) { const yy = y - h * 0.5 + k * h * 0.35; g.beginPath(); g.moveTo(x - w, yy + tilt * 20); g.lineTo(x + w, yy - tilt * 20 + (R() - 0.5) * 6); g.stroke(); }
       for (let i = 0; i < w * 0.5; i++) { g.fillStyle = R() < 0.6 ? '#5a5068' : '#0e0a16'; g.fill(circ(x - w + R() * 2 * w, y - R() * h * 0.9, 0.8 + R() * 1.8)); }
       g.restore();
       // a thin, broken skin of snow on the top plane
       for (let k = 0; k < 3; k++) {
-        const t0 = 0.15 + R() * 0.5, a0 = [lerp(pts[2][0], pts[5][0], t0), lerp(pts[2][1], pts[5][1], t0)], len = w * (0.2 + R() * 0.35);
+        const t0 = 0.15 + R() * 0.5, a0 = [lerp(pts[3][0], pts[6][0], t0), lerp(pts[3][1], pts[6][1], t0)], len = w * (0.2 + R() * 0.35);
         ink(g, curve([[a0[0], a0[1] + 2], [a0[0] + len * 0.3, a0[1] - 2 - R() * 3], [a0[0] + len, a0[1] + 1], [a0[0] + len * 0.5, a0[1] + 3]]), C.snow, 1, C.snowShade);
       }
       g.lineCap = 'round';

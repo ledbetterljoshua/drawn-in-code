@@ -15,7 +15,7 @@ const sstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t 
 
 // ------------------------------------------------------------ reception, in the arch
 const DESK = { x0: 322, x1: 428, y: 1226, h: 34 };
-const BELL = [410, 1224];
+const BELL = [402, 1224];
 const INDEX = [334, 1226];
 const state = { ding: 0, idx: 0, look: 0, blink: Drawn.blinker(2, 5) };
 OW.bell = BELL;
@@ -37,7 +37,12 @@ layer({
   },
   draw(g, t) {
     // the lamp's pool on the arch floor and the inner walls
-    OW.lampGlow(g, 352, 1206, 70, 0.55);
+    // the one warm light in the picture: the night porter's oil lamp at reception, on the arch floor
+    // and the inner walls, against all that blue
+    const wf = 0.9 + 0.1 * Math.sin(t * 7.1) * Math.sin(t * 4.3);
+    g.fillStyle = radial(g, 410, 1210, 0, 110, [[0, `rgba(255,190,110,${0.5 * wf})`], [0.4, `rgba(255,160,100,${0.18 * wf})`], [1, 'rgba(255,150,100,0)']]);
+    g.fillRect(300, 1100, 220, 220);
+    OW.lampGlow(g, 352, 1206, 54, 0.4);
     // the desk porter, reading the index cards through spectacles
     const px = 380, py = 1226;
     const pl = state.look;
@@ -79,6 +84,15 @@ layer({
     }
     ink(g, circ(ix + 12, iy - 15, 1), C.brass.lit, 0.4); ink(g, circ(ix + 12, iy - 5.5, 1), C.brass.lit, 0.4);
     // the bell, ringing
+    // the oil lamp itself: brass, a glass chimney, a warm flame
+    {
+      const lx = 424, ly = DESK.y;
+      ink(g, ell(lx, ly - 1, 4.5, 1.4), C.brass.base, 0.8);
+      ink(g, poly([[lx - 2.5, ly - 1], [lx + 2.5, ly - 1], [lx + 3.4, ly - 6], [lx - 3.4, ly - 6]]), C.brass.base, 0.8);
+      ink(g, curve([[lx - 2, ly - 6], [lx - 3.6, ly - 11], [lx - 1.6, ly - 17], [lx + 1.6, ly - 17], [lx + 3.6, ly - 11], [lx + 2, ly - 6]]), 'rgba(255,230,190,0.5)', 0.7);
+      g.fillStyle = radial(g, lx, ly - 10, 0, 16, [[0, `rgba(255,220,150,${0.8 * wf})`], [1, 'rgba(255,200,130,0)']]); g.fillRect(lx - 16, ly - 26, 32, 32);
+      g.fillStyle = '#fff2c8'; g.fill(ell(lx, ly - 10 - wf, 1.2, 2.6 * wf));
+    }
     const [bx, by] = BELL, sh = Math.sin(t * 60) * state.ding * 1.2;
     ink(g, ell(bx, by - 0.5, 7, 1.6), '#5a4a3a', 1);
     const bp = new Path2D(); bp.moveTo(bx - 6 + sh, by - 1); bp.quadraticCurveTo(bx - 6 + sh, by - 9, bx + sh, by - 9); bp.quadraticCurveTo(bx + 6 + sh, by - 9, bx + 6 + sh, by - 1); bp.closePath();

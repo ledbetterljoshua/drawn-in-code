@@ -36,7 +36,8 @@ layer({
     // lumps and catches the afterglow — rose and apricot near the sunset, violet away from it —
     // above a clear band of sky on the horizon. (It's what's dropping the snow.)
     const R = rng(77);
-    const deckY = (x) => 380 + 120 * noise(x * 0.0022 + 4) + 70 * noise(x * 0.006 + 9) + (x - SUNX) * 0.05;
+    // the deck lifts clear of the stack's top so its edge never runs across the drawers
+const deckY = (x) => 380 + 120 * noise(x * 0.0022 + 4) + 70 * noise(x * 0.006 + 9) + (x - SUNX) * 0.05 - 190 * Math.exp(-(((x - 760) / 520) ** 2));
     const top = Math.min(Y0, -600);
     // soft shapes: draw the shape far off-canvas and let its blurred shadow land where it belongs
     // (shadow offsets are in device pixels, so undo the transform's scale for the path)
@@ -62,7 +63,7 @@ layer({
     }
     // the lit underside: blurred strokes along the edge, warmer and brighter near the sunset
     for (let x = X0; x < X1; x += 80) {
-      const near = clamp(1 - Math.abs(x + 40 - SUNX) / 1300, 0, 1) ** 1.4;
+      const near = clamp(1 - Math.abs(x + 40 - SUNX) / 1300, 0, 1) ** 1.4 * clamp((deckY(x + 40) - 200) / 220, 0, 1);
       if (near < 0.03) continue;
       const p = new Path2D();
       for (let xx = x - 20; xx <= x + 100; xx += 10) (xx === x - 20 ? p.moveTo(xx, deckY(xx) - 6) : p.lineTo(xx, deckY(xx) - 6));

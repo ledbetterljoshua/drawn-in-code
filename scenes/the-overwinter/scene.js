@@ -1,6 +1,38 @@
-/* scene.js — The Overwinter: the falling snow over everything, and the start.
-   The snow is fine and dry, three depths of it, all leaning on the shared wind; near the pointer it
-   swirls aside. z 40. */
+/* scene.js — The Overwinter. At the lowest tide of the year a causeway opens to a sea stack whose
+   face is a cliff of filing drawers; white stoat night porters ride library ladders tending the
+   hibernating guests. This file holds the falling snow and the start; the parts are:
+   world.js (camera, palette, the cabinet layout) · sky.js · stack.js · guests.js (drawers, sleepers,
+   the yawn) · porters.js · shore.js · foot.js (reception, hedgehogs, gull) · top.js (cupola).
+
+   Reactions — hover (h), tap (t), linger (l), idle (i), pointer-aware (p):
+    1. h  drawer: the sleeper rolls over, snores a paper Z, the drawer lifts a crack
+    2. l  drawer: its luggage tag lifts toward you so you can read the wake condition
+    3. t  drawer (or l 2.6 s): the guest wakes, squints at its own tag, yawns a cold breath
+    4. —  the yawn is contagious: it spreads drawer to drawer, downhill more readily
+    5. —  the nearest porter races along its rail and cranks a punch-card music box; notes rise
+    6. —  reach the bear cub and it sits up: the stack shudders, snow falls, every porter freezes
+    7. h  feather porter: puts a paw to its lips (shh); the dormouse's nose twitches… and it sneezes
+    8. h  any porter: shh; l: tips its red cap
+    9. p  porters' eyes follow the pointer when it comes near
+   10. h  bats: they all turn together like closed umbrellas; l: one lets go with a foot and dangles
+   11. h  kettle: comes down its rope a little way, the pulley turns, it steams harder
+   12. h  cupola: the cockerel vane tries to crow, its nightcap slips over its eyes; the vane spins
+   13. h/t reception bell: ding — every porter on the cliff glares down
+   14. h  card index: a drawer slides out and the index cards riffle
+   15. h  desk porter: looks up over its spectacles
+   16. h  hedgehogs: the last one breaks into a run, suitcase bumping; i: at high tide it hurries anyway
+   17. i  the gull glides in, lands on the bell, dings it, gets glared at; h: it leaves at once
+   18. h  the flats: rings spread on the incoming tide from the pointer
+   19. h  causeway lamp: it gutters and its reflection shivers; the lamp swings from your push
+   20. h  bare rock: a little snow and a chip of stone come off the seam above the pointer
+   21. h  far lighthouse: the beam slows and stares
+   22. h  Venus / a low star: it brightens and throws a glint
+   23. p  falling snow swirls aside around the pointer
+   24. i  sleepers breathe and snore; one now and then stirs on its own
+   25. i  porters idle on their own clocks: glance round, blow on their paws (breath), ride the
+          ladder a little way, climb a rung, yawn
+   26. i  tags, lamps and the kettle swing in one shared wind; the tide creeps in and out
+   27. i  the hush lamps flicker; the lighthouse sweeps; glints move on the afterglow */
 (() => {
 const { TAU, clamp, rng, wind, st, P, layer } = Drawn;
 const flakes = [];

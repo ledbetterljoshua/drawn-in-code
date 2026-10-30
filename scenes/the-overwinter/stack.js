@@ -163,8 +163,8 @@ function drawRock(g) {
   // the high face: the oldest drawers, half swallowed by the rock — a scatter of dark slots and
   // the odd brass glint, thinning out as they go up into the haze
   const RT = rng(808);
-  for (let i = 0; i < 46; i++) {
-    const vv = OW.TEXTURE_V + 0.01 + RT() ** 1.4 * 0.26, u = 0.05 + RT() * 0.9, w = 0.025 + RT() * 0.05, hh = 0.008 + RT() * 0.014;
+  for (let i = 0; i < 70; i++) {
+    const vv = OW.TEXTURE_V + 0.01 + RT() ** 1.4 * 0.3, u = 0.05 + RT() * 0.9, w = 0.025 + RT() * 0.05, hh = 0.008 + RT() * 0.014;
     const q = [drum(u, vv + hh), drum(u + w, vv + hh), drum(u + w, vv), drum(u, vv)];
     const dy = OW.dip(u + w / 2, vv);
     for (const p of q) p[1] += dy;
@@ -175,6 +175,7 @@ function drawRock(g) {
     // its sill catches a little sky
     g.fillStyle = 'rgba(160,150,200,0.35)'; g.fill(poly([q[3], q[2], [q[2][0], q[2][1] + 1.2], [q[3][0], q[3][1] + 1.2]]));
     if (RT() < 0.5) { const c = OW.qat(q, 0.5, 0.45); g.fillStyle = '#b89a62'; g.fillRect(c[0] - 1.5, c[1] - 0.6, 3, 1.4); }
+    if (RT() < 0.55) { g.globalAlpha = 0.8 * (1 - fade * 0.4); g.fillStyle = C.snow; g.fill(poly([[q[0][0] - 1, q[0][1] + 0.5], [q[1][0] + 1, q[1][1] + 0.5], [q[1][0], q[1][1] - 1.8], [q[0][0] + 2, q[0][1] - 1.2]])); }
   }
   g.globalAlpha = 1;
   // haze: the snow in the air between us and the top of the stack
@@ -518,7 +519,7 @@ function drawRim(g) {
   g.strokeStyle = grad(g, 0, 160, 0, 1260, [[0, 'rgba(200,140,180,0)'], [0.45, 'rgba(230,140,150,0.12)'], [1, 'rgba(255,180,150,0.4)']]);
   g.stroke(SP);
   g.lineWidth = 3;
-  g.strokeStyle = grad(g, 0, 160, 0, 1260, [[0, 'rgba(220,160,190,0.15)'], [0.5, 'rgba(240,160,150,0.4)'], [1, 'rgba(255,200,170,0.75)']]);
+  g.strokeStyle = grad(g, 0, 160, 0, 1260, [[0, 'rgba(180,170,230,0.55)'], [0.35, 'rgba(200,160,200,0.4)'], [0.6, 'rgba(240,160,150,0.45)'], [1, 'rgba(255,200,170,0.75)']]);
   g.stroke(SP);
   g.restore();
   // snow on the ledges where the outline steps in

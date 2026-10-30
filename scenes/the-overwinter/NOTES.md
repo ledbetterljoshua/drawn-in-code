@@ -175,3 +175,24 @@ Five worst (mine):
 3. **Rock lips over cabinet corners still read as blots.** → removed; the ledges do that job better.
 4. **Foreground slabs had flat box bottoms on the phone.** → run off the bottom of any screen.
 5. **Snow strip on every cabinet top** (critic's copy-paste note). → about 60%, drifted.
+
+## Round 8 (third fresh critic, then fixes)
+
+Critic's ten, condensed: drawers pasted on, eye level inconsistent (some open drawers show a top
+plane — that's my drawer-interior cheat, kept on purpose: without it the sleepers lie *on* the
+drawers, which every critic flagged first); the top third empty and the same value as the sky; the
+story too small (stoats ~30 px, bats eggplants); glows with no visible source; the cloud deck's edge
+a scribble making a tangent across the upper drawers; the arch "cardboard" (from a pre-tunnel
+render? the tunnel was in); one purple family with no warm accent; hairline rope and ladders;
+procedural rubble and squiggle kelp; black rectangles in the phone's bottom corners.
+
+Fixed:
+- Cloud deck lifts in a broad swell behind the stack so its edge no longer crosses the drawers; the
+  lit underside fades out as the edge rises (first try drew a gold rope over the cupola).
+- **One warm accent**: the night porter's brass oil lamp at reception, warm light on the arch floor
+  and walls against all the blue.
+- Upper silhouette gets a cool sky rim so the top separates from the cloud; 70 snowed-over slots
+  carry the drawers up toward the summit.
+- Fixed lamps 1.4× bigger on visible brackets, so every pool has a source.
+- Kettle rope a real rope (ink edge); ladder rails heavier.
+- Wrack as flat fronds with a midrib; foreground slabs as boulders with sloped sides (no boxes).
