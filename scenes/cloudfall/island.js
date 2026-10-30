@@ -213,6 +213,11 @@ layer({
     g.fillRect(tipx - 520, tipy - 420, 900, 520);
     g.restore();
     g.restore();
+    // the sunlit cloud below-right throws a warm bounce up into that side of the belly
+    g.save(); g.globalCompositeOperation = 'screen';
+    const [bxr, byr] = pr(260, -330, 120);
+    g.fillStyle = radial(g, bxr, byr, 0, 220, [[0, 'rgba(255,170,120,0.3)'], [1, 'rgba(255,170,120,0)']]); g.fillRect(bxr - 240, byr - 240, 480, 480);
+    g.restore();
     // the warm rim of sun down the right edge of the whole rock, and the big form over the facets
     g.save();
     const sil = new Path2D(); for (const c of ISLE.cells) if (c.facing > -0.05) sil.addPath(c.path);
@@ -317,7 +322,9 @@ D.onLayout(() => {
   if (roots.length) return;
   const r = rng(44);
   for (const c of ISLE.cells) {
-    if (c.facing < 0.15 || c.b < 1 || c.b > 4 || r() > 0.32) continue;
+    // roots come out in a few clumps, where the cracks run, not one per slab
+    const ca = Math.atan2((c.p[0][2] + c.p[2][2]) / 2 / RZ, (c.p[0][0] + c.p[2][0]) / 2 / RX);
+    if (c.facing < 0.15 || c.b < 1 || c.b > 4 || ![0.95, 1.75, 2.45].some((k) => Math.abs(ca - k) < 0.2) || r() > 0.8) continue;
     const u = 0.2 + r() * 0.6, q = c.p, X = lerp(q[3][0], q[2][0], u), Y = lerp(q[3][1], q[2][1], u), Z = lerp(q[3][2], q[2][2], u);
     roots.push({ X, Y: Y + 4, Z, len: 14 + r() ** 2 * 70, ph: r() * 6, curl: r() < 0.5 ? 1 : -1, leaf: r() < 0.35, kids: r() < 0.6 ? 1 + ((r() * 2) | 0) : 0, bend: (r() - 0.5) * 30 });
   }
@@ -369,7 +376,7 @@ layer({
       if (R.leaf) { ink(g, ell(ex + 4, ey - 6, 5.5, 2.6, undefined, -0.6), '#6fa64f', 1.1, '#24392c'); ink(g, ell(ex - 4, ey - 14, 4.5, 2.2, undefined, 0.6), '#88c25a', 1.1, '#24392c'); }
       if (R.lantern) {
         const f = 0.55 + 0.08 * Math.sin(t * 5.3) + 0.05 * noise(t * 7);
-        CF.glow(g, ex, ey + 14, 46, '#ffc070', f);
+        CF.glow(g, ex, ey + 14, 26, '#ffc070', f * 0.6);
         ink(g, D.rect(ex - 5, ey + 1, 10, 3), '#4a3030', 1.2);
         ink(g, poly([[ex - 6, ey + 4], [ex + 6, ey + 4], [ex + 5, ey + 21], [ex - 5, ey + 21]]), grad(g, 0, ey, 0, ey + 21, ['#fff0b0', '#f6a95a']), 1.6);
         g.lineWidth = 1; g.strokeStyle = 'rgba(80,40,30,0.6)'; g.beginPath(); g.moveTo(ex, ey + 4); g.lineTo(ex, ey + 21); g.stroke();
@@ -737,7 +744,7 @@ layer({
     if (c > 0.85 && Math.random() < 0.04) spawn({ kind: 'spark', x: bx + (Math.random() - 0.5) * 20, y: fall + 10, vy: -20, life: 0.8 });
     const rod = D.quad(fx_ - 12, fy - 14, fx_ - 30, fy - 30 - c * 10, tip[0], tip[1]);
     tube(g, rod, '#b07a4c', 2.2, 1.2);
-    frog(g, fx_, fy - 2, 0.85, { wide: 1.08, open: fisher.blink(t), look: [-0.8, 0.6 - c], smile: 2 + c * 3, c: CF.FROG_TINTS.olive,
+    frog(g, fx_, fy - 2, 0.74, { wide: 1.08, open: fisher.blink(t), look: [-0.8, 0.6 - c], smile: 2 + c * 3, c: CF.FROG_TINTS.olive,
       arms: [[-17, -12 - c * 6, -12, -11]],
       hat: (g, lw) => { ink(g, D.ell(0, -37, 17, 4), '#e8c56a', lw); ink(g, D.ell(0, -41, 9, 5.5), '#e8c56a', lw); g.lineWidth = 2.4; g.strokeStyle = '#c9503f'; g.beginPath(); g.ellipse(0, -38.5, 8.6, 2, 0, 0, Math.PI); g.stroke(); } });
     // a bucket beside the fisher, with one already in it

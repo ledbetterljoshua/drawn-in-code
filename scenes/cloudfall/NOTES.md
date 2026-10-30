@@ -208,3 +208,24 @@ Looked only at full-frame size. One thing would visibly help: the door, which is
 didn't announce itself. Its lamplight now falls out of the open door in a warm wedge across the
 step and the path, the warmest accent in the picture. Waterfall mist puffs halved (they read as
 a glint). Nothing else I could name changes the full frame.
+
+## Round 12 (fourth critic, full frame only, each item rated visible or marginal)
+It still rated eight items visible, so not done. The ones that held up:
+1. Two hot glows read as two suns: additive mist halfway down the waterfall, and the root
+   lantern's halo under the tip. The mid-air mist is gone and the lantern's halo is half the size.
+2. The island cast nothing on the clouds under it. The cloud floor now dims directly beneath
+   the island (it hides that patch from the sky), and the far-off cast shadow stays where the
+   sun puts it.
+3. The waterfall was the coolest, most saturated colour in a warm picture. It now starts a
+   greyer blue and warms to peach as it falls.
+4. The peach tree's crown was as big as the house and turret together and pulled the eye off
+   the door. It is a fifth smaller and sits lower. (Its sprite was also clipping it: placed by a
+   fixed rectangle from before the island moved. Now placed from the tree's own position.)
+5. Roots were spaced like pegs, one per slab. They now come out in three clumps where the
+   cracks run; a warm bounce from the sunlit cloud comes up into the right of the belly.
+6. Same-template sky clouds and a pillow-shaped bank on the phone. Varied their proportions,
+   split the pillow into two; fixed their sprites clipping the taller ones flat.
+7. The fisher was big for his signpost and the balloon's basket was a thimble: fisher down to
+   the household's size, basket half as big again.
+Marginal by its own rating, left alone: tangents at the frame edge, "perspective is mixed" (it
+isn't).

@@ -195,6 +195,12 @@ layer({
     g.fillStyle = radial(g, shx, shy, 0, 330, [[0, 'rgba(150,130,190,0.45)'], [0.7, 'rgba(170,150,200,0.25)'], [1, 'rgba(200,180,220,0)']]);
     g.save(); g.translate(shx, shy); g.scale(1, 0.18); g.fill(circ(0, 0, 330)); g.restore();
     g.restore();
+    // and the plain dimming of the cloud right under it, where the island hides the sky
+    g.save(); g.globalCompositeOperation = 'multiply';
+    const [ux, uy] = [CF.CAM.cx + 40, CF.CAM.cy + 520];
+    g.fillStyle = radial(g, ux, uy, 0, 360, [[0, 'rgba(170,150,200,0.4)'], [1, 'rgba(200,180,220,0)']]);
+    g.save(); g.translate(ux, uy); g.scale(1, 0.22); g.fill(circ(0, 0, 360)); g.restore();
+    g.restore();
     // the sun's warmth laid across the cloud tops on its side
     g.save(); g.globalCompositeOperation = 'soft-light';
     g.fillStyle = radial(g, 1900, HZ + 40, 0, 1300, [[0, 'rgba(255,190,110,0.55)'], [1, 'rgba(255,190,110,0)']]);
@@ -228,11 +234,11 @@ function cumulusCircles(seed, w, h) {
 }
 CF.cumulusCircles = cumulusCircles;
 const clouds = [
-  { x: 1320, y: 110, w: 460, h: 130, seed: 3, sp: 3.2 },
+  { x: 1320, y: 110, w: 380, h: 160, seed: 3, sp: 3.2 },
   { x: 1520, y: 150, w: 200, h: 60, seed: 4, sp: 3.2 },
   { x: 640, y: 40, w: 170, h: 50, seed: 9, sp: 4.5 },
   { x: -40, y: 130, w: 300, h: 85, seed: 21, sp: 5 },
-  { x: 940, y: -250, w: 520, h: 150, seed: 14, sp: 2.6 },
+  { x: 940, y: -250, w: 340, h: 190, seed: 14, sp: 2.6 },
   { x: 260, y: -480, w: 260, h: 74, seed: 17, sp: 2.2 },
   { x: 1180, y: -700, w: 140, h: 40, seed: 19, sp: 2.2 },
 ];
@@ -240,7 +246,7 @@ onLayout(() => {
   for (const c of clouds) {
     c.cs = cumulusCircles(c.seed, c.w, c.h);
     // the underside of a cloud above us is in its own shade; its top catches the sun
-    c.sp_ = sprite(-c.w * 0.6 - 10, -c.h * 1.7, c.w * 1.2 + 20, c.h * 1.9, (g) => {
+    c.sp_ = sprite(-c.w * 0.6 - c.h, -c.h * 1.9, c.w * 1.2 + c.h * 2, c.h * 2.1, (g) => {
       // a base of small lumps, so the underside is nearly flat but never ruled
       const r = rng(c.seed * 5), cs = c.cs.slice();
       for (let x = -c.w * 0.46; x < c.w * 0.46; x += c.h * 0.2) cs.push([x, -c.h * 0.1 + (r() - 0.5) * c.h * 0.05, c.h * (0.13 + r() * 0.06)]);
@@ -326,7 +332,7 @@ layer({
   },
   draw(g, t, L) {
     const cx = balloon.cx, cy = balloon.cy, r = 88, tilt = balloon.sway * 0.8;
-    const bx = cx + Math.sin(tilt) * 132, by = cy + 132, [tx, ty] = balloon.tie;
+    const bx = cx + Math.sin(tilt) * 160, by = cy + 160, [tx, ty] = balloon.tie;
     const sag = 50 - balloon.rise * 36;
     g.lineWidth = 1.5; g.strokeStyle = '#6e4c46';
     g.beginPath(); g.moveTo(bx, by); g.quadraticCurveTo((bx + tx) / 2 - 10, (by + ty) / 2 + sag, tx, ty); g.stroke();
@@ -361,7 +367,7 @@ layer({
     if (balloon.flame > 0.02) { g.fillStyle = radial(g, 0, r, 0, r * 1.2, [[0, `rgba(255,200,110,${0.55 * balloon.flame})`], [1, 'rgba(255,190,110,0)']]); g.fillRect(-r - 5, -r - 20, r * 2 + 10, r * 2 + 50); }
     g.restore();
     g.lineWidth = 1.3; g.strokeStyle = '#5a3c3c';
-    for (const sx of [-1, 1]) { g.beginPath(); g.moveTo(sx * 19, r + 12); g.lineTo(sx * 16, r + 38); g.stroke(); }
+    for (const sx of [-1, 1]) { g.beginPath(); g.moveTo(sx * 19, r + 12); g.lineTo(sx * 23, r + 38); g.stroke(); }
     if (balloon.flame > 0.02) {
       const f = balloon.flame, fl = 14 + 3 * Math.sin(t * 40);
       g.fillStyle = `rgba(255,170,60,${0.9 * f})`;
@@ -369,17 +375,17 @@ layer({
       g.fillStyle = `rgba(255,240,170,${f})`; g.fill(ell(0, r + 24 - fl * 0.3 * f, 3, 6 * f + 1));
     }
     const [lookX, lookY] = CF.lookAt(cx, cy + 110, [clamp((P.x - cx) / 300, -1, 1), clamp((P.y - cy - 110) / 300, -1, 1)], 300);
-    frog(g, 2, r + 56, 0.78, { c: CF.FROG_TINTS.gold, open: balloon.blink(t), look: [lookX, lookY], smile: 2 + L.hover * 2.5,
+    frog(g, 2, r + 62, 0.78, { c: CF.FROG_TINTS.gold, open: balloon.blink(t), look: [lookX, lookY], smile: 2 + L.hover * 2.5,
       arms: L.hover > 0.3 ? [[18, -22 - Math.sin(t * 12) * 6 * L.hover]] : null,
       hat: (g, lw) => { ink(g, poly([[-14, -33], [14, -33], [10, -38], [-10, -38]]), '#7a4a3a', lw); ink(g, D.ell(0, -38, 10, 5), '#8f5a44', lw); } });
-    const bk = poly([[-19, r + 38], [19, r + 38], [16, r + 62], [-16, r + 62]]);
-    ink(g, bk, grad(g, -19, 0, 19, 0, ['#7d5234', '#b9874e', '#e8be7c']), 2);
+    const bk = poly([[-25, r + 40], [25, r + 40], [21, r + 72], [-21, r + 72]]);
+    ink(g, bk, grad(g, -25, 0, 25, 0, ['#7d5234', '#b9874e', '#e8be7c']), 2);
     g.lineWidth = 1; g.strokeStyle = 'rgba(58,34,50,0.45)';
-    for (let yy = r + 44; yy < r + 62; yy += 5) { g.beginPath(); g.moveTo(-18, yy); g.lineTo(18, yy); g.stroke(); }
-    for (let xx = -14; xx < 16; xx += 7) { g.beginPath(); g.moveTo(xx, r + 39); g.lineTo(xx * 0.86, r + 61); g.stroke(); }
-    ink(g, D.rect(-21, r + 36, 42, 5), '#6c4430', 1.6);
+    for (let yy = r + 46; yy < r + 72; yy += 5) { g.beginPath(); g.moveTo(-24, yy); g.lineTo(24, yy); g.stroke(); }
+    for (let xx = -18; xx < 20; xx += 7) { g.beginPath(); g.moveTo(xx, r + 41); g.lineTo(xx * 0.86, r + 71); g.stroke(); }
+    ink(g, D.rect(-27, r + 37, 54, 5), '#6c4430', 1.6);
     // a sandbag over the side
-    ink(g, ell(-20, r + 48, 5, 7), '#cdb48a', 1.2);
+    ink(g, ell(-26, r + 52, 5, 7), '#cdb48a', 1.2);
     g.restore();
   },
 });

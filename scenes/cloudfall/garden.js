@@ -57,7 +57,7 @@ layer({
     for (const f of CF.casters) g.fill(CF.castPath(f()));
     // the tree's canopy throws a dappled patch
     const [sx, sz] = CF.shadowOf(TREE.X, TREE.cy, TREE.Z), [x, y] = pr(sx, 0, sz), r = rng(2);
-    g.fill(ell(x, y, 140, 140 * S * 1.1));
+    g.fill(ell(x, y, 112, 112 * S * 1.1));
     g.globalCompositeOperation = 'destination-out';
     for (let i = 0; i < 12; i++) g.fill(ell(x + (r() - 0.5) * 240, y + (r() - 0.5) * 50, 8 + r() * 12, 3 + r() * 3));
     g.globalCompositeOperation = 'source-over';
@@ -74,7 +74,7 @@ layer({
 });
 
 // ------------------------------------------------------------------ the peach tree
-const TREE = { X: -318, Z: -64, cy: 206 };
+const TREE = { X: -318, Z: -64, cy: 186 };
 let treeSprite = null;
 const peaches = [];
 function drawTree(g) {
@@ -111,10 +111,10 @@ function drawTree(g) {
   const R = rng(11), cl = [];
   for (let i = 0; i < 26; i++) {
     const a = (i / 26) * TAU + R() * 0.3, d = 0.35 + R() * 0.62;
-    cl.push([cx + Math.cos(a) * 150 * d, cy + Math.sin(a) * 105 * d, 30 + R() * 22]);
+    cl.push([cx + Math.cos(a) * 118 * d, cy + Math.sin(a) * 84 * d, 24 + R() * 18]);
   }
-  cl.push([cx, cy - 10, 44], [cx + 40, cy - 50, 40], [cx - 50, cy - 30, 40], [cx + 10, cy - 80, 36], [cx - 80, cy + 30, 34]);
-  const dark = (x, y) => clamp(((cx - x) / 150) * 0.55 + ((y - cy) / 110) * 0.35 + 0.12, 0, 0.92);
+  cl.push([cx, cy - 8, 36], [cx + 32, cy - 40, 32], [cx - 40, cy - 24, 32], [cx + 8, cy - 64, 29], [cx - 64, cy + 24, 27]);
+  const dark = (x, y) => clamp(((cx - x) / 120) * 0.55 + ((y - cy) / 88) * 0.35 + 0.12, 0, 0.92);
   // back clumps first, darker, so the canopy has depth
   CF.leafy(g, cl.map(([x, y, r_]) => [x - 8, y - 12, r_ * 0.95]), M.leaf, { seed: 3, dark: (x, y) => clamp(dark(x, y) + 0.35, 0, 0.95), lw: 2.2 });
   CF.leafy(g, cl, M.leafWarm, { seed: 7, dark, lw: 2.4 });
@@ -126,7 +126,7 @@ function drawTree(g) {
   // ripe peaches, mostly on the sunny side
   peaches.length = 0;
   for (let i = 0; i < 24; i++) {
-    const a = R() * TAU, d = 0.3 + R() * 0.65, x = cx + Math.cos(a) * 140 * d, y = cy + Math.sin(a) * 92 * d;
+    const a = R() * TAU, d = 0.3 + R() * 0.65, x = cx + Math.cos(a) * 112 * d, y = cy + Math.sin(a) * 74 * d;
     if (dark(x, y) > 0.55) continue;
     peaches.push([x, y]);
     ink(g, circ(x, y, 5.5), grad(g, x - 5, y - 5, x + 5, y + 5, ['#ffd08a', '#f59a62', '#d9604a']), 1.4, '#5a2a2a');
@@ -134,15 +134,15 @@ function drawTree(g) {
     ink(g, ell(x + 3, y - 6, 3.4, 1.6, undefined, -0.5), '#5f9e52', 0.8, M.leaf.line);
   }
 }
-onLayout(() => { treeSprite = sprite(200, 150, 520, 560, drawTree); });
+onLayout(() => { const [bx, by] = pr(TREE.X, 0, TREE.Z); treeSprite = sprite(bx - 220, by - 340, 440, 380, drawTree); });
 const tree = { sh: 0, drop: null, dropT: 0 };
 layer({
   id: 'tree', z: 24,
-  hit: (x, y) => { const [cx, cy] = pr(TREE.X, TREE.cy, TREE.Z), [bx, by] = pr(TREE.X, 0, TREE.Z); return ((x - cx) / 165) ** 2 + ((y - cy) / 125) ** 2 < 1 || (Math.abs(x - bx) < 24 && y < by + 6 && y > by - 170); },
+  hit: (x, y) => { const [cx, cy] = pr(TREE.X, TREE.cy, TREE.Z), [bx, by] = pr(TREE.X, 0, TREE.Z); return ((x - cx) / 135) ** 2 + ((y - cy) / 100) ** 2 < 1 || (Math.abs(x - bx) < 24 && y < by + 6 && y > by - 170); },
   update(dt, t, L) {
     tree.sh = ease(tree.sh, L.hovered ? clamp(0.25 + P.sp / 500, 0, 1) : 0, 4, dt);
     const [cx, cy] = pr(TREE.X, TREE.cy, TREE.Z);
-    if (L.hovered && Math.random() < dt * (2 + P.sp / 60)) spawn({ kind: 'leaf', x: cx - 130 + Math.random() * 260, y: cy - 60 + Math.random() * 120, vy: 20, vx: 10, life: 4.5, rot: Math.random() * 6, vr: 2, size: 0.8 + Math.random() * 0.5 });
+    if (L.hovered && Math.random() < dt * (2 + P.sp / 60)) spawn({ kind: 'leaf', x: cx - 105 + Math.random() * 210, y: cy - 50 + Math.random() * 100, vy: 20, vx: 10, life: 4.5, rot: Math.random() * 6, vr: 2, size: 0.8 + Math.random() * 0.5 });
     tree.dropT -= dt;
     if (L.hovered && L.since > 0.8 && tree.dropT < 0 && peaches.length) {
       tree.dropT = 2.5;
@@ -493,7 +493,7 @@ layer({
       const L = edge(-1, t0, t1, w0, off), R = edge(1, t0, t1, w0, off);
       const p = poly(L.concat(R.reverse()));
       const y0 = L[0][1], y1 = L[L.length - 1][1];
-      g.fillStyle = grad(g, 0, y0, 0, y1, [[0, `rgba(120,188,218,${a0})`], [0.5, `rgba(190,228,242,${(a0 + a1) / 2})`], [1, `rgba(255,250,244,${a1})`]]);
+      g.fillStyle = grad(g, 0, y0, 0, y1, [[0, `rgba(138,192,214,${a0})`], [0.45, `rgba(214,226,232,${(a0 + a1) / 2})`], [1, `rgba(255,232,214,${a1})`]]);
       g.fill(p);
       g.save(); g.clip(p);
       const [cx] = fallAt((t0 + t1) / 2, 0);
@@ -525,9 +525,6 @@ layer({
     const [ex, ey] = fallAt(T1, 0);
     g.save(); g.globalCompositeOperation = 'lighter';
     for (let i = 0; i < 5; i++) { const ph = (t * 0.2 + i / 5) % 1, mr = 30 + ph * 50; g.fillStyle = radial(g, ex + gust * 6 + (i - 2) * 18, ey - ph * 60, 0, mr, [[0, `rgba(255,236,214,${0.2 * Math.sin(ph * Math.PI)})`], [1, 'rgba(255,236,214,0)']]); g.fill(circ(ex + gust * 6 + (i - 2) * 18, ey - ph * 60, mr)); }
-    g.restore();
-    g.save(); g.globalCompositeOperation = 'lighter';
-    for (let i = 0; i < 6; i++) { const ph = (t * 0.25 + i / 6) % 1, [x, y] = fallAt(TS + 0.4 + ph * 0.6, (i - 2.5) * 0.5); const mx = x + gust * 4 + ph * 20, my = y - ph * 30, mr = 22 + ph * 30; g.fillStyle = radial(g, mx, my, 0, mr, [[0, `rgba(255,246,236,${0.12 * Math.sin(ph * Math.PI)})`], [1, 'rgba(255,246,236,0)']]); g.fill(circ(mx, my, mr)); }
     g.restore();
   },
 });
