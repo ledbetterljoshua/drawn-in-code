@@ -162,3 +162,14 @@ he tips it onto the heap, the tally notches; when you make the leaf pour he duck
 action at the focal point: leaf → net → heap. The near bank lost its dangling roots and stones, gained
 moss down its face and washed pebbles at its waterline. On a phone, a bramble cane hangs into the top of
 the frame with dripping leaves.
+
+## Round 8 — 2× sweep of every quadrant
+
+1. Small falling drops read as nails (a pale cap on a dark bun). → under r 4 they're a soft bright bead
+   at the head of the streak; only the big near-camera drops keep the bun shape.
+2. The near bank's foot pulled back under itself, leaving a strip of water beneath it (it floated). →
+   its foot widens toward us below the desktop frame (the arching blade is now rooted in it) and only
+   curls away further down, for the phone.
+3. Its slope was a staircase of spiky balls. → a gentler slope.
+4. Foxglove buds stuck out sideways like grey discs. → they hang.
+5. Quiet sky between the web and the leaf: kept as negative space; the squall and the rain carry it.

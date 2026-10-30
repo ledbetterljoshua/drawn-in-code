@@ -162,6 +162,14 @@
     g.lineWidth = Math.max(0.8, r * 0.38);
     g.beginPath(); g.moveTo(x - ux * len, y - uy * len); g.lineTo(x - ux * r, y - uy * r); g.stroke();
     g.globalAlpha = a;
+    if (r < 4) {
+      // small drops: a bright bead at the head of the streak, no hard edge
+      g.fillStyle = glow > 0.3 ? 'rgba(255,224,160,0.9)' : 'rgba(226,222,248,0.85)';
+      g.fill(ell(x, y, r * 0.7, r * 0.85));
+      g.fillStyle = 'rgba(255,252,244,0.95)'; g.fill(circ(x + r * 0.2, y - r * 0.25, r * 0.28));
+      g.globalAlpha = 1;
+      return;
+    }
     g.save(); g.translate(x, y); g.rotate(Math.atan2(uy, ux) - Math.PI / 2);
     const p = new Path2D();
     p.moveTo(-r, 0.15 * r);

@@ -50,7 +50,7 @@
   function drawBell(g, b, x, y, t) {
     if (b.bud) {
       // a closed bud: a plump teardrop, green flushing pink
-      g.save(); g.translate(x, y); g.rotate(b.side * 0.7 + b.a);
+      g.save(); g.translate(x, y); g.rotate(b.side * 0.3 + b.a);
       const bp = new Path2D(); bp.moveTo(0, 0); bp.bezierCurveTo(-12 * b.s, 10 * b.s, -10 * b.s, 46 * b.s, 0, 52 * b.s); bp.bezierCurveTo(10 * b.s, 46 * b.s, 12 * b.s, 10 * b.s, 0, 0);
       ink(g, bp, '#8a5a6a', 1.8);
       g.fillStyle = grad(g, 0, 0, 0, 52 * b.s, ['#5a7a46', '#a8607e']); g.fill(bp);

@@ -19,7 +19,7 @@
   // big rounded cushions against the bright water
   const bankY = (x) => {
     const e = 990 + 14 * Math.sin(x * 0.012) + 8 * noise(x * 0.03);
-    return x < 400 ? e : e + ((x - 400) / 130) ** 2 * 150;
+    return x < 400 ? e : e + ((x - 400) / 130) ** 2 * 70;
   };
   const cushions = [];
   (() => {
@@ -27,7 +27,8 @@
     for (let x = -900; x < 545; x += 14 + r() * 18) cushions.push([x, bankY(x) + 8 + r() * 8, (14 + r() * 20) * (x > 400 ? 0.7 : 1)]);
   })();
   // the shore curls back under toward the bottom left (the phone sees a lot of it)
-  const shoreX = (y) => (y < 1060 ? 548 : 548 - (y - 1060) ** 1.25 * 0.9);
+  // the bank's foot comes toward us (widening) down to below the desktop frame, then curls away
+  const shoreX = (y) => (y < 1060 ? 548 : y < 1250 ? 548 + (y - 1060) * 0.22 : 590 - (y - 1250) ** 1.2 * 0.9);
   const bankPath = () => {
     const v = st.view, p = new Path2D(), yb = Math.max(v.y1, 1250) + 40;
     for (const [x, y, rr] of cushions) circ(x, y, rr, p);
