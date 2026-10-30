@@ -1,0 +1,496 @@
+{
+  "ideas": [
+    {
+      "id": "bucketwheel-parish",
+      "title": "Bucketwheel Parish",
+      "logline": "A derelict mining excavator still crawls a few metres a year across the open pit it dug, and the pangolin glaziers who live on it have glazed its eighteen buckets with salvaged glass so the great wheel becomes a rose window for the eclipse.",
+      "who": "A parish of about twenty pangolin glaziers who cut window glass from salvage. At totality an apprentice hangs in a rope sling from the wheel rim fitting the eighteenth and last pane, a wedge of green windscreen. Elders sit along the boom in smoked-glass spectacles. A cook stirs lentils on a stove made from a hydraulic cylinder. Curled-up kits roll down the conveyor belt, which is the high street, lined with bolted-on stalls. Patched shacks cling to the counterweight boom and the operator's cab is the chapel.",
+      "light": "Totality. A bruised violet sky with a tangerine band all the way round the pit rim, Venus out, the wind dropped and dust hanging still. The black sun sits behind the wheel's hub with a pearl corona flaring through the spokes. Each glazed bucket throws its own pool of cobalt, amber, rose or green light down onto the slag terraces, overlapping where they meet. Rust holes in the deck still hold tiny fading crescent suns from the partial phase.",
+      "focal": "The black sun framed in the wheel's hub, then down the coloured beams to the pools of light, then along the spiral haul road coiling down and inward past lamps, stalls and travelling pangolins to a small jade lake on the pit floor, where one sapling grows inside a ring of salvaged bricks.",
+      "unique": "Eighteen buckets glazed as a rose window, each a mosaic remembering one house the pit swallowed, cut from that house's own leftovers: its milk bottles, its bathroom window, its car's tail-lights. Once a day the conveyor high street still moves at walking pace, carrying the stalls past each other so neighbours trade places.",
+      "signature": "Linger on the hub and the old pangolin releases the brake. The wheel creaks round one notch and every coloured light pool slides down a terrace onto bare slag, where seedlings sprout in that colour's exact shape. She uncurls, takes off her smoked spectacles, and looks at it with her naked eyes.",
+      "reactions": [
+        "The apprentice in the sling startles, half-curls, swings wildly, then sheepishly uncurls and fits the pane.",
+        "A rust hole's crescent sun swells, and a kit reaches a claw in to catch it.",
+        "The conveyor high street lurches one stall forward; the cook grabs her pot and a ball of kits bounces off the end roller.",
+        "The chapel cab's wipers sweep once, like a slow blink.",
+        "Idle: a loose pane chimes and every pangolin on the boom looks up at once."
+      ],
+      "palette": "rust and iron oxide, slag grey, ash lilac, bruised violet, a tangerine horizon ring, corona pearl, cobalt, bottle green, beer amber, traffic-light red, jade water, butter-yellow stove glow",
+      "composition": "A high view from the pit rim. The spiral of stepped terraces fills the frame; the excavator stands on the second terrace in the upper-left third with a diagonal boom and a wheel big enough to frame the eclipse; the lake sits lower centre at the end of the spiral.",
+      "risk": "The excavator must read as machine and village at once (a lot of truss lattice); coloured pools must mix additively without mud; the spiral must stay legible in eclipse dark.",
+      "hand": {
+        "place": "a vehicle that is also a village",
+        "time": "an eclipse",
+        "inhabitants": "creatures with a trade",
+        "light": "light through coloured glass",
+        "material": "patched, salvaged, mismatched",
+        "composition": "a spiral the eye follows inward",
+        "mechanic": "a secret that opens if you linger",
+        "feeling": "melancholy but hopeful"
+      },
+      "status": "pitched",
+      "batch": "2026-10-29-1",
+      "scores": {
+        "bold": 5,
+        "drawable": 3,
+        "life": 4,
+        "distinct": 4
+      },
+      "cliche": "The walking steampunk machine-city, with a solar eclipse as backdrop.",
+      "fix": "Draw the excavator as a near-black silhouette against the corona and the tangerine ring. Only the eighteen glazed buckets and a few lit shack windows get detail, the truss lattice stays flat linework, and the drawing effort goes into the coloured pools on the terraces.",
+      "rank": 2
+    },
+    {
+      "id": "the-drift-office",
+      "title": "The Drift Office",
+      "logline": "A patched paddle steamer circles forever on the outer rim of a slow whirlpool where every lost message-bottle in the ocean ends up, and the sea otters aboard sort the letters, try to forward them, and grow tomatoes in a greenhouse built from the bottles nobody claimed.",
+      "who": "Sea otter postal workers. While the eclipse holds the sea flat, some float on their backs in the spiral grooves netting rising bottles. A sorting clerk with a corkscrew works a wall of fish-crate pigeonholes labelled by coastline. An old otter at the paddle lever keeps the steamer from sliding inward. Kits sleep in lifeboats slung under the davits. Every letter they re-bottle and throw outward has drifted back.",
+      "light": "Totality over open sea: dark slate sky, a coral and apricot glow all round the horizon, a black sun high up, the current stilled to a near mirror. The bottle-glass wheelhouse, lit by one oil lamp, glows like a jar of embers and lays coloured streaks across the wet deck. Faint blue plankton lights the grooves, brighter toward the eye.",
+      "focal": "The glowing bottle-glass wheelhouse on the outer arm, then round the foam lines and glinting bottles to the whirlpool's eye: a disc of still black water mirroring the eclipsed sun, so there are two black suns.",
+      "unique": "A post office for everything the sea lost: pigeonholes by coastline, a wall of corks stamped with find dates, greenhouse walls of unclaimed bottles still holding their unread letters, tomatoes ripening in tins under the glass.",
+      "signature": "Linger on a bottle near the eye and an otter swims out, uncorks it and reads. Her ears go flat. She writes a reply on the back, re-corks it and throws it outward, and this time, because the water is still, it slides over the rim toward the horizon. Every otter on deck stands to watch and the old one rings the ship's bell once.",
+      "reactions": [
+        "The sorting clerk squints at a letter, files it in the wrong pigeonhole, sighs and moves it.",
+        "The greenhouse lamp flares and coloured light spills across the deck and up the laundry.",
+        "A floating otter rolls over and hugs her bottle like a pup.",
+        "The paddle wheel turns once, slow and dripping, and the steamer edges back to the rim.",
+        "A sleepy kit's head pops over a lifeboat's gunwale, blinks at the black sun, and sinks back."
+      ],
+      "palette": "slate and pewter sea, ink-black eye, coral and apricot horizon ring, bottle green, beer amber, cobalt and milk glass, verdigris brass, salt-white laundry, ghost-blue plankton, sealing-wax red",
+      "composition": "A three-quarter overhead view from a gull behind the ship. A huge logarithmic spiral fills the frame; the steamer on the outer arm at lower right; foam arms winding to the eye just above centre; the sun at the top and its reflection in the eye.",
+      "risk": "The whirlpool must read as a funnel with depth, not a painted swirl; hundreds of bottles each need a believable glint; translucent coloured glass lit from inside.",
+      "hand": {
+        "place": "a vehicle that is also a village",
+        "time": "an eclipse",
+        "inhabitants": "creatures with a trade",
+        "light": "light through coloured glass",
+        "material": "patched, salvaged, mismatched",
+        "composition": "a spiral the eye follows inward",
+        "mechanic": "a secret that opens if you linger",
+        "feeling": "melancholy but hopeful"
+      },
+      "status": "pitched",
+      "batch": "2026-10-29-1",
+      "scores": {
+        "bold": 4,
+        "drawable": 2,
+        "life": 3,
+        "distinct": 3
+      },
+      "cliche": "Message-in-a-bottle whimsy with cute sea otters, a seaside postcard.",
+      "fix": "Bring the camera down onto the steamer's deck at the rail, with the whirlpool spiralling away behind and below. From gull height the clerk, pigeonholes, kits and greenhouse are too small to interact with, and a funnel with real depth is something canvas fakes badly.",
+      "rank": 9
+    },
+    {
+      "id": "the-spectacle-line",
+      "title": "The Spectacle Line",
+      "logline": "A patchwork train of mismatched carriages winds up a spiral viaduct around a lone basalt peak, carrying a village of near-blind mole lens-grinders to the summit for an eclipse their matriarch has spent her whole life making glasses for and has never once seen.",
+      "who": "Mole lens-grinders who cut eclipse filters in ruby, marigold and smoked quartz. The engine has just stopped at the summit. Moles on the carriage roofs pass finished spectacles hand to hand; a treadle-mole works a pumice wheel in the grinding car; a kit at the back still polishes this year's lens. Carriages from a dozen dead railways: a tram, a mail van, a half-boarded dining car, a quilted cattle-wagon dormitory. The matriarch rides the cowcatcher.",
+      "light": "Late partial phase into totality on a mountain. The moon's shadow races across the plain below as a visible dark wall. Cold, with snow dust lifting off the summit. Strings of lens offcuts in every window focus tiny ruby, gold and violet crescent suns onto the carriages and viaduct stones. Lanterns lit early; the horizon gone lilac.",
+      "focal": "The loud ruby-and-gold rear carriage at the bottom, then up through the tightening coils of the viaduct to the summit, where the small matriarch stands under the black sun.",
+      "unique": "Every mole wears a stack of flip-down lenses on brass hinges. Windows are bead curtains of lens offcuts. The engine's headlamp is a giant ground lens that focuses the sun into a crescent of fire on the track. Each kit grinds one lens a year and strings it on the year chain looped from the engine's nose.",
+      "signature": "Linger on the matriarch and the whole scene goes soft and blurred, the way she sees it. She flips down lens after lens, each with a click, each bringing the world sharper. The last is the kits' new one: the corona snaps crisp with pink prominences, and for the first time she sees it. Without looking away, she reaches back and finds a kit's paw.",
+      "reactions": [
+        "A carriage window's lens curtain sways and sprays tiny crescent suns across the next carriage.",
+        "The treadle-mole pedals faster, slurry spits, and she sniffs the lens to see if it's done.",
+        "A roof mole flips down three lenses at once and peers out with one hugely magnified eye.",
+        "The shadow wall surges closer, fur bristles along the train, and birds drop into the arches to roost.",
+        "The engine's crescent of fire brightens and a kit hops over it like a puddle."
+      ],
+      "palette": "basalt black, wet slate, ash-blue dusk, brass and copper, ruby, marigold, smoked quartz, velvet mole grey with pink noses, white-gold corona, a lilac horizon strip, snow-dust white",
+      "composition": "An elevated three-quarter view off the peak's flank. The viaduct coils three times round a tall basalt cone, narrowing as it climbs to the summit at upper centre with the eclipse above; the pale plain below with the moon's shadow rolling in from the left.",
+      "risk": "The viaduct coil in convincing perspective (occluded back sections, foreshortened arches, carriages rotating round the curve); a whole-canvas blur that steps back to sharp without dropping frames.",
+      "hand": {
+        "place": "a vehicle that is also a village",
+        "time": "an eclipse",
+        "inhabitants": "creatures with a trade",
+        "light": "light through coloured glass",
+        "material": "patched, salvaged, mismatched",
+        "composition": "a spiral the eye follows inward",
+        "mechanic": "a secret that opens if you linger",
+        "feeling": "melancholy but hopeful"
+      },
+      "status": "pitched",
+      "batch": "2026-10-29-1",
+      "scores": {
+        "bold": 4,
+        "drawable": 2,
+        "life": 3,
+        "distinct": 3
+      },
+      "cliche": "A mountain Christmas train, plus the old woman who sees for the first time, which tips into sentimentality.",
+      "fix": "Flatten the spiral viaduct into a side-on switchback up a cliff face; curved arches in perspective with hidden back sections are what hand-written canvas does worst. Fake the blur with a downscaled offscreen copy rather than a live full-canvas filter.",
+      "rank": 10
+    },
+    {
+      "id": "agathe-wakes",
+      "title": "Agathe Wakes",
+      "logline": "On the morning of the first snow, a stove-fitter and her apprentice crawl over Agathe, the three-storey glazed tile stove that heats a whole mountain village and sleeps all summer, and light her for the first time since spring while the village presses its faces to the hall windows.",
+      "who": "The old stove-fitter, halfway up a ladder with soot to her elbows, taps each tile with a horn mallet and listens for the dull note of a crack. Her eleven-year-old apprentice has crawled into the firebox, boots sticking out of the stoking door, laying the year's first kindling: birch bark tied with red wool for luck. Outside the tall frosted windows the villagers wait in scarves, breathing on the glass.",
+      "light": "Blue-grey pre-dawn through frosted windows, snowflakes as big as moths, one tallow lamp. Once the fire catches, light leaks from every gap where grout has fallen out, hairline orange threads climbing the stove.",
+      "focal": "The black stoking door with the boots sticking out, then up the green-and-honey tile tower along the glowing seams to the fitter on her ladder, then across to the fogged faces at the windows.",
+      "unique": "Every one of Agathe's four hundred tiles was fired by a different household when a child was born, glazed with something from their life: the miller's sea-green with a raised wheel, the beekeeper's honey-yellow with a relief bee, the ferryman's cobalt with a fish. Each autumn the apprentice finds the leaking seams by their glow and chalks them for regrouting.",
+      "signature": "Hover the stoking door and the apprentice strikes a match. Light runs out through every unmended seam at once, tier by tier like a city map lighting up street by street, up to the blue crown tiles. At the windows every face gasps at once and the glass fogs over.",
+      "reactions": [
+        "The mood follows the pointer: toward the windows the scene cools and frost ferns creep across the glass; toward the stove amber spreads over the floor and flakes near it melt to sparks.",
+        "A family tile's relief comes alive for a moment: the bee walks a circle, the wheel turns a notch, the fish flips.",
+        "The fitter raps a tile: a sound one rings with a shimmer, a cracked one thunks and she chalks an X.",
+        "Felt boots drying on the stove's ledge start to steam, and one slowly tips over.",
+        "Idle: a copper kettle in the warming niche ticks, then rattles its lid, then lets out a thin plume."
+      ],
+      "palette": "celadon green, honey amber, cobalt crown, soot black, snow-blue, tallow yellow, red wool, fogged-glass grey",
+      "composition": "A worm's-eye view from the floorboards by the stoking door. The stove rises as a stepped three-tier tower narrowing to a crown, verticals converging hard; the ladder a thin diagonal; tall cold-blue windows on the right with dark heads in them; floorboards rushing toward the viewer.",
+      "risk": "Hundreds of tiles in steep three-point perspective, each with a motif and a wet glaze highlight that reads as fired ceramic, not plastic; seam light thin and bright without turning into a neon grid.",
+      "hand": {
+        "place": "something enormous, asleep",
+        "time": "first snow",
+        "inhabitants": "a maker and their apprentice",
+        "light": "light leaking through gaps",
+        "material": "glazed ceramic",
+        "composition": "a worm's-eye view",
+        "mechanic": "the mood shifts with where you point",
+        "feeling": "giddy anticipation"
+      },
+      "status": "pitched",
+      "batch": "2026-10-29-1",
+      "scores": {
+        "bold": 3,
+        "drawable": 3,
+        "life": 4,
+        "distinct": 4
+      },
+      "cliche": "A hygge Scandinavian Christmas interior: cosy stove, snow at the window, steaming kettle.",
+      "fix": "Use a near-frontal low angle with only a gentle upward vanishing point instead of steep three-point perspective, so the tiles stay flat quads that can each carry a motif and a glaze highlight. Then make the stove dwarf the hall so 'enormous' actually shows.",
+      "rank": 5
+    },
+    {
+      "id": "old-hush",
+      "title": "Old Hush",
+      "logline": "On a hilltop on the night of the first snow, a bell-tuner and her apprentice stand under Old Hush, a porcelain bell as tall as a barn that rings only once a year, and make the last adjustments before they strike this winter's single note.",
+      "who": "A tall, unhurried tuner presses her ear to the porcelain and shaves glaze from the lip with pumice. Her apprentice, in an oversized coat, can't keep still; she holds a brass-and-paper lantern up into the dome, the tally of adjustments chalked on her sleeve. Far below, the village waits with its windows open.",
+      "light": "Night and thick slow first snow. The only light is the lantern inside the bell, leaking through ten thousand tiny glazed windows in the porcelain, so the snowfall is freckled with drifting amber, celadon and cobalt dots. Village windows glimmer under the bell's lip.",
+      "focal": "The dense constellation of glowing pinpricks in the dome and the lantern at its heart, down the hanging clapper to the two figures at the rim, then out under the lip to the village lights.",
+      "unique": "Rice-grain porcelain: thousands of grain-sized holes filled with clear glaze, each a tiny window, tinted amber at the lip, celadon in the waist and cobalt at the crown. The tuner raises the pitch by pressing out single grains. The clapper is a cedar log wrapped in felt. The village believes the bell has only a few hundred strikes in it, so it spends one per winter.",
+      "signature": "Hover the clapper and the tuner nods. The apprentice hauls it back and lets it swing, and Old Hush rings: a slow visible shockwave rolls out through the falling snow, every flake jumping as it passes, the glazed windows flare band by band to the crown, snow slides off the frame's roof in one sheet, and in the valley every window lights at once.",
+      "reactions": [
+        "The mood follows the pointer: point at a band and the lantern tints the snowfall that colour; at the clapper everything hushes and the flakes slow almost to a stop; at the lip the scene sharpens and brightens.",
+        "The tuner lays her ear on the porcelain and raises a finger for quiet; the apprentice freezes mid-bounce.",
+        "The apprentice bounces on her toes and her lantern's constellation swings wildly across the snow.",
+        "The pumice scrapes the lip and a fine glitter of glaze dust falls through the lantern light.",
+        "Idle: a single snowflake rises inside the bell on the warm air and the apprentice tilts her head back to catch it."
+      ],
+      "palette": "warm porcelain white, cobalt crown, celadon waist, amber lantern, night indigo, lilac-grey snow, tarnished brass, felt brown",
+      "composition": "Flat on the frozen ground directly beneath the bell, looking up into its mouth. The hollow interior fills the top two-thirds as a concave vault with pierced bands converging on the crown; the clapper hangs dead centre; the rim cuts across the lower third like a horizon, with snow, the timber frame and the far village below it.",
+      "risk": "A concave dome seen from below easily reads as a flat disc; thousands of pinpricks must sit on the curve and throw moving dots onto the snow without looking like a starfield screensaver.",
+      "hand": {
+        "place": "something enormous, asleep",
+        "time": "first snow",
+        "inhabitants": "a maker and their apprentice",
+        "light": "light leaking through gaps",
+        "material": "glazed ceramic",
+        "composition": "a worm's-eye view",
+        "mechanic": "the mood shifts with where you point",
+        "feeling": "giddy anticipation"
+      },
+      "status": "pitched",
+      "batch": "2026-10-29-1",
+      "scores": {
+        "bold": 4,
+        "drawable": 2,
+        "life": 2,
+        "distinct": 5
+      },
+      "cliche": "A planetarium-dome or starfield screensaver.",
+      "fix": "Move the camera outside, low and three-quarter below the bell, so its silhouette, frame and lip are visible against the night and the pierced porcelain glows outward. Putting the village and the snowy slope in frame gives it enough to hover for twenty reactions.",
+      "rank": 8
+    },
+    {
+      "id": "vesper-sleeps",
+      "title": "Vesper Sleeps",
+      "logline": "Under a snowing hillside sleeps Vesper, a hyacinth bulb the size of a granary, and in the frozen soil beside it a bulb-forcer and his apprentice watch the pale shoot inside its glazed forcing hood for the first sign that it will bloom at midwinter.",
+      "who": "A stout old forcer in a quilted coat with a glazed clay foot-warmer on his lap checks the root plate by lamplight from a tile-lined tunnel along the bulb's papery skin. His apprentice has climbed to where the shoot leaves the bulb and just found it has grown past last night's chalk mark, and she is trying very hard not to shout.",
+      "light": "Above ground, a pearly overcast afternoon with fat first flakes. Underground, thin dusty blades of light through the forcing hood's vent slots, gaps in the bulb's tunic and cracks in the frozen crust, striping the apprentice's face. The foot-warmer glows ember-orange.",
+      "focal": "The pale green shoot tip glowing inside the cobalt hood at the top, down the light blades to the apprentice's upturned face, then deeper to the violet-skinned bulb and the forcer at its root plate.",
+      "unique": "A forcing hood of thirty hand-thrown earthenware segments, each pierced with a different vent shape (crescent, star, slot, keyhole), cobalt outside and tin-white inside. Two hundred years of growth recorded in tally marks on an ash pole beside the bulb. It blooms for one night at midwinter and its scent reaches the whole valley.",
+      "signature": "Hover the shoot tip and it shoves up a finger's width. A bud splits its sheath, and blue-violet light floods out through all thirty vents, spraying star, crescent and keyhole shapes across the snow above like a magic lantern. Then the bud shyly closes, and the apprentice throws her cap in the air.",
+      "reactions": [
+        "The mood follows the pointer: down into the soil and everything slows and dims; up toward the hood and the light blades brighten and the shoot strains upward.",
+        "The white roots curl like toes and an earthworm tunnels away in a hurry.",
+        "Overwintering ladybirds shuffle tighter together; one opens its wing-cases a crack, then thinks better of it.",
+        "The hedgehog-shaped foot-warmer's coals breathe brighter and steam rises off the forcer's mittens.",
+        "Idle: the bulb's papery tunic rises and falls very slowly, and a violet flake peels loose and drifts down a light blade."
+      ],
+      "palette": "loam umber, onion-skin violet, cobalt glaze, tin-white, ember orange, snow pearl, pale shoot green, hyacinth blue",
+      "composition": "A worm's-eye cross-section from deep in the soil looking up. The ground line a third from the top, with snowfall, the cobalt hood and grey sky above; below, the bulb's huge body towers upward with its root plate and roots fanning near the bottom; the forcer's warm tunnel on one side and the apprentice's ledge near the neck, linked by slanting light blades.",
+      "risk": "A soil cutaway can read as a textbook diagram; it needs crumbling texture, depth in the roots and translucent layered skin. Dark underground and bright snow must both read in one frame.",
+      "hand": {
+        "place": "something enormous, asleep",
+        "time": "first snow",
+        "inhabitants": "a maker and their apprentice",
+        "light": "light leaking through gaps",
+        "material": "glazed ceramic",
+        "composition": "a worm's-eye view",
+        "mechanic": "the mood shifts with where you point",
+        "feeling": "giddy anticipation"
+      },
+      "status": "pitched",
+      "batch": "2026-10-29-1",
+      "scores": {
+        "bold": 3,
+        "drawable": 3,
+        "life": 3,
+        "distinct": 4
+      },
+      "cliche": "A textbook soil cross-section or ant-farm cutaway with a cosy burrow added.",
+      "fix": "Replace the ruler-straight section with one irregular cave-shaped window into the soil, lit by the shoot's glow and the light blades, and lift the ground line so the vent shapes thrown across the snow get real space.",
+      "rank": 7
+    },
+    {
+      "id": "the-overwinter",
+      "title": "The Overwinter",
+      "logline": "At the year's lowest tide a sand causeway opens to a sea stack whose face is a cliff of card filing drawers, and white stoat night porters tend five hundred hibernating guests filed inside them.",
+      "who": "Stoat porters in white winter coats and red pillbox caps ride rolling library ladders along brass rails across the drawer face, holding goose feathers under sleepers' noses, re-tying luggage tags and refilling stoneware hot-water bottles from a kettle on a pulley. Guests: dormice in sock-lined drawers, hedgehogs in leaf litter, a tortoise in a hatbox, bats hanging from drawer handles, and a bear cub in the bottom drawer, which won't shut. Three late hedgehogs are still crossing the causeway with suitcases.",
+      "light": "3pm in deep midwinter, sun already set: a rose and apricot band low behind the stack's base, ink above, fine dry snow. Porters carry hush lamps, candles behind blue paper, leaving cold blue pools on the drawer fronts. Where rose and blue overlap the card turns lilac. Wet sand mirrors both.",
+      "focal": "A mid-height drawer where a porter holds a feather under a dormouse's nose in blue lamplight, up the uneven drawer face to the bats and the cupola (its weathervane in a nightcap), then down to the late hedgehogs and the creeping tide line.",
+      "unique": "Every guest is filed: brass label holders and luggage tags with a wake condition ('Hedgehog, Mrs. Wake at first slug'; 'Bats (all). Wake when moths'). A card index at reception cross-references the snorers. The settling tool is a punch-card music box that plays a lullaby when cranked.",
+      "signature": "Click a drawer and its guest wakes, squints at its own tag and yawns enormously. The yawn is contagious and ripples from drawer to drawer across the cliff while porters race along their ladders cranking music boxes. Let it reach the bottom drawer and the bear cub sits up, the whole stack shudders, and every porter freezes mid-rung.",
+      "reactions": [
+        "A sleeper rolls over; its snore lifts the drawer a crack and a paper 'Z' floats out.",
+        "The tide inches in and the last hedgehog breaks into a waddling run, suitcase bumping.",
+        "The bats rotate in unison like closed umbrellas; one drops and catches itself by one foot.",
+        "A porter's ladder rolls sideways along its rail with the porter clinging on, kettle sloshing.",
+        "Idle: a gull lands on the reception bell and dings it, and every porter on the cliff glares at it."
+      ],
+      "palette": "ermine white, kraft card brown, hush-lamp blue, rose afterglow, lilac where they meet, ink sea, wet-sand mirror, brass gold, bellhop red",
+      "composition": "A tall portrait strip from the wet sand looking up a slightly leaning sea stack: the drawer cliff fills the middle, a dark overhang and tiny cupola on top, the causeway a pale diagonal from bottom left, the horizon very low so the rose band glows behind the base.",
+      "risk": "Hundreds of drawers will read as a spreadsheet unless sizes, warps, handles and ajar drawers vary and the blue light stays in a few pools; curled sleeping animals must stay readable at drawer scale.",
+      "hand": {
+        "place": "a place you can reach only once a year",
+        "time": "deep midwinter, mid-afternoon",
+        "inhabitants": "workers on a night shift",
+        "light": "two light sources of different colours",
+        "material": "paper and card",
+        "composition": "extreme vertical",
+        "mechanic": "something you can wake up",
+        "feeling": "busy and funny"
+      },
+      "status": "pitched",
+      "batch": "2026-10-29-1",
+      "scores": {
+        "bold": 4,
+        "drawable": 4,
+        "life": 5,
+        "distinct": 4
+      },
+      "cliche": "Wes Anderson hotel-porter whimsy, or a cliff-sized advent calendar of cute sleeping animals.",
+      "fix": "Cut the face to about 60-80 drawers of wildly uneven size, foreshortened so the lowest are big and the far ones are rough texture. Five hundred drawers at sea-stack scale turns into a spreadsheet, and the sleepers stop reading at the size where the contagious yawn has to land.",
+      "rank": 1
+    },
+    {
+      "id": "the-sunloft",
+      "title": "The Sunloft",
+      "logline": "Inside a card hangar taller than the clouds, where the sleeping paper sun spends the polar night, a mole night crew uses the solstice afternoon to re-paper it before it has to rise.",
+      "who": "Moles in hard hats with candle stubs on top and welding goggles pushed up as sunglasses work on twine-lashed bamboo scaffolding: pasting tissue over scorched patches, ironing crumpled rays flat, re-pleating card rays at a bench, hauling a tea urn on a pulley. A foreman with a clipboard and whistle. The sun is a paper lantern sphere as big as a barn, in a vast knitted nightcap with a hot-water bottle tucked under it, snoring.",
+      "light": "The sleeping sun gives a banked coral-red glow that swells and dims with each snore and lights the crew from below. A roof slit lets in hard blue-white moonlight. Through the hangar door, polar dark, blue snow and a pink stripe where no sunrise will come. Paper scraps hang in the air, red below and blue above.",
+      "focal": "The sun's sleeping face (nightcap askew) at the middle, up the scaffolding to the moonlit roof slit, then down to the crimping bench, the wall of patch templates and the door to the snow.",
+      "unique": "The sun is a maintained object: each ray is a pleated card fan re-crimped every year; scorched patches are replaced from templates sized 'freckle' to 'flare'; spare rays are racked like oars; by the door a taped sunrise lever with a hand-lettered card reading 'NOT YET'.",
+      "signature": "Click the sun and it yawns and opens its eyes. The coral glow blooms gold and floods the hangar; every mole snaps its goggles down in a ripple up the scaffold; the foreman blows his whistle and two moles leap off holding the nightcap and drag it back over the sun's eyes. The light sinks back to ember and loosened patches flutter down past the crew.",
+      "reactions": [
+        "A pasting mole slips and dangles from its harness, still holding its brush, slowly swinging.",
+        "A ray on the bench snaps open like a fan and knocks the hat off the mole beside it.",
+        "The sun's snore sends a gust of paper scraps up the shaft and every steam curl leans the same way.",
+        "The tea urn rattles up its pulley and every mole head turns to follow it.",
+        "Idle: a torn spot leaks a thin gold beam across the wall and a mole sprints along a plank to slap a patch on."
+      ],
+      "palette": "ember coral, scorched tissue amber, moon blue, bamboo tan, mole charcoal, wheat-paste white, crimped card ochre, polar-snow blue, full gold (only when it wakes)",
+      "composition": "A very tall portrait of a narrow hangar interior, slightly tilted up. The sun fills the frame's width at about 55% height; scaffolding climbs both sides and crosses in front; the roof slit and moon at the top; a dark floor with the bench, the template wall and the bright blue door at the base.",
+      "risk": "The wake has to relight everything from ember to gold and back, so every surface needs two lighting states; the paper sphere must read as translucent and lit from inside, with seams, patches and rib shadows.",
+      "hand": {
+        "place": "a place you can reach only once a year",
+        "time": "deep midwinter, mid-afternoon",
+        "inhabitants": "workers on a night shift",
+        "light": "two light sources of different colours",
+        "material": "paper and card",
+        "composition": "extreme vertical",
+        "mechanic": "something you can wake up",
+        "feeling": "busy and funny"
+      },
+      "status": "pitched",
+      "batch": "2026-10-29-1",
+      "scores": {
+        "bold": 4,
+        "drawable": 4,
+        "life": 4,
+        "distinct": 3
+      },
+      "cliche": "A cartoon sun with a face in a nightcap, plus workshop elves (here, moles) on scaffolding.",
+      "fix": "Take the face off the sun and keep the nightcap: let the sleep show only in the glow and the paper ribs swelling and dimming with each snore. Swap the moles for another worker, to break from The Spectacle Line.",
+      "rank": 3
+    },
+    {
+      "id": "proving-silo",
+      "title": "Proving Silo",
+      "logline": "A disused grain silo lined with paper flour sacks bakes the whole valley's midwinter bread in one afternoon, and its badger night crew must send every loaf up the old bucket elevator to the high viaduct before the once-a-year train stops there at four.",
+      "who": "Badgers in folded flour-sack hats and stiff aprons shape loaves on five landings, bag them in paper stamped with each household's name, and drop them into the tin buckets of the old grain elevator. One has fallen asleep standing up holding a rolling pin. At the bottom, in a stoneware crock the size of a bathtub, the mother dough sleeps under a cloth cap, its crust rising and falling.",
+      "light": "At the base, a brick oven glows orange through slots and cracks and throws heat shimmer up the shaft. At the top, the viaduct halt's signal lamp has just turned green and green light falls through the roof hatch. Outside, 3:40pm blue dusk, snow on the cap, steam from the vents. Flour dust shows both as beams: warm cones rising, a cool shaft falling.",
+      "focal": "The oven mouth where a badger slides a peel in, up the bucket chain loaf by loaf to the viaduct where a badger in a guard's cap catches each bag, then the green lamp and the station clock at 3:52.",
+      "unique": "A grain elevator that now carries bread, one stamped loaf per dented enamel bucket; walls lined with flattened flour sacks, mill names upside down and patched over old dough splats; orders spiked on nails; a paper ticker tape unspooling names down the shaft.",
+      "signature": "Click the mother dough and it yawns one huge bubble, burps and starts to rise, swelling up the silo landing by landing while badgers scramble ahead of it, one caught waist-deep and paddling. The head baker leaps down and punches it square in the middle, and it sighs flat with a fwump that billows flour up through both colours of light.",
+      "reactions": [
+        "A bagged loaf bounces out as its bucket tips, and the guard makes a diving catch.",
+        "The signal lamp blinks and every badger glances at the clock and works twice as fast.",
+        "The oven door clanks open in a gust of shimmer and a badger pats out his smouldering hat.",
+        "The sleeping badger startles awake and very seriously pretends to shape the nearest lump of dough.",
+        "Idle: the ticker tape jams and spools across a landing, and the badger caught in it turns slowly to unwind."
+      ],
+      "palette": "oven orange, signal green, flour-dust cream, kraft sack brown, crust russet, dusk snow blue, chipped enamel grey, badger black and white, viaduct stone",
+      "composition": "A tall portrait side-on cutaway of the cylindrical silo, front wall peeled away: oven and crock at the bottom, five landings stacked through the middle, the cap and elevator head at the top with a stone viaduct across the upper edge and the train's headlamp coming in from the left; the bucket chain climbing the right side like a zip.",
+      "risk": "The rising dough must look soft, swelling and glossy as it swallows floors and then deflates; flour dust in orange and green light can muddy into grey-brown haze instead of two clean beams.",
+      "hand": {
+        "place": "a place you can reach only once a year",
+        "time": "deep midwinter, mid-afternoon",
+        "inhabitants": "workers on a night shift",
+        "light": "two light sources of different colours",
+        "material": "paper and card",
+        "composition": "extreme vertical",
+        "mechanic": "something you can wake up",
+        "feeling": "busy and funny"
+      },
+      "status": "pitched",
+      "batch": "2026-10-29-1",
+      "scores": {
+        "bold": 3,
+        "drawable": 3,
+        "life": 4,
+        "distinct": 2
+      },
+      "cliche": "A busy-town cutaway with badger bakers.",
+      "fix": "Make the mother dough the giant: a glossy breathing mass filling the bottom third of the silo from the start, with the landings and bucket chain stacked over it, so it isn't a five-floor doll's house.",
+      "rank": 11
+    },
+    {
+      "id": "arilwick-court",
+      "title": "Arilwick Court",
+      "logline": "A sun-split pomegranate wedged on the rim of a stone garden birdbath has become a tenement for two rival mouse households, and tonight is Float Night, when each family launches lantern boats onto the water to outshine the other side of the fruit.",
+      "who": "The pith runs down the middle like a party wall. East of it the Garnets, nine harvest mice, have put a candle stub behind every aril on their side and are rigging a three-tier lantern boat from a strip of rind. West of it the Fenwicks, dormice, claim they aren't competing while their youngest bores a spy hole through the wall and another flicks seeds at the Garnet boats with a slingshot made from a crown spike. Grandpa Fenwick is asleep on the rind lip, fat as a plum, holding one aril like a ruby.",
+      "light": "A warm, still late-summer night, no moon yet. Candles behind translucent arils make the split face glow like a cut gem; the birdbath throws wobbling red-gold ripples back onto the rind's underside and the mossy stone. A few fireflies; dew beading as the night goes on.",
+      "focal": "The glowing split face with the yellow party wall and ruby windows packed either side, down to the water where the reflection doubles the fruit and lantern boats drift through it, to the huge fallen aril in the foreground holding a tiny inverted copy of the scene, then out to Grandpa snoring on the lip.",
+      "unique": "Every room is an aril chamber: pith membranes are the walls and floors, each seed a glassy red window lit from behind, so standing is counted in lit arils. Lantern boats are aril skins over rind ribs. The spiky crown is the shared bell tower, and the families have never agreed whose turn it is to ring it.",
+      "signature": "Feed Grandpa Fenwick. Each click hands him an aril, which he swallows without waking, getting visibly rounder. On the fifth he rolls off the lip into the birdbath with a plop that capsizes the Garnets' best boat and breaks the reflection into a thousand red pieces; the Garnets lean out shouting and every Fenwick child ducks below the sills.",
+      "reactions": [
+        "The mouse behind an aril window yanks a pith curtain shut, then peeks round it.",
+        "An eye blinks in the Fenwick spy hole and a Garnet paw slaps a leaf over it.",
+        "A ringer from each family scrambles up the crown and the bell rings twice, out of time.",
+        "A lantern boat turns slowly and its reflection follows half a beat late.",
+        "Idle: the slingshot kid flicks a seed into the basin and rings spread across the reflected fruit."
+      ],
+      "palette": "ruby and garnet, pith butter-yellow, oxblood rind, candle amber, wet slate stone, birdbath moss, black-green garden night",
+      "composition": "Low eye level just above the water: the pomegranate upper centre, its reflection filling the lower middle; in the lower-left corner one fallen aril on the rim, drawn as big as the whole fruit looks, glassy, with the scene inverted inside it; soft dark foliage and fireflies behind.",
+      "risk": "Translucency: arils must read as wet, glassy and back-lit, not red dots, and the foreground aril's inverted copy will look cheap unless well blurred and tinted; hundreds of lit windows must cluster and fall off rather than become noise.",
+      "hand": {
+        "place": "a home built inside something that used to be alive",
+        "time": "the night of a festival",
+        "inhabitants": "a rivalry between two neighbours",
+        "light": "light thrown back off water",
+        "material": "something edible",
+        "composition": "foreground so close it's out of scale",
+        "mechanic": "something you can feed",
+        "feeling": "mischievous"
+      },
+      "status": "pitched",
+      "batch": "2026-10-29-1",
+      "scores": {
+        "bold": 4,
+        "drawable": 3,
+        "life": 4,
+        "distinct": 3
+      },
+      "cliche": "Mice living in a piece of fruit, a familiar picture-book setup.",
+      "fix": "Light the two households in different colours, warm candle gold against cool glow-worm green-white, so the pith wall reads at a glance as a split between two temperatures. Drop the inverted scene inside the foreground aril; a plain glassy, backlit giant aril does the out-of-scale job.",
+      "rank": 4
+    },
+    {
+      "id": "cascabel-row",
+      "title": "Cascabel Row",
+      "logline": "Two strings of dried red chillies hang from neighbouring doorposts over a stone irrigation channel on the last night before they come in for winter, each one a tower of crickets locked in a singing feud, and a goat at the edge of the frame would eat either side if you let it.",
+      "who": "Crickets, one family per pod, behind doors chewed through the skin, with the stem cap as a chimney. The left string, long and glossy, belongs to the Rasps; the right, older, darker and moth-bitten, to the Trills. It is frost-eve, so each tower's top-pod choir rehearses in a clashing key while the children drop chilli flakes down the other family's chimneys. Tomatillo husks hang as lanterns with a glow-worm in each.",
+      "light": "A cold, clear autumn night, the first frost forming on the adobe sill and the goat's breath steaming. Glow-worms in husk lanterns and candles behind the chewed windows make the chilli skins glow orange-red; the channel throws long wobbling orange stripes up the whitewashed wall and under the pods. Stars between the rooflines.",
+      "focal": "The two red strings side by side, across the sagging thread bridge between them where a flag both families claim hangs, down to the bright stripe of water, then forward to the enormous amber goat eye and muzzle crowding the lower right.",
+      "unique": "Dried-chilli architecture: each pod a house whose skin glows when lit, loose seeds rattling as its doorbell, the stem cap its chimney. The hottest pods at the top are the best addresses. The string is braided, so a knock on one pod ripples through every house.",
+      "signature": "Feed the goat. Click a pod and the goat stretches in and crunches it; crickets pour out of its door and the rival tower cheers. A second later the goat's ears flush red, its eyes water, it steams and sneezes a cloud of flakes that sets both choirs coughing. Feed it a top pod and it lets out a long bleat that both choirs try to out-sing.",
+      "reactions": [
+        "A pod's seeds rattle and a cricket leans out to chirp something rude at the other string.",
+        "Two crickets tug the disputed flag on the thread bridge until it flips sides.",
+        "A husk lantern's glow-worm dims shyly, then brightens.",
+        "A fallen pod drifts down the channel like a canoe with a cricket paddling it.",
+        "Idle: the choirs sing in turns, their tower's lit pods pulsing with the volume, while frost creeps along the sill."
+      ],
+      "palette": "dried-chilli red and oxblood, adobe whitewash blued by night, straw-twine gold, glow-worm green, husk ivory, starlight indigo, black water with orange stripes",
+      "composition": "Street level at doorknob height: the two strings left and right of centre on one whitewashed wall, a slot of sky between the rooflines, a band of water across the lower third; the goat's amber eye and whiskery muzzle pushing in from the bottom right at three times the scale of anything else, soft at the edges.",
+      "risk": "A huge goat eye, fur and wet nose that come across as warm and funny, not monstrous; forty wrinkled, glossy pods that each read as a house; two near-symmetrical towers that don't look copy-pasted.",
+      "hand": {
+        "place": "a home built inside something that used to be alive",
+        "time": "the night of a festival",
+        "inhabitants": "a rivalry between two neighbours",
+        "light": "light thrown back off water",
+        "material": "something edible",
+        "composition": "foreground so close it's out of scale",
+        "mechanic": "something you can feed",
+        "feeling": "mischievous"
+      },
+      "status": "pitched",
+      "batch": "2026-10-29-1",
+      "scores": {
+        "bold": 3,
+        "drawable": 3,
+        "life": 3,
+        "distinct": 2
+      },
+      "cliche": "A chilli-ristra postcard, and the same twin-hanging-lantern rivalry as Mudmouth Lanterns.",
+      "fix": "Make the two towers completely different in silhouette (a tall tight braid against a sagging, moth-bitten wreath) and draw the goat as a rim-lit silhouette of eye and muzzle with no rendered fur.",
+      "rank": 12
+    },
+    {
+      "id": "mudmouth-lanterns",
+      "title": "Mudmouth Lanterns",
+      "logline": "On a mangrove mudflat at low tide, two dried pufferfish hang as lanterns from the same bent pole, each one home to a family of mudskippers, and on Shrimp-Run Night the two families are competing over whose lantern burns brightest across the shining mud.",
+      "who": "Bug-eyed mudskippers, one family per lantern: the Gogglers in the newer, rounder puffer with every spine intact, the Flops in the older, slightly deflated one patched with a leaf. Both families are out on their porches (the puffers' open mouths) with sail-fins raised, grilling shrimp on mangrove-twig skewers, while their kids skip across the mud to pinch the other family's skewers. A huge fiddler crab in the foreground has appointed itself referee.",
+      "light": "A humid, windless tropical night with mist on the water. Fish-oil candles inside the dried puffers glow parchment gold through the spotted skin and cast spot patterns and spine shadows outward like star maps. Underneath, the wet mud and tide creek throw back long rippling gold streaks broken by those shadows. A low tangerine moon behind the mangroves.",
+      "focal": "The two spiky glowing puffers on the bent pole, down their gold reflections on the mud, along the creek where shrimp glint, to the fiddler crab's giant claw in the left foreground, then to tiny lanterns of other families deep in the mangrove roots.",
+      "unique": "Pufferfish architecture: the open mouth is the front door, the spines are coat hooks and fence, the spotted skin is a lampshade that projects its pattern on everything nearby. A family's spines are its honour; losing one in a squabble is a scandal. Mudskippers keep their walls supple by flicking mud onto them.",
+      "signature": "Drop a shrimp on the mud between the lanterns and both fathers launch out at once, fins flared and gills ballooned, into a mudskipper standoff, jumping higher and higher, while a kid from the other family quietly walks off with the shrimp. Whoever jumps highest knocks his own lantern swinging, and its spine-shadows wheel across the whole mudflat like a party light.",
+      "reactions": [
+        "A lantern turns slowly on its string and its spot-and-spine shadow sweeps across the mud.",
+        "The fiddler crab's claw rises in a grand wave that blocks half the view, then lowers with great dignity.",
+        "A mudskipper's eyes pop up on their stalks, swivel toward the rival lantern, and blink by sinking back in.",
+        "Shrimp scatter in a silver burst on the creek and their glints double in the reflection.",
+        "Idle: a kid skips across the mud in three bounces, each leaving a ring in the gold, a stolen skewer held high."
+      ],
+      "palette": "parchment gold, puffer-belly cream with brown spots, plum-brown wet mud streaked with gold, mangrove black-green, dark teal water, tangerine moon, shrimp silver",
+      "composition": "Ground level on the mudflat, eye almost on the mud: the bent pole and two lanterns right of centre against a dark wall of arched mangrove roots; a tide creek winding from the lower right into the depth; a huge fiddler crab claw rising from the lower left, cropped by the frame; the whole lower half reflective mud.",
+      "risk": "Wet mud as a mirror that still reads as mud (footprints, ripples, skip-rings, streaked reflections); dried pufferfish that read as charming rather than grim; mudskipper faces expressive at small sizes.",
+      "hand": {
+        "place": "a home built inside something that used to be alive",
+        "time": "the night of a festival",
+        "inhabitants": "a rivalry between two neighbours",
+        "light": "light thrown back off water",
+        "material": "something edible",
+        "composition": "foreground so close it's out of scale",
+        "mechanic": "something you can feed",
+        "feeling": "mischievous"
+      },
+      "status": "pitched",
+      "batch": "2026-10-29-1",
+      "scores": {
+        "bold": 4,
+        "drawable": 3,
+        "life": 3,
+        "distinct": 4
+      },
+      "cliche": "Tourist-kitsch pufferfish lamps with goggle-eyed fish, sliding toward grim.",
+      "fix": "Make the projected spot-and-spine shadows the main light of the scene, sweeping the mud, roots and mist like a slow star map, and cut the fiddler-crab foreground that competes with it.",
+      "rank": 6
+    }
+  ]
+}

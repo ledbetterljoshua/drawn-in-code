@@ -14,7 +14,7 @@ const thumbs = !process.argv.includes('--no-thumbs');
 
 rmSync(out, { recursive: true, force: true });
 mkdirSync(join(out, 'thumbs'), { recursive: true });
-for (const f of ['index.html', 'engine', 'scenes']) cpSync(join(root, f), join(out, f), { recursive: true });
+for (const f of ['index.html', 'engine', 'scenes', 'ideas']) cpSync(join(root, f), join(out, f), { recursive: true });
 writeFileSync(join(out, '.nojekyll'), '');
 
 const lines = (dir) => readdirSync(dir).filter((f) => f.endsWith('.js')).reduce((n, f) => n + readFileSync(join(dir, f), 'utf8').split('\n').length, 0);

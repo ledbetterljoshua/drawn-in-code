@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Idea Factory · Drawn in Code</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  /* The gallery's back room: the same ink wall, ideas pinned up as cards with the hand of
+     constraint cards that made each one shown underneath it. */
+  :root {
+    --wall: #17121b; --card: #211a27; --card-edge: rgba(244,235,223,0.08);
+    --ink: #f4ebdf; --ink-dim: #b3a6a9; --ink-faint: #7d6f78;
+    --lamp: #f3b86a; --green: #9fd49a; --blue: #9cc3e8;
+    --display: "Young Serif", "Iowan Old Style", Georgia, serif;
+    --body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box }
+  html { background: var(--wall) }
+  body { margin: 0; background: var(--wall); color: var(--ink); font: 400 16px/1.55 var(--body);
+    padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); padding-block: clamp(36px, 6vw, 80px) 64px }
+  .wrap { max-width: 1240px; margin: 0 auto; display: grid; gap: clamp(32px, 5vw, 56px) }
+  header { display: grid; gap: 14px; max-width: 42rem }
+  .back { font: 500 13px/1.4 var(--mono); letter-spacing: .02em }
+  h1 { font: 400 clamp(40px, 6.5vw, 72px)/1 var(--display); margin: 0; text-wrap: balance }
+  header p { margin: 0; color: var(--ink-dim); font-size: 17px; text-wrap: pretty }
+  a { color: var(--lamp); text-decoration: none }
+  a:hover { text-decoration: underline; text-underline-offset: 3px }
+  a:focus-visible, summary:focus-visible { outline: 2px solid var(--lamp); outline-offset: 3px; border-radius: 4px }
+
+  .counts { display: flex; flex-wrap: wrap; gap: 8px 18px; font: 400 13px/1.4 var(--mono); color: var(--ink-faint); font-variant-numeric: tabular-nums }
+  .board { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 20px; align-items: start }
+  .idea { background: var(--card); border: 1px solid var(--card-edge); border-radius: 10px; padding: 20px 20px 16px; display: grid; gap: 12px; min-width: 0 }
+  .top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px }
+  .idea h2 { font: 400 23px/1.15 var(--display); margin: 0; text-wrap: balance }
+  .pill { font: 500 11px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; padding: 5px 8px; border-radius: 99px; white-space: nowrap; border: 1px solid currentColor }
+  .pill.pitched { color: var(--ink-faint) } .pill.greenlit { color: var(--green) } .pill.in-progress { color: var(--blue) } .pill.hung { color: var(--lamp) } .pill.shelved { color: var(--ink-faint); opacity: .6 }
+  .logline { margin: 0; color: var(--ink) }
+  .sig { margin: 0; color: var(--ink-dim); font-size: 15px }
+  .sig b { color: var(--ink); font-weight: 600 }
+  .scores { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; font: 400 11.5px/1.2 var(--mono); color: var(--ink-faint) }
+  .score { display: grid; gap: 5px }
+  .bar { height: 4px; border-radius: 2px; background: rgba(244,235,223,0.08); overflow: hidden }
+  .bar i { display: block; height: 100%; background: var(--lamp); border-radius: 2px }
+  .hand { display: flex; flex-wrap: wrap; gap: 6px }
+  .card { font: 400 12px/1.3 var(--body); color: var(--ink-dim); background: rgba(244,235,223,0.05); border-radius: 5px; padding: 4px 7px }
+  .card span { font: 500 10px/1 var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--ink-faint); margin-right: 5px }
+  details { border-top: 1px solid var(--card-edge); padding-top: 10px }
+  summary { cursor: pointer; font: 500 12.5px/1.4 var(--mono); color: var(--ink-faint); list-style: none }
+  summary::-webkit-details-marker { display: none }
+  summary::before { content: "+ "; } details[open] summary::before { content: "− " }
+  dl { margin: 12px 0 0; display: grid; gap: 10px; font-size: 14.5px }
+  dt { font: 500 10.5px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 3px }
+  dd { margin: 0; color: var(--ink-dim) }
+  dd ul { margin: 0; padding-left: 18px }
+  .critic dd { color: var(--ink) }
+  .meta { font: 400 11.5px/1.4 var(--mono); color: var(--ink-faint) }
+  .empty { color: var(--ink-dim) }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="back" href="../">← all drawings</a>
+    <h1>Idea Factory</h1>
+    <p>Worlds waiting to be drawn. Each one started as a hand of constraint cards dealt at random, which a Claude had to collide into a world without seeing anyone else's pitches. A critic scored them all. Joshua picks what gets drawn next.</p>
+    <div class="counts" id="counts"></div>
+  </header>
+  <main class="board" id="board" aria-live="polite"><p class="empty">Pinning up the ideas…</p></main>
+</div>
+<script>
+  const ORDER = { 'in-progress': 0, greenlit: 1, pitched: 2, hung: 3, shelved: 4 };
+  const SUITS = ['place', 'time', 'inhabitants', 'light', 'material', 'composition', 'mechanic', 'feeling'];
+  const total = (i) => i.scores ? i.scores.bold + i.scores.drawable + i.scores.life + i.scores.distinct : 0;
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  function field(dl, label, value) {
+    if (!value || (Array.isArray(value) && !value.length)) return;
+    const wrap = el('div'); wrap.appendChild(el('dt', null, label));
+    const dd = el('dd');
+    if (Array.isArray(value)) { const ul = el('ul'); value.forEach((v) => ul.appendChild(el('li', null, v))); dd.appendChild(ul); }
+    else dd.textContent = value;
+    wrap.appendChild(dd); dl.appendChild(wrap);
+  }
+  fetch('ideas.json').then((r) => r.json()).then(({ ideas }) => {
+    const board = document.getElementById('board');
+    board.textContent = '';
+    const counts = {};
+    ideas.forEach((i) => (counts[i.status] = (counts[i.status] || 0) + 1));
+    document.getElementById('counts').textContent = `${ideas.length} ideas · ` + Object.keys(ORDER).filter((k) => counts[k]).map((k) => `${counts[k]} ${k.replace('-', ' ')}`).join(' · ');
+    if (!ideas.length) { board.appendChild(el('p', 'empty', 'No ideas yet. The first batch is on its way.')); return; }
+    ideas.sort((a, b) => (ORDER[a.status] ?? 9) - (ORDER[b.status] ?? 9) || total(b) - total(a));
+    for (const i of ideas) {
+      const c = el('article', 'idea');
+      const top = el('div', 'top'); top.append(el('h2', null, i.title), el('span', `pill ${i.status}`, i.status.replace('-', ' ')));
+      c.appendChild(top);
+      c.appendChild(el('p', 'logline', i.logline));
+      if (i.signature) { const s = el('p', 'sig'); s.append(el('b', null, 'Signature: '), document.createTextNode(i.signature)); c.appendChild(s); }
+      if (i.scores) {
+        const sc = el('div', 'scores');
+        for (const k of ['bold', 'drawable', 'life', 'distinct']) {
+          const s = el('div', 'score'); s.appendChild(el('span', null, `${k} ${i.scores[k]}`));
+          const bar = el('div', 'bar'), fill = el('i'); fill.style.width = `${(i.scores[k] / 5) * 100}%`; bar.appendChild(fill); s.appendChild(bar);
+          sc.appendChild(s);
+        }
+        c.appendChild(sc);
+      }
+      const hand = el('div', 'hand');
+      for (const suit of SUITS) if (i.hand && i.hand[suit]) { const k = el('span', 'card'); k.append(el('span', null, suit), document.createTextNode(i.hand[suit])); hand.appendChild(k); }
+      c.appendChild(hand);
+      const d = el('details'); d.appendChild(el('summary', null, 'the whole pitch'));
+      const dl = el('dl');
+      field(dl, 'Who lives here', i.who); field(dl, 'Light and weather', i.light); field(dl, 'Where the eye goes', i.focal);
+      field(dl, 'Only here', i.unique); field(dl, 'Reactions', i.reactions); field(dl, 'Palette', i.palette);
+      field(dl, 'Composition', i.composition); field(dl, 'Hardest part', i.risk);
+      const crit = el('div', 'critic'); const cdl = el('dl');
+      field(cdl, 'Critic: the cliché nearby', i.cliche); field(cdl, 'Critic: the fix', i.fix);
+      crit.appendChild(cdl); dl.appendChild(crit);
+      d.appendChild(dl); c.appendChild(d);
+      c.appendChild(el('div', 'meta', [i.batch && `batch ${i.batch}`, i.scene && `scene: ${i.scene}`].filter(Boolean).join(' · ')));
+      board.appendChild(c);
+    }
+  }).catch(() => { document.getElementById('board').textContent = 'The idea list did not load. Try a refresh.'; });
+</script>
+</body>
+</html>
