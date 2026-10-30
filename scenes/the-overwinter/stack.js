@@ -26,7 +26,7 @@ OW.stackPath = stackPath;
 // rock colour by height: warm bounce off the sand near the foot, cooler and paler up high
 function rockAt(y, k = 0) {
   const w = OW.warmAt(y);
-  return mix(mix('#3e3550', '#5a4256', w), '#1e1828', k);
+  return mix(mix('#262036', '#3a2838', w), '#1e1828', k);
 }
 
 // ------------------------------------------------------------ the rock
@@ -36,7 +36,7 @@ function drawRock(g) {
   g.save();
   g.clip(SP);
   // body: cool violet above, warm plum near the sand
-  g.fillStyle = grad(g, 0, 150, 0, 1270, [[0, '#2a2640'], [0.3, '#211c30'], [0.65, '#231c30'], [0.88, '#32243a'], [1, '#4a3244']]);
+  g.fillStyle = grad(g, 0, 150, 0, 1270, [[0, '#221e36'], [0.3, '#1a1628'], [0.65, '#1b1628'], [0.88, '#281c30'], [1, '#3a2636']]);
   g.fillRect(250, 120, 950, 1200);
   // the drum turns away at the sides: darker toward both edges, the centre faces the sky behind us
   g.fillStyle = grad(g, 380, 0, 1110, 0, [[0, 'rgba(20,14,30,0.55)'], [0.16, 'rgba(20,14,30,0.2)'], [0.45, 'rgba(20,14,30,0)'], [0.82, 'rgba(20,14,30,0.25)'], [1, 'rgba(20,14,30,0.6)']]);
@@ -149,30 +149,21 @@ function drawRock(g) {
   }
   g.globalAlpha = 1;
 
-  // the high face: drawers too far up to make out, dissolving into the bedding and the snow haze
+  // the high face: the oldest drawers, half swallowed by the rock — a scatter of dark slots and
+  // the odd brass glint, thinning out as they go up into the haze
   const RT = rng(808);
-  for (let vv = OW.TEXTURE_V + 0.004; vv < 1.02;) {
-    const hh = 0.014 + RT() * 0.02;
-    let u = 0.06 + RT() * 0.1;
+  for (let i = 0; i < 46; i++) {
+    const vv = OW.TEXTURE_V + 0.01 + RT() ** 1.4 * 0.26, u = 0.05 + RT() * 0.9, w = 0.025 + RT() * 0.05, hh = 0.008 + RT() * 0.014;
+    const q = [drum(u, vv + hh), drum(u + w, vv + hh), drum(u + w, vv), drum(u, vv)];
+    const dy = OW.dip(u + w / 2, vv);
+    for (const p of q) p[1] += dy;
     const fade = clamp((vv - OW.TEXTURE_V) / 0.27, 0, 1);
-    while (u < 0.95) {
-      const w = 0.03 + RT() * 0.08;
-      if (RT() < 0.25 + fade * 0.45) { u += w + 0.02; continue; }
-      const q = [drum(u, vv + hh), drum(u + w, vv + hh), drum(u + w, vv), drum(u, vv)];
-      const dy = OW.dip(u + w / 2, vv);
-      for (const p of q) p[1] += dy;
-      g.globalAlpha = 0.55 * (1 - fade * 0.8);
-      g.fillStyle = RT() < 0.25 ? '#3a4650' : RT() < 0.5 ? '#5a3a46' : '#6c5660';
-      g.fill(qpath(q));
-      g.globalAlpha = 0.5 * (1 - fade);
-      g.lineWidth = 0.8; g.strokeStyle = '#1e1626'; g.stroke(qpath(q));
-      // a label holder glint and a pull
-      const c = OW.qat(q, 0.5, 0.42);
-      g.fillStyle = '#c8b48a'; g.globalAlpha = 0.6 * (1 - fade * 0.7);
-      g.fillRect(c[0] - 2, c[1] - 1, 4, 2);
-      u += w + 0.004 + RT() * 0.01;
-    }
-    vv += hh + 0.002 + RT() * 0.006;
+    g.globalAlpha = 0.75 * (1 - fade * 0.7);
+    g.fillStyle = '#0e0a16'; g.fill(qpath(OW.inset(q, -0.08, -0.15)));
+    g.fillStyle = RT() < 0.3 ? '#2a3038' : '#3a2a34'; g.fill(qpath(q));
+    // its sill catches a little sky
+    g.fillStyle = 'rgba(160,150,200,0.35)'; g.fill(poly([q[3], q[2], [q[2][0], q[2][1] + 1.2], [q[3][0], q[3][1] + 1.2]]));
+    if (RT() < 0.5) { const c = OW.qat(q, 0.5, 0.45); g.fillStyle = '#b89a62'; g.fillRect(c[0] - 1.5, c[1] - 0.6, 3, 1.4); }
   }
   g.globalAlpha = 1;
   // haze: the snow in the air between us and the top of the stack
@@ -187,7 +178,7 @@ let LAMPS = [];
 function lampLight(g, k = 1) {
   g.globalCompositeOperation = 'screen';
   for (const [x, y, a, r] of LAMPS) {
-    g.fillStyle = radial(g, x, y, 0, r, [[0, `rgba(170,190,255,${0.95 * a * k})`], [0.25, `rgba(120,140,250,${0.6 * a * k})`], [0.6, `rgba(90,96,210,${0.22 * a * k})`], [1, 'rgba(60,60,180,0)']]);
+    g.fillStyle = radial(g, x, y, 0, r, [[0, `rgba(160,200,255,${0.95 * a * k})`], [0.4, `rgba(110,150,250,${0.55 * a * k})`], [0.72, `rgba(80,100,220,${0.14 * a * k})`], [1, 'rgba(60,60,180,0)']]);
     g.fillRect(x - r, y - r, r * 2, r * 2);
   }
   g.globalCompositeOperation = 'source-over';
@@ -248,6 +239,23 @@ function drawCabinet(g, cab) {
     ink(g, qpath(ext), T.lit, 1.4);
   }
   for (const d of cab.drawers) drawDrawerClosed(g, d, R);
+  // snow lodged along the cabinet's top, thicker at one end where it drifted
+  {
+    const a = q[0], b = q[1], dir = R() < 0.5 ? 1 : -1, n = 8, pts = [], bot = [];
+    for (let i = 0; i <= n; i++) { const t = i / n, th = (1.2 + (dir > 0 ? t : 1 - t) * 3.5) * (0.7 + R() * 0.6); pts.push([lerp(a[0], b[0], t), lerp(a[1], b[1], t) - th]); bot.push([lerp(a[0], b[0], t), lerp(a[1], b[1], t) + 1.4]); }
+    ink(g, curve(pts.concat(bot.reverse())), C.snow, 0.8, C.snowShade);
+  }
+  // the rock creeps over the cabinet's edge in places: a lip of stone over a corner
+  if (R() < 0.55) {
+    const side = R() < 0.5 ? 0 : 1, c = side ? q[1] : q[0], w = 14 + R() * 18, h = 10 + R() * 16, sx = side ? -1 : 1;
+    const lump = curve([[c[0] - sx * 10, c[1] - 6], [c[0] + sx * w * 0.6, c[1] - 4], [c[0] + sx * w, c[1] + h * 0.3], [c[0] + sx * w * 0.5, c[1] + h * 0.6], [c[0] + sx * 3, c[1] + h], [c[0] - sx * 8, c[1] + h * 0.7]]);
+    g.save(); g.shadowColor = 'rgba(6,4,12,0.6)'; g.shadowBlur = 5; g.shadowOffsetY = 3; ink(g, lump, rockAt(c[1]), 1.6); g.restore();
+    g.save(); g.clip(lump);
+    g.fillStyle = 'rgba(150,130,180,0.22)'; g.fill(ell(c[0] + sx * w * 0.35, c[1] - 3, w * 0.5, 3));
+    g.strokeStyle = 'rgba(10,6,18,0.6)'; g.lineWidth = 1; g.beginPath(); g.moveTo(c[0] - sx * 8, c[1] + h * 0.35); g.lineTo(c[0] + sx * w, c[1] + h * 0.3); g.stroke();
+    for (let k = 0; k < 8; k++) { g.fillStyle = R() < 0.5 ? '#0e0a16' : '#5a5070'; g.fill(circ(c[0] + sx * R() * w, c[1] + R() * h * 0.7, 0.7 + R())); }
+    g.restore();
+  }
   // weathering on the carcass: a drip stain from the top
   if (R() < 0.6) {
     const s = 0.2 + R() * 0.6, a = OW.qat(q, s, 0);
@@ -422,20 +430,26 @@ function drawCap(g) {
     const a = top[j], b = top[j + 1], x = lerp(a[0], b[0], R()), y = lerp(a[1], b[1], 0.5) - 2;
     g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + 2, y - 6, x + 3 + R() * 6, y - 8 - R() * 8); g.stroke();
   }
-  // the snow: a soft lumpy blanket with a blue shade side and a rose rim from behind
-  const snow = [];
-  for (let i = 0; i < top.length; i++) snow.push([top[i][0], top[i][1] - 6 - R() * 5]);
-  for (let i = top.length - 1; i >= 0; i--) snow.push([top[i][0] + 2, top[i][1] + 6 + R() * 6]);
-  const SP = curve(snow);
-  ink(g, SP, C.snowShade, 2);
+  // the snow: drifted — thick in the hollows of the top, thin over the bumps — with a blue
+  // shaded lip where it curls over the edge, and the faintest rose where it faces the glow
+  const snow = [], lip = [];
+  for (let i = 0; i < top.length; i++) {
+    const [x, y] = top[i], prev = top[Math.max(0, i - 1)], next = top[Math.min(top.length - 1, i + 1)];
+    const hollow = clamp(((prev[1] + next[1]) / 2 - y) * 0.25 + 0.5, 0.2, 1.4);
+    snow.push([x, y - 3 - hollow * 5 - R() * 3]);
+    lip.push([x + 1, y + 2 + hollow * 6 + R() * 7 + (R() < 0.15 ? 6 : 0)]);
+  }
+  const SP = curve(snow.concat(lip.slice().reverse()));
+  ink(g, SP, C.snowShade, 1.6);
   g.save(); g.clip(SP);
-  g.fillStyle = C.snow; g.fill(curve(snow.map(([x, y], i) => [x, y - (i < top.length ? 2 : 4)])));
-  g.fillStyle = 'rgba(255,190,180,0.55)'; g.fill(curve(snow.slice(0, top.length).concat(snow.slice(0, top.length).reverse().map(([x, y]) => [x, y + 3])), true));
+  g.fillStyle = C.snow; g.fill(curve(snow.map(([x, y]) => [x, y - 2]).concat(lip.slice().reverse().map(([x, y]) => [x, y - 5]))));
+  g.fillStyle = 'rgba(255,200,190,0.35)'; g.fill(curve(snow.slice(0, 9).concat(snow.slice(0, 9).reverse().map(([x, y]) => [x, y + 5]))));
   g.restore();
   // icicles off the brow
-  for (let i = 0; i < 16; i++) {
-    const a = top[1 + Math.floor(R() * 8)], x = a[0] + (R() - 0.5) * 20, y = a[1] + 12;
-    const l = 5 + R() * 16;
+  for (let i = 0; i < 14; i++) {
+    // clustered where meltwater runs off the lip, a few long, most short
+    const a = top[[1, 1, 2, 4, 4, 5, 9, 14, 15, 15, 20, 21, 2, 4][i]], x = a[0] + (R() - 0.5) * 9, y = a[1] + 10;
+    const l = R() < 0.25 ? 14 + R() * 14 : 3 + R() * 7;
     ink(g, poly([[x - 1.6, y], [x + 1.6, y], [x, y + l]]), '#dde4ff', 0.7);
   }
 }
@@ -444,11 +458,14 @@ function drawCap(g) {
 function drawRim(g) {
   const SP = stackPath();
   g.save(); g.clip(SP);
-  for (const [w, a] of [[14, 0.12], [7, 0.25], [3, 0.5]]) {
-    g.lineWidth = w;
-    g.strokeStyle = grad(g, 0, 150, 0, 1260, [[0, `rgba(220,150,180,${a * 0.6})`], [0.6, `rgba(240,150,150,${a})`], [1, `rgba(255,190,160,${a * 1.3})`]]);
-    g.stroke(SP);
-  }
+  // the afterglow wraps the edges: a soft rose light inside the silhouette, strongest low down
+  // where the glow is brightest, fading out up high where the sky behind is dark
+  g.lineWidth = 10;
+  g.strokeStyle = grad(g, 0, 160, 0, 1260, [[0, 'rgba(200,140,180,0)'], [0.45, 'rgba(230,140,150,0.12)'], [1, 'rgba(255,180,150,0.4)']]);
+  g.stroke(SP);
+  g.lineWidth = 3;
+  g.strokeStyle = grad(g, 0, 160, 0, 1260, [[0, 'rgba(220,160,190,0.15)'], [0.5, 'rgba(240,160,150,0.4)'], [1, 'rgba(255,200,170,0.75)']]);
+  g.stroke(SP);
   g.restore();
   // snow on the ledges where the outline steps in
   const pts = OW.stackPtsRaw, R = rng(4);
@@ -480,7 +497,7 @@ onLayout(() => {
     drawArch(g);
     drawCap(g);
     // silhouette ink, heavy; then punch the arch out so the sky shows through
-    g.lineWidth = 3.2; g.strokeStyle = LINE; g.stroke(stackPath());
+    g.lineWidth = 2.6; g.strokeStyle = grad(g, 0, 160, 0, 1260, [[0, LINE], [0.6, LINE], [1, '#5a3448']]); g.stroke(stackPath());
     g.save(); g.globalCompositeOperation = 'destination-out'; g.fill(archPath()); g.restore();
     g.lineWidth = 2.6; g.strokeStyle = LINE; g.stroke(archPath());
   });

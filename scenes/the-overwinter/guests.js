@@ -42,7 +42,7 @@ const TAGS = {
 // fixed casting first
 D.forEach((d) => { d.guest = null; d.rest = 0; });
 const free = () => D.filter((d) => !d.guest);
-const bear = D.find((d) => d.bear); bear.guest = 'bear'; bear.rest = 0.75;
+const bear = D.find((d) => d.bear); bear.guest = 'bear'; bear.rest = 1;
 focal.guest = 'dormouse'; focal.rest = 0.45; focal.cap = true;
 const big = free().filter((d) => d.w > 95 && d.cy > 900).sort((a, b) => b.w - a.w);
 big[0].guest = 'tortoise'; big[0].rest = 0.4;
@@ -56,14 +56,14 @@ free().filter((d) => d.cab.v0 > 0.59).sort(() => R() - 0.5).slice(0, 6).forEach(
 for (const d of free()) {
   const r = R();
   d.guest = r < 0.48 ? 'dormouse' : r < 0.82 ? 'hedgehog' : 'squirrel';
-  if (R() < (d.cy > 700 ? 0.42 : 0.3) && d.w > 50) d.rest = 0.3 + R() * 0.22;
+  if (R() < (d.cy > 700 ? 0.42 : 0.3) && d.w > 50) d.rest = 0.45 + R() * 0.3;
 }
 const tagUsed = {};
 for (const d of D) {
   const list = TAGS[d.guest] || TAGS.dormouse;
   const k = (tagUsed[d.guest] = (tagUsed[d.guest] || 0) + 1);
   d.tagText = list[(k - 1) % list.length];
-  d.hasTag = d.guest !== 'bat' && (d.rest > 0 || R() < 0.55 || d.focal);
+  d.hasTag = d.guest !== 'bat' && (d.rest > 0 ? R() < 0.7 : R() < 0.22) || d.focal;
   d.tagSide = R() < 0.5 ? -1 : 1;
   d.o = d.rest; d.ph = R() * TAU; d.sw = (R() - 0.5) * 0.3; d.sv = 0;
   d.state = 'sleep'; d.wt = 0; d.immune = 0; d.settled = 0; d.read = 0; d.stir = 0; d.gen = 0;
@@ -151,12 +151,13 @@ function mouthYawn(g, x, y, s, k, lw) {
 }
 
 const FUR = {
-  dormouse: { base: '#c08a52', shade: '#7e5638', lit: '#e6b47a', belly: '#f0dcbc' },
+  dormouse: { base: '#cf8a42', shade: '#8a5228', lit: '#f0b868', belly: '#f6e6cc' },
   squirrel: { base: '#a65430', shade: '#6c3222', lit: '#d47e4c', belly: '#ecd6bc' },
   bear: { base: '#6e4a36', shade: '#40281e', lit: '#9a6c4c', belly: '#b08a6a' },
 };
 
 function dormouse(g, s, a, d) {
+  // a hazel dormouse: golden, a white throat, huge black eyes, small ears, a tail like a bottle-brush
   const F = FUR.dormouse, base = furTone(F.base, d), shade = furTone(F.shade, d), lit = furTone(F.lit, d), lw = clamp(1.4 * s, 0.9, 1.8);
   const rise = a.rise, br = a.br, y = a.yawn;
   // the sock lining, turned over the lip
@@ -168,51 +169,63 @@ function dormouse(g, s, a, d) {
     for (let x = -sw; x < sw; x += 6 * s) g.fillRect(x, -2, 3 * s, sh + 3);
     g.restore();
   }
-  // back and body: a furry mound rising out of the drawer
-  const bx = -4 * s, by = -4 * s - rise * 9 * s;
-  const body = ell(bx, by + 4 * s, 15 * s, (8 + br * 0.8 + rise * 6) * s);
-  ink(g, body, base, lw);
-  g.save(); g.clip(body); g.fillStyle = shade; g.fill(ell(bx - 4 * s, by + 10 * s, 15 * s, 8 * s)); g.fillStyle = lit; g.fill(ell(bx + 5 * s, by - 3 * s, 8 * s, 3 * s)); g.restore();
+  // curled: a golden ball. Waking: it uncurls and sits up
+  const by = -4 * s - rise * 10 * s;
+  const ball = ell(-2 * s, by + 2 * s, (13 - rise * 2) * s, (9 + br * 0.7 + rise * 5) * s);
+  ink(g, ball, base, lw);
+  g.save(); g.clip(ball);
+  g.fillStyle = shade; g.fill(ell(-6 * s, by + 10 * s, 13 * s, 7 * s));
+  g.fillStyle = lit; g.fill(ell(2 * s, by - 5 * s, 8 * s, 3 * s));
+  if (rise > 0.3) { g.fillStyle = mix(base, F.belly, 0.8); g.fill(ell(5 * s, by + 4 * s, 5 * s, 7 * s * rise)); }
+  g.restore();
   // arms up for the yawn's stretch
   if (rise > 0.5 && y > 0.2) {
     const k = sstep(0.2, 0.7, y);
     for (const side of [-1, 1]) {
-      const sx = bx + side * 9 * s, sy = by - 2 * s;
-      const hx = sx + side * 6 * s * k, hy = sy - 16 * s * k;
-      Drawn.tube(g, seg(sx, sy, hx, hy), base, 3.4 * s, lw * 0.6);
-      ink(g, circ(hx, hy, 2.2 * s), mix(base, '#f0c8b0', 0.5), lw * 0.6);
+      const sx = side * 7 * s, sy = by - 3 * s;
+      const hx = sx + side * 5 * s * k, hy = sy - 13 * s * k;
+      Drawn.tube(g, seg(sx, sy, hx, hy), base, 2.8 * s, lw * 0.6);
+      ink(g, circ(hx, hy, 1.8 * s), mix(base, '#f0c8b0', 0.5), lw * 0.6);
     }
   }
-  // head
+  // head: tucked into the ball asleep, lifted and turned to us awake
   g.save();
-  const hx = (-6 + a.roll * 5) * s, hy = by - 4 * s - rise * 3 * s;
-  g.translate(hx, hy); g.rotate(-y * 0.35 + a.roll * 0.15);
-  ink(g, circ(-5.5 * s, -6.5 * s, 4.4 * s), base, lw); g.fillStyle = '#d89a90'; g.fill(circ(-5.5 * s, -6.5 * s, 2.4 * s));
-  ink(g, circ(5 * s, -7 * s, 4.2 * s), base, lw); g.fillStyle = '#d89a90'; g.fill(circ(5 * s, -7 * s, 2.2 * s));
-  const head = ell(0, 0, 9 * s, 8 * s);
+  const hx = lerp(6, 1, rise) * s + a.roll * 3 * s, hy = by + lerp(-2, -10, rise) * s;
+  g.translate(hx, hy); g.rotate(lerp(0.5, 0, rise) - y * 0.3 + a.roll * 0.12);
+  const head = ell(0, 0, 7.2 * s, 6.4 * s);
+  ink(g, ell(-4.6 * s, -4.6 * s, 2.4 * s, 2.8 * s, undefined, -0.4), base, lw * 0.8);
+  g.fillStyle = '#d8908a'; g.fill(ell(-4.6 * s, -4.4 * s, 1.2 * s, 1.6 * s, undefined, -0.4));
   ink(g, head, base, lw);
-  g.save(); g.clip(head); g.fillStyle = lit; g.fill(ell(2 * s, -4 * s, 7 * s, 3.2 * s)); g.fillStyle = shade; g.fill(ell(-3 * s, 7 * s, 9 * s, 4 * s)); g.restore();
-  ink(g, ell(5 * s, 3 * s, 4.8 * s, 3.6 * s), mix(base, F.belly, 0.6), lw * 0.7);
-  g.fillStyle = '#d8707c'; g.fill(circ(9 * s, 2 * s, 1.4 * s));
-  // whiskers
-  g.lineWidth = 0.5; g.strokeStyle = 'rgba(40,30,40,0.6)';
-  g.beginPath(); g.moveTo(8 * s, 3 * s); g.lineTo(15 * s, 1 * s); g.moveTo(8 * s, 4 * s); g.lineTo(15 * s, 5 * s); g.stroke();
-  if (a.eye > 0.15) eyeOpen(g, 2 * s, -1.5 * s, 2.6 * s, a.eye, a.look, lw);
-  else eyeShut(g, 2 * s, -1.5 * s, 2.6 * s, lw, y > 0.4 ? 1 : 0);
-  mouthYawn(g, 6 * s, 5 * s, s, y, lw * 0.7);
+  g.save(); g.clip(head); g.fillStyle = lit; g.fill(ell(-1 * s, -3.6 * s, 5 * s, 2.2 * s)); g.fillStyle = mix(base, F.belly, 0.85); g.fill(ell(3 * s, 4.4 * s, 5 * s, 3.2 * s)); g.restore();
+  ink(g, ell(4.2 * s, -4.6 * s, 2.2 * s, 2.6 * s, undefined, 0.4), base, lw * 0.8);
+  g.fillStyle = '#d8908a'; g.fill(ell(4.2 * s, -4.4 * s, 1.1 * s, 1.5 * s, undefined, 0.4));
+  // muzzle and nose: short, pink-tipped; long whiskers
+  g.fillStyle = '#d8707c'; g.fill(circ(7.4 * s, 1.4 * s, 1.2 * s));
+  g.lineWidth = 0.45; g.strokeStyle = 'rgba(40,30,40,0.7)';
+  g.beginPath(); for (const k of [-1.5, 0, 1.6]) { g.moveTo(6.6 * s, 2 * s); g.lineTo(15 * s, (2 + k * 1.6) * s); } g.stroke();
+  // eyes: huge and black when open
+  if (a.eye > 0.15) {
+    g.save(); g.translate(2.4 * s, -0.8 * s); g.scale(1, Math.max(0.15, a.eye));
+    g.fillStyle = '#0e0810'; g.fill(ell(0, 0, 2.4 * s, 2.6 * s));
+    g.fillStyle = '#fff'; g.fill(circ(-0.8 * s + a.look * 0.6 * s, -1 * s, 0.8 * s));
+    g.restore();
+    if (a.eye < 0.6) { g.lineWidth = lw * 0.8; g.strokeStyle = LINE; g.beginPath(); g.moveTo(0, -0.8 * s - 2.6 * s * a.eye); g.lineTo(5 * s, -0.8 * s - 2.8 * s * a.eye); g.stroke(); }
+  } else eyeShut(g, 2.4 * s, -0.6 * s, 2.3 * s, lw, y > 0.4 ? 1 : 0);
+  mouthYawn(g, 4.8 * s, 3.4 * s, s * 0.85, y, lw * 0.7);
   if (d.cap) {
-    // a striped nightcap, its tassel flopping with the head
-    const cap = curve([[-8 * s, -4 * s], [-2 * s, -12 * s], [8 * s, -10 * s], [14 * s, -2 * s + Math.sin(a.t * 0.8) * s], [8 * s, -6 * s], [0, -5 * s]]);
+    const cap = curve([[-6 * s, -3 * s], [-1 * s, -10 * s], [7 * s, -9 * s], [12 * s, -2 * s + Math.sin(a.t * 0.8) * s], [6 * s, -5 * s], [0, -4 * s]]);
     ink(g, cap, '#d8d2ec', lw * 0.8);
-    g.save(); g.clip(cap); g.fillStyle = '#8a6cb4'; for (let k = -10; k < 16; k += 5) g.fillRect(k * s, -14 * s, 2.2 * s, 14 * s); g.restore();
-    ink(g, circ(14 * s, -1.5 * s + Math.sin(a.t * 0.8) * s, 2 * s), '#f0eaff', lw * 0.6);
+    g.save(); g.clip(cap); g.fillStyle = '#8a6cb4'; for (let k = -8; k < 14; k += 4.4) g.fillRect(k * s, -12 * s, 2 * s, 12 * s); g.restore();
+    ink(g, circ(12 * s, -1.5 * s + Math.sin(a.t * 0.8) * s, 1.8 * s), '#f0eaff', lw * 0.6);
   }
   g.restore();
-  // paws on the lip, and the tail laid over the sock like a scarf
-  ink(g, ell(hx + 2 * s, -1 * s, 2.6 * s, 1.8 * s), mix(base, '#f0c8b0', 0.4), lw * 0.7);
-  ink(g, ell(hx + 8 * s, -0.6 * s, 2.6 * s, 1.8 * s), mix(base, '#f0c8b0', 0.4), lw * 0.7);
-  const tail = curve([[14 * s, -4 * s - rise * 4 * s], [17 * s, 0], [10 * s, 3 * s], [-2 * s, 3.5 * s], [-14 * s, 1.5 * s]], false);
-  Drawn.tube(g, tail, lit, 4.4 * s, lw * 0.8);
+  // the tail: a thick bottle-brush wrapped round the front of the ball like a scarf
+  const tail = curve([[-14 * s, by + 4 * s], [-10 * s, by + 10 * s], [0, by + 10.5 * s], [10 * s, by + 8 * s - rise * 2 * s], [14 * s, by + 2 * s - rise * 3 * s]], false);
+  Drawn.tube(g, tail, lit, 5.4 * s, lw * 0.8);
+  g.strokeStyle = shade; g.lineWidth = 0.7 * s;
+  for (let k = 0; k < 7; k++) { const x = -11 * s + k * 3.6 * s, yy = by + 9.4 * s - Math.max(0, k - 4) * 1.6 * s; g.beginPath(); g.moveTo(x, yy - 2 * s); g.lineTo(x + 1.6 * s, yy + 1.6 * s); g.stroke(); }
+  // little pink paws on the lip when sitting up
+  if (rise > 0.4) { ink(g, ell(-3 * s, -0.6 * s, 2 * s, 1.4 * s), '#e0b0a8', lw * 0.6); ink(g, ell(3 * s, -0.6 * s, 2 * s, 1.4 * s), '#e0b0a8', lw * 0.6); }
 }
 
 function hedgehog(g, s, a, d) {
@@ -228,7 +241,7 @@ function hedgehog(g, s, a, d) {
     g.restore();
   }
   // the spiny dome
-  const cx = 0, cy = -2 * s - rise * 6 * s, rx = 16 * s, ry = (9 + a.br * 0.7 + rise * 3) * s;
+  const cx = 0, cy = 1 * s - rise * 8 * s, rx = 16 * s, ry = (9 + a.br * 0.7 + rise * 3) * s;
   const dome = new Path2D(); dome.moveTo(cx - rx, 2 * s); dome.ellipse(cx, cy + 2 * s, rx, ry, 0, Math.PI, 0); dome.closePath();
   ink(g, dome, furTone('#5a4a40', d), lw);
   g.save(); g.clip(dome);
@@ -262,7 +275,7 @@ function squirrel(g, s, a, d) {
   const rise = a.rise, y = a.yawn;
   // moss lining
   ink(g, curve([[-26 * s, 0], [-14 * s, -3 * s], [0, -2 * s], [14 * s, -3 * s], [26 * s, 0], [20 * s, 4 * s], [-20 * s, 4 * s]]), furTone('#5c6a3c', d), lw * 0.7);
-  const by = -5 * s - rise * 8 * s;
+  const by = -2 * s - rise * 11 * s;
   ink(g, ell(2 * s, by + 3 * s, 13 * s, (7 + a.br * 0.7 + rise * 5) * s), base, lw);
   // head
   g.save(); g.translate(-7 * s + a.roll * 4 * s, by - 4 * s); g.rotate(-y * 0.35);
@@ -324,7 +337,7 @@ function ladybirds(g, s, a, d) {
 function bee(g, s, a, d) {
   const lw = clamp(1.2 * s, 0.8, 1.5);
   ink(g, curve([[-16 * s, 1], [-8 * s, -4 * s], [4 * s, -3 * s], [16 * s, 1], [6 * s, 3 * s]]), '#f0eef8', lw * 0.6);
-  const by = -5 * s - a.rise * 4 * s;
+  const by = -4 * s - a.rise * 4 * s;
   const body = ell(0, by, 8 * s, (5.5 + a.br * 0.4) * s);
   ink(g, body, '#2a1e1a', lw);
   g.save(); g.clip(body); g.fillStyle = '#e0a83c'; g.fillRect(-3 * s, by - 6 * s, 3 * s, 12 * s); g.fillStyle = '#efe0c0'; g.fillRect(4 * s, by - 6 * s, 4 * s, 12 * s); g.restore();
@@ -484,7 +497,7 @@ function drawOpen(g, d, o, a) {
   }
   // the guest, behind the front so the front hides its lower half
   const lipL = f[0], lipR = f[1], lx = (lipL[0] + lipR[0]) / 2, ly = (lipL[1] + lipR[1]) / 2;
-  const s = clamp((lipR[0] - lipL[0]) / 66, 0.45, 1.6) * (d.guest === 'bear' ? 0.62 : 1);
+  const s = clamp((lipR[0] - lipL[0]) / 66, 0.45, 1.6) * (d.guest === 'bear' ? 0.8 : 1);
   if (d.guest && RIGS[d.guest] && (o > 0.08 || d.guest === 'bear')) {
     g.save();
     // only what rises above the lip (or, below eye level, what's in the open drawer) is visible
@@ -584,7 +597,7 @@ for (const d of D) {
         anim.eye = ease(anim.eye, w0 < 0.5 ? 0.15 : w0 < 1.8 ? 0.42 + 0.1 * Math.sin(w0 * 9) : w0 < 3.2 ? 0 : 0, 6, dt);
         anim.look = ease(anim.look, w0 < 1.8 ? 0.6 : 0, 4, dt);
         anim.yawn = ease(anim.yawn, w0 > 1.8 && w0 < 3.1 ? (d.settled ? 0.45 : 1) : 0, w0 > 1.8 && w0 < 3.1 ? 3 : 5, dt);
-        if (d.hasTag) d.read = Math.max(d.read, w0 > 0.5 && w0 < 1.9 ? 0.55 : 0);
+        if (d.hasTag && !L.hovered) d.read = Math.max(d.read, w0 > 0.5 && w0 < 1.9 ? 0.22 : 0);
         if (!d.spread && w0 > 2.4) {
           d.spread = true; spread(d);
           puff(d.cx + d.flip * d.w * 0.15, d.y0 - (d.guest === 'bear' ? 50 : 18) * d.hs, clamp(d.w / 70, 0.6, 1.8), d.flip);

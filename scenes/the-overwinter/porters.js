@@ -40,8 +40,7 @@ layer({
       // end caps
       for (const [x, y] of [pts[0], pts[pts.length - 1]]) ink(g, circ(x, y, 3.6 * s), C.brass.lit, 1.2);
       // snow along the top of the tube in places
-      g.lineWidth = 1.6 * s; g.strokeStyle = C.snow; g.setLineDash([10 * s, 14 * s, 4 * s, 20 * s]);
-      g.stroke(curve(pts.map(([x, y]) => [x, y - 2.4 * s]), false)); g.setLineDash([]);
+      for (let i = 2; i < pts.length - 2; i += 5 + (i % 3)) { const [x, y] = pts[i]; ink(g, ell(x, y - 2.6 * s, (3 + (i * 7) % 5) * s, 1.4 * s), C.snow, 0.6, C.snowShade); }
     }
     g.restore();
   },
@@ -202,11 +201,11 @@ function bottle(g, x, y, s) {
   g.restore();
 }
 
-const lampAt = (p, L) => p.lamp === 'hook' ? [L.tx + p.face * (L.wt / 2 + 9 * L.s), L.ty + 2 * L.s] : null;
+const lampAt = (p, L) => p.lamp === 'hook' ? [L.tx + p.face * (L.wt / 2 + 13 * L.s), L.ty + 4 * L.s] : null;
 OW.lamps = [];
 const FIXED = OW.FIXED_LAMPS;
 // where every lamp hangs when nobody is racing anywhere: the stack's light is baked from these
-OW.homeLamps = () => PORTERS.map((p) => { const L = ladderGeom(p); return [L.tx + p.face * (L.wt / 2 + 9 * L.s), L.ty + 8 * L.s, p.item === 'feather' ? 1.2 : 0.7, p.item === 'feather' ? 165 : 100]; }).concat(FIXED.map(([x, y, a]) => [x, y + 6, a, 95]));
+OW.homeLamps = () => PORTERS.map((p) => { const L = ladderGeom(p); return [L.tx + p.face * (L.wt / 2 + 9 * L.s), L.ty + 8 * L.s, p.item === 'feather' ? 1.3 : 0.75, p.item === 'feather' ? 135 : 88]; }).concat(FIXED.map(([x, y, a]) => [x, y + 6, a, 85]));
 
 for (const p of PORTERS) {
   layer({
@@ -278,8 +277,8 @@ for (const p of PORTERS) {
         g.lineWidth = 1.2 * G.s; g.strokeStyle = '#2a2236';
         g.beginPath(); g.moveTo(G.tx + p.face * G.wt / 2, G.ty - 2 * G.s); g.lineTo(la[0], la[1] - 10 * G.s); g.stroke();
         g.save(); g.translate(la[0], la[1] - 10 * G.s); g.rotate(p.lampSw); g.translate(-la[0], -la[1] + 10 * G.s);
-        OW.lampGlow(g, la[0], la[1] + 6 * G.s, 30 * G.s, 0.5 * fl);
-        OW.hushLamp(g, la[0], la[1] + 6 * G.s, G.s * 0.95, fl);
+        OW.lampGlow(g, la[0], la[1] + 6 * G.s, 44 * G.s, 0.6 * fl);
+        OW.hushLamp(g, la[0], la[1] + 6 * G.s, G.s * 1.5, fl);
         g.restore();
       }
       stoat(g, fx, fy, s, { face: p.face, t, grip, hand, blink: p.blink(t), look: p.look, capLift: p.tip, freeze: sstep(0.15, 0.4, p.freeze), shh: p.shh > 0.3, glare: p.glare, yawn, lampSide: p.face });
@@ -292,8 +291,8 @@ for (const p of PORTERS) {
       }
       if (p.item === 'lamp') {
         g.lineWidth = 1.4 * s; g.strokeStyle = '#4a3a3a'; g.beginPath(); g.moveTo(hand[0], hand[1] + 4 * s); g.lineTo(la[0], la[1] - 8 * s); g.stroke();
-        OW.lampGlow(g, la[0], la[1], 30 * s, 0.5 * fl);
-        OW.hushLamp(g, la[0], la[1], s * 0.9, fl);
+        OW.lampGlow(g, la[0], la[1], 40 * s, 0.6 * fl);
+        OW.hushLamp(g, la[0], la[1], s * 1.2, fl);
       }
       if (p.act === 'blow' && Math.random() < 0.08) OW.spawn({ kind: 'puff', x: fx + p.face * 14 * s, y: fy - 40 * s, vx: p.face * 8, vy: -6, life: 1.2, s: s * 0.6 });
       g.restore();
@@ -333,7 +332,7 @@ layer({
     g.globalCompositeOperation = 'source-over';
     // the fixed lamps themselves, hung on brackets
     FIXED.forEach(([x, y], i) => {
-      const s = OW.scaleAt(y) * 0.85, fl = 0.86 + 0.14 * Math.sin(t * 7 + i * 2) * Math.sin(t * 4.1 + i);
+      const s = OW.scaleAt(y) * 1.3, fl = 0.86 + 0.14 * Math.sin(t * 7 + i * 2) * Math.sin(t * 4.1 + i);
       g.lineWidth = 1.4 * s; g.strokeStyle = '#2a2236'; g.beginPath(); g.moveTo(x - 10 * s, y - 16 * s); g.lineTo(x, y - 16 * s); g.lineTo(x, y - 12 * s); g.stroke();
       OW.hushLamp(g, x, y - 2 * s, s, fl);
     });

@@ -69,3 +69,33 @@ Five worst:
   the head's translate — the head was drawn at the feet); rails shortened to staggered segments;
   silhouette jagged; brow made massive; reception in the arch, three late hedgehogs, the gull,
   the cupola with the nightcapped cockerel vane.
+
+## Round 2 (fresh-eyes critic, screenshots only)
+
+Critic's ten, condensed: (1) silhouette is a boot/chimney — the brow cantilevers like a toe, the
+shoulder over the arch is a flat step, no wave-cut notch; (2) the upper "dissolving" drawers read
+as ghost wallpaper; (3) light contradicts itself — a white wash over the upper-left drawers, lamps
+are tiny squares that cast nothing; (4) everything one mid violet — push the stack darker, the
+glow brighter and warmer behind the base, lamps the cyan accent, caps the warm one; (5) sleepers lie
+*on* drawers, the bear cub is smaller than a stoat, porters all one pose; (6) centred, empty left,
+no foreground; (7) reflection is a full-strength mirror; (8) causeway seen from above while the
+stack is at eye level; (9) materials all one gradient, brass rails read as string lights (the
+dashed snow); (10) machine repetition — a tag on every drawer, even lichen, even icicles, a
+double-stripe snow cap, uniform line, pink double outline where the stack meets the glow.
+
+My own after testing the chain: woken dormice read as teddy bears (round ears, small eyes);
+reading-size tags flood the face during a chain. Fixed both (hazel-dormouse redesign: golden ball,
+huge black eyes, small ears, bottle-brush tail; tags only reach reading size under a lingering
+pointer).
+
+Fixed in round 2: the sunset moved left of the stack (SUNX 720 → 300) — its brightest glow had
+been hidden behind the stack; now it lights the empty left and shines through the arch. Eye level
+up to 1150 so the foot drawers show their insides. Stack value down again (#1a1628), rim reduced to
+one soft inner rose glow (no double outline), silhouette ink lighter where it meets the glow. Brow
+cut back from a boot toe; the shoulder over the arch rounded into a buttress. Lamp pools tighter
+with a defined falloff, lamps 1.5× bigger. Rails lost their dashed snow (string lights). Causeway
+width now strictly ∝ distance below the horizon (it was seen from above), bending into the
+foreground. Reflection half strength and fading fast. Foreground slabs at the bottom left. The
+high face is now a scatter of dark half-buried slots instead of ghost wallpaper. Snow on every
+cabinet top, drifted to one end; rock lips creep over cabinet corners. Cap snow drifted, uneven.
+Sleepers sunk into their drawers with heads on the lips; tags on far fewer drawers.

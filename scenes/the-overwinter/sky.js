@@ -7,7 +7,7 @@
 (() => {
 const { TAU, clamp, lerp, rng, noise, st, layer, grad, radial, poly, curve, circ, ell, ink } = Drawn;
 const C = OW.C, HZ = OW.HZ, mix = OW.mix;
-const SUNX = 720; // where the sun went down, behind the stack
+const SUNX = 300; // where the sun went down: just left of the stack, so it shines through the arch
 
 // ------------------------------------------------------------ sky
 layer({
@@ -23,7 +23,7 @@ layer({
     // the afterglow: warm, wide and flat, strongest where the sun went down
     g.save();
     g.translate(SUNX, HZ); g.scale(1, 0.22);
-    g.fillStyle = radial(g, 0, 0, 0, 1500, [[0, 'rgba(255,226,180,0.95)'], [0.08, 'rgba(255,200,150,0.75)'], [0.25, 'rgba(246,160,140,0.42)'], [0.55, 'rgba(200,120,140,0.16)'], [1, 'rgba(160,100,140,0)']]);
+    g.fillStyle = radial(g, 0, 0, 0, 1500, [[0, 'rgba(255,240,205,1)'], [0.1, 'rgba(255,212,160,0.9)'], [0.28, 'rgba(250,166,138,0.5)'], [0.55, 'rgba(210,120,140,0.18)'], [1, 'rgba(160,100,140,0)']]);
     g.fillRect(-3000, -6000, 6000, 6000);
     g.restore();
     g.save();

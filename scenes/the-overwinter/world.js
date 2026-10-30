@@ -9,7 +9,7 @@
 const { clamp, lerp, rng } = Drawn;
 const OW = (window.OW = {});
 OW.W = 1200; OW.H = 1500;
-OW.HZ = 1185;        // horizon: eye level, a man's height above the wet sand
+OW.HZ = 1150;        // horizon: eye level, a little above the drawers at the stack's foot
 OW.BASE = 1252;      // where the stack meets the sand, at its middle
 OW.LINE = '#24192e'; // ink: a deep violet-plum
 Drawn.style.line = OW.LINE;
@@ -42,11 +42,11 @@ OW.C = {
 // ------------------------------------------------------------ the stack's outline
 // silhouette (clockwise from the bottom left), lean a touch to the left, narrowing upward
 OW.stackPts = [
-  [236, 1268], [246, 1222], [262, 1164], [256, 1124], [280, 1084], [318, 1060], [370, 1044], [418, 1028],
-  [432, 1004], [426, 984], [440, 944], [446, 884], [428, 866], [446, 846], [454, 790], [452, 730],
+  [236, 1268], [246, 1222], [262, 1164], [254, 1120], [264, 1078], [290, 1036], [326, 1002], [362, 978],
+  [398, 958], [428, 930], [446, 884], [428, 866], [446, 846], [454, 790], [452, 730],
   [462, 700], [466, 648], [450, 626], [438, 600], [446, 566], [462, 548], [468, 500], [476, 440],
-  [468, 404], [478, 360], [474, 342], [456, 338], [430, 340], [404, 334], [384, 322], [370, 300],
-  [368, 280], [404, 250], [432, 238], [468, 226], [500, 216], [530, 220], [560, 206], [592, 200],
+  [468, 404], [478, 360], [474, 342], [462, 336], [446, 330], [430, 318], [422, 300],
+  [426, 276], [404, 250], [432, 238], [468, 226], [500, 216], [530, 220], [560, 206], [592, 200],
   [626, 190], [652, 192], [682, 180], [712, 182], [742, 174], [772, 180], [804, 176], [824, 166],
   [838, 146], [852, 130], [868, 126], [880, 140], [886, 166], [904, 188], [926, 206], [942, 228],
   [934, 250], [944, 264], [930, 302], [938, 362], [948, 420], [940, 446], [956, 472], [962, 540],
@@ -67,7 +67,7 @@ OW.stackPts = [
   }
   out.push(src[src.length - 1]);
   OW.stackPtsRaw = src;
-  OW.capPts = src.slice(31, 57);
+  OW.capPts = src.slice(30, 57);
   OW.stackPts = out;
 }
 // the natural arch through the stack's left foot; the causeway runs into it, reception is inside
@@ -86,7 +86,7 @@ OW.fx = (u, y) => { const k = (OW.FB - y) / (OW.FB - OW.FT); return lerp(lerp(XL
 // The face also wraps round the stack like a drum (θ across). Seen from below, the sides are
 // farther away, so above eye level every horizontal arcs down toward the edges and the cabinets
 // there narrow; at eye level the arc flattens out.
-const TH = 1.0, RZ = 0.11; // half-angle of the face (rad), drum radius / distance
+const TH = 1.0, RZ = 0.14; // half-angle of the face (rad), drum radius / distance
 const zf = (th) => 1 / (1 + RZ * (1 - Math.cos(th)));
 const ZE = zf(TH), SE = Math.sin(TH) * ZE;
 OW.at = (u, v) => {

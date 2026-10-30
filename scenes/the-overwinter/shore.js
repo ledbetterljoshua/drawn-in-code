@@ -11,8 +11,9 @@ const C = OW.C, HZ = OW.HZ, LINE = OW.LINE, mix = OW.mix;
 const SHORE = OW.SHORE, BASE = OW.BASE;
 
 // the causeway's centre line, far end (in the arch) to near end (off the bottom left)
-const CW = [[402, 1262], [384, 1284], [330, 1316], [236, 1360], [120, 1414], [-20, 1484], [-200, 1580], [-430, 1720], [-760, 1940], [-1100, 2200]];
-const cwWidth = (y) => 52 + (y - 1262) * 1.35;
+const CW = [[396, 1262], [366, 1288], [296, 1326], [206, 1372], [128, 1420], [86, 1476], [92, 1548], [150, 1640], [262, 1770], [410, 1950], [580, 2200]];
+// perspective: width grows with distance below the horizon, nothing more
+const cwWidth = (y) => (y - OW.HZ) * 0.92;
 function causewayEdges() {
   const L = [], Rr = [];
   for (let i = 0; i < CW.length; i++) {
@@ -56,13 +57,15 @@ layer({
         // draw in horizontal slivers, each nudged sideways: a mirror on rippled wet sand
         const y0 = BASE - i * 26, h = 26;
         g.save(); g.beginPath(); g.rect(X0, y0 - h, X1 - X0, h + 1); g.clip();
-        g.globalAlpha = clamp(0.62 - i * 0.012, 0.1, 0.62);
-        blit(g, S, Math.sin(i * 1.7) * (2 + i * 0.25), 0);
+        g.globalAlpha = clamp(0.42 - i * 0.022, 0, 0.42);
+        if (g.globalAlpha > 0) { blit(g, S, Math.sin(i * 1.7) * (2 + i * 0.5), 0); g.globalAlpha *= 0.5; blit(g, S, -Math.sin(i * 2.3) * (3 + i * 0.6), 2); }
         g.restore();
       }
       g.restore();
       // tint the reflection toward the wet-sand violet so it sits in the sand, not on it
-      g.fillStyle = 'rgba(52,40,80,0.35)'; g.fillRect(X0, BASE - 6, X1 - X0, Y1 - BASE);
+      g.fillStyle = 'rgba(52,40,80,0.4)'; g.fillRect(X0, BASE - 6, X1 - X0, Y1 - BASE);
+      // a bright skim of afterglow laid across the wet just below the stack's foot
+      g.fillStyle = grad(g, 0, BASE - 4, 0, BASE + 30, [[0, 'rgba(255,190,170,0.28)'], [1, 'rgba(255,190,170,0)']]); g.fillRect(X0, BASE - 4, X1 - X0, 34);
     }
     // ripple marks: long gentle crests, short and close in the distance, broad and spaced near us
     for (let i = 0; i < 380; i++) {
@@ -229,10 +232,46 @@ layer({
   },
 });
 
+// ------------------------------------------------------------ the foreground
+// big wet rocks at the bottom left with snow on their shoulders and wrack over them: they're
+// near, so drawn large and dark, a frame for the causeway coming in past them
+layer({
+  id: 'foreground', z: 36, still: true,
+  draw(g) {
+    const R = rng(909);
+    const rocks = [[-150, 1530, 150, 70], [40, 1555, 90, 46], [-430, 1500, 120, 60], [-20, 1480, 40, 20], [1040, 1600, 120, 50], [1240, 1540, 90, 40]];
+    for (const [x, y, w, h] of rocks) {
+      // angular slabs of the same bedded stone as the stack, tilted, with flat tops
+      const tilt = (R() - 0.5) * 0.3;
+      const pts = [[x - w, y + h], [x - w * 0.95, y - h * 0.3], [x - w * 0.7, y - h * 0.85], [x - w * 0.2, y - h - tilt * w], [x + w * 0.35, y - h * 0.95 + tilt * w * 0.5], [x + w * 0.8, y - h * 0.6 + tilt * w], [x + w, y - h * 0.1], [x + w, y + h]];
+      const p = poly(pts.map(([px, py]) => [px + (R() - 0.5) * 6, py + (R() - 0.5) * 4]));
+      ink(g, p, '#1c1626', 3);
+      g.save(); g.clip(p);
+      // the top plane catches the glow; bedding lines run across the face
+      g.fillStyle = 'rgba(255,170,160,0.22)'; g.fill(poly([pts[1], pts[2], pts[3], pts[4], pts[5], [pts[5][0], pts[5][1] + h * 0.25], [pts[1][0], pts[1][1] + h * 0.2]]));
+      g.strokeStyle = 'rgba(8,4,14,0.6)'; g.lineWidth = 1.6;
+      for (let k = 1; k < 4; k++) { const yy = y - h * 0.5 + k * h * 0.35; g.beginPath(); g.moveTo(x - w, yy + tilt * 20); g.lineTo(x + w, yy - tilt * 20 + (R() - 0.5) * 6); g.stroke(); }
+      for (let i = 0; i < w * 0.5; i++) { g.fillStyle = R() < 0.6 ? '#5a5068' : '#0e0a16'; g.fill(circ(x - w + R() * 2 * w, y - R() * h * 0.9, 0.8 + R() * 1.8)); }
+      g.restore();
+      // a thin, broken skin of snow on the top plane
+      for (let k = 0; k < 3; k++) {
+        const t0 = 0.15 + R() * 0.5, a0 = [lerp(pts[2][0], pts[5][0], t0), lerp(pts[2][1], pts[5][1], t0)], len = w * (0.2 + R() * 0.35);
+        ink(g, curve([[a0[0], a0[1] + 2], [a0[0] + len * 0.3, a0[1] - 2 - R() * 3], [a0[0] + len, a0[1] + 1], [a0[0] + len * 0.5, a0[1] + 3]]), C.snow, 1, C.snowShade);
+      }
+      g.lineCap = 'round';
+      for (let i = 0; i < w / 22; i++) {
+        const sx = x - w * 0.8 + R() * w * 1.6, sy = y - h * (0.3 + R() * 0.5);
+        g.lineWidth = 4 + R() * 4; g.strokeStyle = R() < 0.5 ? '#2c2a1e' : '#3a3424';
+        g.beginPath(); g.moveTo(sx, sy); g.bezierCurveTo(sx + 10, sy + 10, sx - 8, sy + 20, sx + (R() - 0.5) * 20, sy + 30 + R() * 20); g.stroke();
+      }
+    }
+  },
+});
+
 // ------------------------------------------------------------ marker posts along the causeway
 // driftwood stakes each with a hush lamp on a hook, so the porters can find the way at the turn of
 // the tide. Their blue light lies on the sand and doubles in the water.
-const POSTS = [[0.06, 1.25], [0.16, -1.3], [0.3, 1.2], [0.46, -1.25], [0.64, 1.2]].map(([s, o], i) => ({ i, s, o, at: OW.cwAt(s, o), sw: 0, sv: 0, gut: 0 }));
+const POSTS = [[0.05, 1.25], [0.15, -1.3], [0.3, 1.2], [0.44, -1.25], [0.6, 1.2], [0.75, -1.25]].map(([s, o], i) => ({ i, s, o, at: OW.cwAt(s, o), sw: 0, sv: 0, gut: 0 }));
 OW.posts = POSTS;
 function lampGlow(g, x, y, r, a) {
   g.fillStyle = radial(g, x, y, 0, r, [[0, `rgba(170,200,255,${a})`], [0.3, `rgba(120,160,255,${a * 0.4})`], [1, 'rgba(110,150,255,0)']]);
