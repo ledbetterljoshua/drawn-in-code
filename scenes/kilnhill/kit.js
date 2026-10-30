@@ -77,7 +77,7 @@
     earth: '#6a4a3a', earthDark: '#3e2c26', grass: '#4c6a3a', grassDry: '#8a7a4a', stone: '#8a8290',
     wood: '#8a5a3a', woodDark: '#5a3a28', woodPale: '#b08860', rope: '#a48a60',
     cloth: '#c8b48c', clothRed: '#a84438', clothBlue: '#4a5a8a', clothGreen: '#5a7a4a',
-    fur: '#5a5462', furDark: '#3a3440', skin: '#f2a4a0', skinDark: '#c87878',
+    fur: '#4c4858', furDark: '#2e2a38', skin: '#f2a4a0', skinDark: '#c87878',
     smoke: '#5a5058',
   };
   // fire colours, from coolest to hottest

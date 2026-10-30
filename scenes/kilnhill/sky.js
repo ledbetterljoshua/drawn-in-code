@@ -87,9 +87,11 @@
       L.flashT += dt;
     },
     draw(g, t, L) {
-      g.fillStyle = '#100c16'; g.fill(farPath);
-      // a lighter ridge line where the haze sits behind
-      g.lineWidth = 1.2; g.strokeStyle = 'rgba(120,60,50,0.35)'; g.stroke(farPath);
+      // the warm haze the far towns raise behind their hills, then the hills dark against it
+      g.fillStyle = grad(g, 0, 730, 0, 820, [[0, 'rgba(70,30,30,0)'], [0.7, 'rgba(110,46,34,0.35)'], [1, 'rgba(140,60,40,0.45)']]);
+      g.fillRect(760, 730, 1500, 90);
+      g.fillStyle = '#0a080e'; g.fill(farPath);
+      g.lineWidth = 1.4; g.strokeStyle = 'rgba(170,80,50,0.4)'; g.stroke(curve([[880, 812], [1000, 800], [1120, 806], [1240, 786], [1380, 800], [1520, 784], [1660, 804], [1780, 796], [1900, 810], [2200, 820]], false));
       g.globalCompositeOperation = 'lighter';
       for (const T of towns) {
         const r = rng(T.seed * 31);
@@ -99,8 +101,8 @@
         const fl = 0.8 + 0.2 * noise(t * 2 + T.seed * 7);
         K.glow(g, T.x, T.y - 22 * T.s, 60 * T.s, '#ff7a30', 0.32 * fl + f * 0.7);
         if (f > 0.02) K.glow(g, T.x, T.y - 30 * T.s, 110 * T.s, '#7affc8', f * 0.35);
-        for (let i = 0; i < 6; i++) {
-          const wx = T.x + (r() - 0.5) * 120 * T.s, wy = T.y - 2 - r() * 10 * T.s;
+        for (let i = 0; i < 11; i++) {
+          const wx = T.x + (r() - 0.5) * 150 * T.s, wy = T.y + 2 + r() * 14 * T.s;
           const blink = noise(t * 0.3 + i * 3.1 + T.seed) > 0.75 ? 0.3 : 1;
           g.fillStyle = `rgba(255,${170 + r() * 50 | 0},90,${(0.55 + f * 0.4) * blink})`;
           g.fillRect(wx, wy, 1.8, 1.8);

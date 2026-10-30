@@ -21,6 +21,9 @@
     post: K.addLight({ id: 'post', x: 836, y: 996, z: 90, r: 300, col: [0.95, 0.64, 0.3] }),
     burrowL: K.addLight({ id: 'burrowL', x: 96, y: 640, z: 30, r: 140, col: [0.9, 0.5, 0.2] }),
     burrowR: K.addLight({ id: 'burrowR', x: 1210, y: 952, z: 30, r: 130, col: [0.9, 0.5, 0.2] }),
+    hillDoor: K.addLight({ id: 'hillDoor', x: -66, y: 846, z: 80, r: 230, col: [1, 0.66, 0.3] }),
+    digger: K.addLight({ id: 'digger', x: 96, y: 862, z: 60, r: 190, col: [0.9, 0.6, 0.28] }),
+    groundDoor: K.addLight({ id: 'groundDoor', x: 1040, y: 1396, z: 120, r: 330, col: [1.1, 0.72, 0.34] }),
     burrowF: K.addLight({ id: 'burrowF', x: 140, y: 1196, z: 30, r: 160, col: [0.9, 0.48, 0.2] }),
   };
 })();

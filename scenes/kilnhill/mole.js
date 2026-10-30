@@ -25,19 +25,19 @@
     return { dx: sx / m, dy: sy / m, I: tot };
   };
 
-  const bodyPts = [[-14, -1], [-17, -14], [-15, -28], [-8, -39], [3, -42], [12, -37], [16, -28], [17, -14], [14, -3], [0, 1]];
+  const bodyPts = [[-15, -1], [-19, -13], [-17, -27], [-10, -37], [1, -41], [11, -38], [17, -30], [19, -16], [15, -3], [0, 1]];
   const BODY = curve(bodyPts);
   const APRON = curve([[-4, -27], [10, -27], [15, -16], [15, -5], [8, -1], [-6, -1], [-8, -12]]);
 
   function paw(g, x, y, ang, s, col, line, lw, rim) {
     g.save(); g.translate(x, y); g.rotate(ang);
-    const p = ell(0, 0, 5.6, 4.2);
+    const p = ell(0, 0, 6.8, 5.2);
     g.lineWidth = lw * 2; g.strokeStyle = line; g.stroke(p);
     g.fillStyle = col; g.fill(p);
-    if (rim) { g.fillStyle = rim; g.fill(ell(-1, -1.6, 3.6, 1.6)); }
+    if (rim) { g.fillStyle = rim; g.fill(ell(-1, -2, 4.4, 1.9)); }
     // five pale claws fanned along the far edge
     g.lineWidth = 1.1; g.strokeStyle = '#efe4d4';
-    for (let i = 0; i < 5; i++) { const a = -0.9 + i * 0.45; g.beginPath(); g.moveTo(Math.cos(a) * 5, Math.sin(a) * 3.8); g.lineTo(Math.cos(a) * 7.6, Math.sin(a) * 5.4); g.stroke(); }
+    for (let i = 0; i < 5; i++) { const a = -0.9 + i * 0.45; g.beginPath(); g.moveTo(Math.cos(a) * 6, Math.sin(a) * 4.6); g.lineTo(Math.cos(a) * 9, Math.sin(a) * 6.6); g.stroke(); }
     g.restore();
   }
 
@@ -72,6 +72,8 @@
     g.lineWidth = 6 + lw * 2; g.strokeStyle = line; g.stroke(armB);
     g.lineWidth = 6; g.strokeStyle = furShade; g.stroke(armB);
     paw(g, hb[0], hb[1], Math.atan2(hb[1] + 24, hb[0] + 6), s, skin, line, lw, null);
+    // a stub of a tail
+    { const tl = ell(-17, -5, 4, 2.4, undefined, 0.5); g.lineWidth = lw * 2; g.strokeStyle = line; g.stroke(tl); g.fillStyle = skin; g.fill(tl); }
     // feet
     for (const fx of [-7, 6]) { const p = ell(fx + 2, -1, 5.5, 2.6); g.lineWidth = lw * 2; g.strokeStyle = line; g.stroke(p); g.fillStyle = skin; g.fill(p); }
     // body: breathing swells the chest a touch
@@ -85,7 +87,7 @@
     g.lineWidth = 5;
     g.strokeStyle = grad(g, -kdx * 16, -20 - kdy * 16, kdx * 16, -20 + kdy * 16, [[0, 'rgba(0,0,0,0)'], [0.6, 'rgba(0,0,0,0)'], [1, rim]]);
     g.stroke(BODY);
-    g.fillStyle = 'rgba(255,240,230,0.05)'; g.fill(ell(4, -32, 7, 4));
+    g.fillStyle = 'rgba(170,180,230,0.07)'; g.fill(ell(-4, -30, 9, 5)); g.fill(ell(2, -36, 6, 3));
     if (o.apron) {
       const ap = K.lit(o.apron, lx, ly, [key.dx, key.dy, 0.7]);
       g.fillStyle = grad(g, -kdx * 14, -14, kdx * 14, -14, [[0, K.css(K.mul(ap, 0.55))], [1, K.css(ap)]]);
@@ -107,27 +109,27 @@
 
     // head details: snout, eyes, whiskers, mouth
     const sn = o.snout || 0;
-    const snout = curve([[11, -38], [20, -36.5 + sn * 0.4], [26.5, -33.5 + sn], [26, -30.5 + sn], [19, -29], [12, -30]]);
+    const snout = curve([[13, -36], [19.5, -34.5 + sn * 0.4], [24, -32 + sn], [23.6, -29.6 + sn], [18.5, -28.6], [14, -29.4]]);
     g.lineWidth = lw * 2; g.strokeStyle = line; g.stroke(snout);
     g.fillStyle = skin; g.fill(snout);
-    g.save(); g.clip(snout); g.fillStyle = skinRim; g.fill(ell(19 + kdx * 3, -34 - Math.max(0, -kdy) * 2, 6, 2.4)); g.restore();
-    g.fillStyle = K.css(K.lit('#c05a64', lx, ly)); g.fill(ell(26, -32 + sn, 2.2, 2));
+    g.save(); g.clip(snout); g.fillStyle = skinRim; g.fill(ell(18 + kdx * 3, -33 - Math.max(0, -kdy) * 2, 5, 2.2)); g.restore();
+    g.fillStyle = K.css(K.lit('#c05a64', lx, ly)); g.fill(ell(23.8, -31 + sn, 2.1, 1.9));
     g.lineWidth = 0.6; g.strokeStyle = 'rgba(255,230,220,0.55)';
-    for (const [a, b] of [[-36, -40], [-32, -32], [-34, -27]]) { g.beginPath(); g.moveTo(22, -32 + sn); g.quadraticCurveTo(28, (a + b) / 2, 33, b + 4); g.stroke(); }
-    if (o.mouth) { g.fillStyle = '#5a1a24'; g.fill(ell(19, -28, 3 * o.mouth, 2 * o.mouth)); }
-    else { g.lineWidth = 0.9; g.strokeStyle = line; g.beginPath(); g.moveTo(15, -29); g.quadraticCurveTo(17.5, -27 + (o.smile || 0.6) * 1.2, 20, -29); g.stroke(); }
+    g.strokeStyle = 'rgba(255,230,220,0.3)'; for (const [a, b] of [[-36, -38], [-32, -31], [-30, -25]]) { g.beginPath(); g.moveTo(21, -31 + sn); g.quadraticCurveTo(26, (a + b) / 2, 30, b + 3); g.stroke(); }
+    if (o.mouth) { g.fillStyle = '#5a1a24'; g.fill(ell(17.5, -27.6, 2.8 * o.mouth, 2 * o.mouth)); }
+    else { g.lineWidth = 0.9; g.strokeStyle = line; g.beginPath(); g.moveTo(14.5, -28.4); g.quadraticCurveTo(16.5, -26.6 + (o.smile || 0.6) * 1.1, 18.8, -28.4); g.stroke(); }
     const open = o.sleep ? 0 : o.open == null ? 1 : o.open, lk = o.look || [0, 0];
     if (open > 0.3) {
-      g.fillStyle = '#05030a'; g.fill(ell(9.5 + lk[0] * 0.8, -35 + lk[1] * 0.6, 1.7, 1.6 * open));
-      g.fillStyle = K.css(K.mix([0.8, 0.7, 0.6], [1, 0.85, 0.5], clamp(I, 0, 1))); g.fill(circ(10.1 + lk[0] * 0.8, -35.6 + lk[1] * 0.6, 0.55));
+      g.fillStyle = '#05030a'; g.fill(ell(10 + lk[0] * 0.8, -33.6 + lk[1] * 0.6, 1.55, 1.5 * open));
+      g.fillStyle = K.css(K.mix([0.8, 0.7, 0.6], [1, 0.85, 0.5], clamp(I, 0, 1))); g.fill(circ(10.6 + lk[0] * 0.8, -34.2 + lk[1] * 0.6, 0.5));
     } else {
-      g.lineWidth = 0.9; g.strokeStyle = line; g.beginPath(); g.moveTo(7.6, -35); g.quadraticCurveTo(9.5, -33.6, 11.4, -35); g.stroke();
+      g.lineWidth = 0.9; g.strokeStyle = line; g.beginPath(); g.moveTo(8.2, -33.6); g.quadraticCurveTo(10, -32.2, 11.8, -33.6); g.stroke();
     }
     if (o.specs) {
       const glint = K.css(K.mix([0.7, 0.6, 0.6], [1, 0.9, 0.6], clamp(I * 0.9, 0, 1)), 0.9);
       g.lineWidth = 0.9; g.strokeStyle = '#c8a050';
-      g.stroke(circ(10, -35, 3.4)); g.beginPath(); g.moveTo(6.6, -35.5); g.lineTo(-2, -37); g.stroke();
-      g.fillStyle = glint; g.fill(ell(11, -36.4, 1.3, 0.8));
+      g.stroke(circ(10.4, -33.6, 3.4)); g.beginPath(); g.moveTo(7, -34); g.lineTo(-2, -36); g.stroke();
+      g.fillStyle = glint; g.fill(ell(11.4, -35, 1.3, 0.8));
     }
     if (o.cap) {
       const cp = K.lit(o.cap, lx, ly, [key.dx, key.dy, 0.6]);

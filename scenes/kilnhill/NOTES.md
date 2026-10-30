@@ -68,3 +68,18 @@ five pot houses, the moles, the foreground. Five worst things after the first sh
    breaks into soil and loose bricks; the path is darker, footprinted, grass creeps over its edges.
 Also: moles up ~20% (they didn't read), rack and bench brought nearer and bigger, saggar wall made
 irregular (sagging courses, round saggars end-on), heat pipe thickened and propped on a post.
+
+## Round 2
+1. **Moles read as rats** (long snouts, lanky pear bodies, brown). Redesigned: chunkier, darker
+   velvet with a cool sheen, short pink snout, eyes up on the dome, much bigger spade paws, a stub
+   tail.
+2. **The left clay face was a big empty striped panel.** Gave it a story: a round green door into
+   the hill with a lit fanlight, a mole digging clay out with a mattock (chips fly; linger and it
+   finds a worm), a hoist with a basket of clay hanging off the terrace lip.
+3. **Far hills invisible**: the hills were the colour of the sky. Now there's a warm haze band from
+   the far towns behind dark hill silhouettes, with more windows.
+4. **Bottom band was flat earth with scattered pebbles.** Fewer, bigger stones; a slip puddle that
+   catches the firemouths' glow; a barrow of dug clay with a spade stuck in; on the phone frame a
+   ground door in a mound with steps going down into light and boots left outside.
+5. **Kiln brickwork was mechanically even.** Salt crust speckling the shoulder and arches (three
+   nights of salt glazing), a patch of newer bricks where a crack was mended.

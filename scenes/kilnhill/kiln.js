@@ -160,6 +160,21 @@
         const pts = []; for (let y = y0; y <= y1; y += 20) { const w = F.halfW(y); pts.push([cx + w * Math.cos(th), y + K.rimRy(y, w) * Math.sin(th)]); }
         g.lineWidth = 3 + r() * 6; g.strokeStyle = `rgba(8,5,8,${0.2 + r() * 0.25})`; g.stroke(curve(pts, false));
       }
+      // salt crust: three nights of salt vapour have left a pale, pitted glaze on the shoulder
+      // and round the arches, the way salt-glaze kilns crust over
+      for (let i = 0; i < 900; i++) {
+        const nearTop = r() < 0.6, th = 0.1 + r() * (Math.PI - 0.2), y = nearTop ? 270 + Math.pow(r(), 1.6) * 260 : 790 + r() * 70;
+        const w = F.halfW(y), x = cx + w * Math.cos(th), yy = y + K.rimRy(y, w) * Math.sin(th);
+        if (noise(x * 0.03 + y * 0.02) < 0.1) continue;
+        g.fillStyle = K.css(kilnLit('#c8d4c0', x, yy, [Math.cos(th), 0, Math.sin(th)]), 0.25 + r() * 0.35);
+        g.fill(ell(x, yy, (0.8 + r() * 1.8) * Math.sin(th) + 0.3, 0.6 + r() * 1.2));
+      }
+      // a patch of newer bricks where a crack was mended
+      for (let k = 0; k < 4; k++) for (let j = 0; j < 3; j++) {
+        const y = 640 + k * 8.6, u0 = 40 + j * 19 + (k % 2) * 9;
+        const a = onK(Math.PI / 2, -u0, y + 0.6), b = onK(Math.PI / 2, -u0 - 17, y + 0.6), c = onK(Math.PI / 2, -u0 - 17, y + 7.8), d = onK(Math.PI / 2, -u0, y + 7.8);
+        g.fillStyle = K.css(kilnLit('#d08a5a', a[0], a[1], [0.3, 0, 0.95])); g.fill(poly([a, b, c, d]));
+      }
       // the bottle turns away at its edges: darken the silhouette sides (ambient occlusion)
       g.fillStyle = grad(g, cx - 190, 0, cx + 190, 0, [[0, 'rgba(6,4,12,0.6)'], [0.14, 'rgba(6,4,12,0.15)'], [0.5, 'rgba(6,4,12,0)'], [0.86, 'rgba(6,4,12,0.12)'], [1, 'rgba(6,4,12,0.55)']]);
       g.fillRect(cx - 200, 220, 400, 660);
