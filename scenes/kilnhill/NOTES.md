@@ -119,3 +119,17 @@ they're nearly straight, which is correct.
    side facing the kiln and a dark far side.
 4. **Teapot spout steam was grey blobs.** Now thin curling wisps.
 5. Checked every hit area with `--hits`: all generous and matching the shapes.
+
+## Round 5
+1. **Crest and terrace grass glowed saturated green in the dark**: tufts above a terrain edge fell
+   outside the light-map clip, so they kept their daylight colour. Tufts now take their colour
+   from the light model directly and are drawn after the light pass: dark at night, warm only
+   near a fire.
+2. **Glaze edges were a regular sawtooth.** The glaze line is now a soft waver with a few rounded
+   runs hanging off it, and the pots are faceted finer (3-unit rows, 40 slices) so the runs read.
+3. **Glaze highlights followed each pot's own lamp** (a white stripe down the jug and jar stack,
+   lit from inside). The highlight now ignores the lamp inside the pot it's on.
+4. **Doors were flat yellow arches.** The teapot's door has an inside now (far wall, rug, a chair
+   back) and its door leaf stands open against the jamb.
+5. **The thorn tree on the right knoll read as balls of dark smoke** next to the jar stack.
+   Removed.

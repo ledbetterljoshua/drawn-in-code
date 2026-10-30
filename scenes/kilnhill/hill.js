@@ -48,7 +48,7 @@
           g.beginPath(); g.moveTo(bx - 1.4, y);
           g.quadraticCurveTo(bx + lean * hh * 0.3, y - hh * 0.6, bx + lean * hh, y - hh * (0.8 + r() * 0.4));
           g.quadraticCurveTo(bx + lean * hh * 0.3 + 1.2, y - hh * 0.5, bx + 1.4, y);
-          g.fillStyle = r() < 0.3 ? M.grassDry : M.grass; g.fill();
+          g.fillStyle = K.litc(r() < 0.3 ? M.grassDry : M.grass, x, y - hh * 0.5, [0, -0.3, 0.95]); g.fill();
         }
       }
     }
@@ -175,11 +175,10 @@
       g.lineWidth = 9; g.strokeStyle = 'rgba(150,120,90,0.5)';
       g.stroke(curve([[-400, 460], [-200, 430], [0, 420], [140, 440]], false));
       g.restore();
+      K.applyLight(g, p);
       tufts(g, crestTop.slice(0, 9), 3, { n: 4, h: 16 });
       tufts(g, crestTop.slice(12), 5, { n: 3, h: 12 });
       thornTree(g, -150, 312, 1.05, 4);
-      thornTree(g, 1500, 776, 0.55, 8);
-      K.applyLight(g, p);
       // the silhouette line against the smoke
       g.lineWidth = 1.6; g.strokeStyle = 'rgba(6,6,14,0.8)'; g.stroke(curve(crestTop, false));
     },
@@ -260,8 +259,8 @@
       g.lineWidth = 12; g.strokeStyle = 'rgba(200,170,130,0.5)';
       g.stroke(curve([[960, 900], [1100, 884], [1260, 882], [1400, 870]], false));
       g.restore();
-      tufts(g, [[1300, 842], [1420, 802], [1540, 786], [1640, 812], [1760, 846], [2000, 856]], 33, { n: 4, h: 11 });
       K.applyLight(g, tp);
+      tufts(g, [[1300, 842], [1420, 802], [1540, 786], [1640, 812], [1760, 846], [2000, 856]], 33, { n: 4, h: 11 });
       // the wall of saggars: fireclay boxes the pots are fired in, too cracked to use again
       g.fillStyle = '#3a2a26'; g.fill(wallPath);
       const r = rng(41);
@@ -353,7 +352,6 @@
       const r = rng(51);
       for (let i = 0; i < 120; i++) { g.fillStyle = r() < 0.5 ? 'rgba(120,80,60,0.4)' : 'rgba(40,24,24,0.3)'; g.fill(ell(-700 + r() * 3000, 900 + r() * 150, 6 + r() * 20, 2 + r() * 4)); }
       g.restore();
-      tufts(g, [[-760, 896], [140, 900]], 52, { n: 4, h: 12 });
       // the yard: brick paving laid in rows, foreshortened (rows nearer the viewer are deeper)
       g.fillStyle = '#6a4434'; g.fill(yardPath);
       g.save(); g.clip(yardPath);
@@ -395,6 +393,7 @@
       for (let i = 0; i < 9; i++) { const x = 180 + rr() * 760, y = 936 + rr() * 30; const p = poly([[x, y], [x + 12, y - 1], [x + 13, y + 4], [x + 1, y + 5]]); g.fillStyle = M.brick2; g.fill(p); g.lineWidth = 1; g.strokeStyle = 'rgba(30,16,20,0.8)'; g.stroke(p); }
       K.applyLight(g, bankPath);
       K.applyLight(g, yardPath);
+      tufts(g, [[-760, 896], [140, 900]], 52, { n: 4, h: 12 });
       g.lineWidth = 1.2; g.strokeStyle = 'rgba(20,10,14,0.5)'; g.stroke(yardPath);
     },
   });
@@ -429,19 +428,18 @@
       }
       g.restore();
       // grass creeping over the path's edges so it isn't a hard strip
-      tufts(g, [[592, 1060], [610, 1110], [590, 1180], [556, 1260], [552, 1400], [580, 1700]], 66, { n: 7, h: 10 });
-      tufts(g, [[690, 1052], [718, 1110], [706, 1180], [690, 1260], [736, 1400], [840, 1700]], 67, { n: 7, h: 10 });
+
       stones(g, p, [-700, 1030, 3000, Math.max(200, v.y1 - 1030)], 26, 63, M.stone, 10);
       burrowMouth(g, 140, 1196, 32, 22, 12);
-      tufts(g, frontEdge, 64, { n: 3, h: 14 });
-      // tall grass in the very front, mostly beyond the artboard's bottom on a phone
-      const rr = rng(65);
-      const clumps = [];
-      for (let i = 0; i < 40; i++) clumps.push([[-700 + rr() * 3000, 1180 + rr() * Math.max(80, v.y1 - 1180)]]);
-      for (const [[x, y]] of clumps) { if (x > 560 && x < 980) continue; tufts(g, [[x - 30, y], [x + 30, y]], x | 0, { n: 6, h: 20 + (y - 1100) * 0.05 }); }
       // the near ground's lip: a soft shadowed crest rather than an inked line
       g.save(); g.clip(p); g.lineWidth = 10; g.strokeStyle = 'rgba(20,10,14,0.35)'; g.stroke(curve(frontEdge.map(([x, y]) => [x, y + 6]), false)); g.restore();
       K.applyLight(g, p);
+      tufts(g, [[592, 1060], [610, 1110], [590, 1180], [556, 1260], [552, 1400], [580, 1700]], 66, { n: 7, h: 10 });
+      tufts(g, [[690, 1052], [718, 1110], [706, 1180], [690, 1260], [736, 1400], [840, 1700]], 67, { n: 7, h: 10 });
+      tufts(g, frontEdge, 64, { n: 3, h: 14 });
+      // tall grass in the very front, mostly beyond the artboard's bottom on a phone
+      const rr = rng(65);
+      for (let i = 0; i < 40; i++) { const x = -700 + rr() * 3000, y = 1180 + rr() * Math.max(80, v.y1 - 1180); if (x > 540 && x < 1000) continue; tufts(g, [[x - 30, y], [x + 30, y]], x | 0, { n: 6, h: 20 + (y - 1100) * 0.05 }); }
       g.lineWidth = 1.2; g.strokeStyle = 'rgba(12,6,12,0.5)'; g.stroke(curve(frontEdge, false));
     },
   });

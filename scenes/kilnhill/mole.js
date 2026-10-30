@@ -13,9 +13,10 @@
   const K = window.Kiln, M = K.M;
 
   // direction (unit) toward where most of the light at a point comes from, and how much there is
-  K.keyAt = (x, y) => {
+  K.keyAt = (x, y, skip) => {
     let sx = 0, sy = 0, tot = 0;
     for (const L of K.lights) {
+      if (L === skip) continue;
       const dx = L.x - x, dy = L.y - y, d = Math.hypot(dx, dy);
       if (d > L.r || d < 1) continue;
       const f = Math.pow(1 - d / L.r, L.p) * L.k * (L.col[0] + L.col[1]);

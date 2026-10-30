@@ -27,11 +27,18 @@
   function throwPot(g, F, o = {}) {
     const r = rng(o.seed || 1);
     const prof = F.prof, y0 = prof[0][1], y1 = prof[prof.length - 1][1];
-    const key = K.keyAt(F.cx, (y0 + y1) / 2);
-    const drips = []; for (let i = 0; i <= 32; i++) drips.push((r() < 0.3 ? 8 + r() * 30 : r() * 8));
-    const edgeAt = (th) => { const u = (th / Math.PI) * 32, i = Math.floor(clamp(u, 0, 31.99)); return o.glaze ? o.glaze.edge + lerp(drips[i], drips[i + 1], u - i) : -1e9; };
+    const key = K.keyAt(F.cx, (y0 + y1) / 2, o.skip);
+    // the glaze edge: a soft wavering line with a few rounded runs hanging off it
+    const runs = []; for (let i = 0; i < 9; i++) runs.push([r() * Math.PI, 0.03 + r() * 0.06, 6 + r() * 26]);
+    const ph = r() * 50;
+    const edgeAt = (th) => {
+      if (!o.glaze) return -1e9;
+      let e = o.glaze.edge + noise(th * 3 + ph) * 4;
+      for (const [c, w, l] of runs) e += l * Math.exp(-(((th - c) / w) ** 2));
+      return e;
+    };
     g.save(); g.clip(F.path);
-    const dy = 4, nth = 26;
+    const dy = 3, nth = 40;
     for (let y = y0 - 2; y < y1 + 4; y += dy) {
       const w0 = F.halfW(y), w1 = F.halfW(y + dy), ry0 = K.rimRy(y, w0), ry1 = K.rimRy(y + dy, w1);
       const slope = (w1 - w0) / dy;
@@ -68,7 +75,7 @@
     // the glaze edge: a thicker lip where it pooled before running
     if (o.glaze) {
       g.beginPath();
-      for (let i = 0; i <= 64; i++) { const th = (i / 64) * Math.PI, yy = edgeAt(th), w = F.halfW(yy), ry = K.rimRy(yy, w); const x = F.cx + w * Math.cos(th), y = yy + ry * Math.sin(th); i ? g.lineTo(x, y) : g.moveTo(x, y); }
+      for (let i = 0; i <= 160; i++) { const th = (i / 160) * Math.PI, yy = edgeAt(th), w = F.halfW(yy), ry = K.rimRy(yy, w); const x = F.cx + w * Math.cos(th), y = yy + ry * Math.sin(th); i ? g.lineTo(x, y) : g.moveTo(x, y); }
       g.lineWidth = 1.6; g.strokeStyle = K.css(K.mul(K.lit(o.glaze.col, F.cx, o.glaze.edge), 0.6), 0.8); g.stroke();
     }
     // turn the edges away into shadow
@@ -300,7 +307,15 @@
       const f = lampFlicker(t, 3) * (1 + L.hover * 0.15) * (K.pulse ? 1 + K.pulse.teapot : 1);
       holesLive(g, teaHoles, f * 1.05, [1, 0.84, 0.5], t, 3);
       g.fillStyle = K.css(K.fireAt(0.7 * f)); g.fill(teaWin.path);
-      g.fillStyle = K.css(K.fireAt(0.66 * f)); g.fill(teaDoor.path);
+      g.save(); g.clip(teaDoor.path);
+      g.fillStyle = grad(g, 0, TB - 62, 0, TB, [[0, K.css(K.fireAt(0.6 * f))], [1, K.css(K.fireAt(0.74 * f))]]); g.fill(teaDoor.path);
+      // inside: the far wall, a rug, a chair back
+      g.fillStyle = 'rgba(120,40,14,0.35)'; g.fillRect(TX - 40, TB - 16, 80, 16);
+      g.fillStyle = 'rgba(80,24,10,0.6)'; g.fillRect(TX + 2, TB - 34, 3, 28); g.fillRect(TX + 14, TB - 34, 3, 28); g.fillRect(TX + 2, TB - 34, 15, 3);
+      g.restore();
+      // the door leaf, standing open against the jamb
+      { const [ax, ay] = teaDoor.at(20, TB); const lf = poly([[ax, ay], [ax, ay - 56], [ax + 10, ay - 52], [ax + 10, ay - 2]]);
+        g.fillStyle = K.litc(M.wood, ax, ay - 30); g.fill(lf); g.lineWidth = 1.4; g.strokeStyle = K.LINE; g.stroke(lf); }
       // a shadow moving behind the window now and then
       const pass = (t * 0.13) % 1;
       if (pass < 0.25) { g.save(); g.clip(teaWin.path); g.fillStyle = 'rgba(40,16,10,0.55)'; g.fill(ell(1070 + pass * 4 * 60, 746, 9, 16)); g.restore(); }
