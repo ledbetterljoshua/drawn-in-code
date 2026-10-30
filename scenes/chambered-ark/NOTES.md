@@ -50,3 +50,18 @@ Worst five, looking at it cold:
 3. The haze coral are bunches of grapes (lumps) in a row; no variety of form, nothing that says reef.
 4. The phone frame is half empty sand; the near seabed has no foreground at all.
 5. The siphuncle's gold collars make a target of the coil; the inner whorls read as a clock face.
+
+## Round 2
+Fixed: the head is now one soft mass (hood, face, eye, a fringe of sheaths and cirri) instead of an egg
+on a slab; kelp blades are long ribbons with floats; the reef has real forms (brain domes, staghorn,
+table coral, tube sponges, fans) fogged by depth; boulders with coral, sea grass, garden eels that duck
+when you come near, a starfish and shells, an anchor and the mooring line from the keel. The siphuncle's
+collars are pearl and scale with the whorl. Found that the engine's lumps() is lit from the upper right
+while this sea's sun is upper left; mirrored it (A.lumps) and flipped the coral highlights.
+
+Worst five now:
+1. Kelp still reads as a garden fern: paired leaves up a straight pole, all strands the same height.
+2. The left third of the desktop frame is empty water and kelp: no secondary point of interest.
+3. Rooms are pale lilac and evenly lit; the jelly-light doesn't pool; interiors don't feel warm vs sea.
+4. The body crescent is a big blank cream fan; its stripes are thin rays like a paper fan.
+5. Rocks in the phone foreground are dull grey mounds with tiny coral on top.

@@ -168,6 +168,14 @@ A.stroke = (g, pts, lw, color = A.LINE, closed = false) => {
 };
 A.line = (g, x0, y0, x1, y1, lw, color = A.LINE) => { g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.lineWidth = lw; g.strokeStyle = color; g.stroke(); };
 
+// the engine's lumps() is lit from the upper right; this sea is lit from the upper left, so mirror it
+A.lumps = (g, circles, col, flatY) => {
+  let cx = 0; for (const c of circles) cx += c[0]; cx /= circles.length;
+  g.save(); g.translate(cx * 2, 0); g.scale(-1, 1);
+  Drawn.lumps(g, circles, col, flatY);
+  g.restore();
+};
+
 // particles every part can spawn (bubbles, notes, sparkles…); life.js draws them
 A.fx = [];
 A.spawn = (p) => A.fx.push(Object.assign({ age: 0, life: 2, vx: 0, vy: 0, size: 1, kind: 'bubble', shell: true }, p));

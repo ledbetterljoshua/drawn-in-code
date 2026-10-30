@@ -68,8 +68,53 @@ function ridge(g, y, amp, seed, fill, line, decor) {
   if (line) { g.lineWidth = 1.2; g.strokeStyle = line; g.stroke(p); }
   if (decor) decor(pts, r);
 }
-// a coral head or sponge clump on a ridge
-function coralHead(g, x, y, s, col) { lumps(g, [[x, y - s * 0.4, s * 0.6], [x - s * 0.55, y - s * 0.15, s * 0.45], [x + s * 0.6, y - s * 0.1, s * 0.48], [x + s * 0.1, y - s * 0.85, s * 0.42]], col); }
+// reef forms, each in a palette { line?, shade, base, lit }: brain domes, branching staghorn, table
+// coral, tube sponges, sea fans. Far away they're flat shapes in the haze; near, inked and lit.
+function brain(g, x, y, s, c, r) {
+  const D = new Path2D(); D.ellipse(x, y, s, s * 0.62, 0, Math.PI, 0); D.closePath();
+  g.fillStyle = c.base; g.fill(D);
+  g.save(); g.clip(D);
+  g.fillStyle = c.shade; g.fill(ell(x + s * 0.25, y + s * 0.1, s * 0.9, s * 0.5));
+  g.fillStyle = c.lit; g.fill(ell(x - s * 0.3, y - s * 0.45, s * 0.5, s * 0.2));
+  if (c.line) {
+    g.lineWidth = Math.max(0.8, s * 0.04); g.strokeStyle = c.shade;
+    for (let i = 0; i < 6; i++) { g.beginPath(); let px = x - s + r() * s * 2, py = y - r() * s * 0.6; g.moveTo(px, py); for (let j = 0; j < 6; j++) { px += (r() - 0.5) * s * 0.35; py += (r() - 0.5) * s * 0.2; g.lineTo(px, py); } g.stroke(); }
+  }
+  g.restore();
+  if (c.line) { g.lineWidth = 1.3; g.strokeStyle = c.line; g.stroke(D); }
+}
+function staghorn(g, x, y, s, c, r) {
+  const seg = (x0, y0, a, len, w, d) => {
+    const x1 = x0 + Math.cos(a) * len, y1 = y0 + Math.sin(a) * len;
+    const p = new Path2D(); p.moveTo(x0, y0); p.lineTo(x1, y1);
+    if (c.line) { g.lineWidth = w + 2.2; g.strokeStyle = c.line; g.stroke(p); }
+    g.lineWidth = w; g.strokeStyle = c.base; g.stroke(p);
+    g.lineWidth = w * 0.35; g.strokeStyle = c.lit; const q = new Path2D(); q.moveTo(x0 - w * 0.2, y0); q.lineTo(x1 - w * 0.2, y1); g.stroke(q);
+    if (d > 0) for (const da of [-0.45, 0.4]) seg(x1, y1, a + da + (r() - 0.5) * 0.3, len * (0.72 + r() * 0.1), w * 0.8, d - 1);
+    else { g.fillStyle = c.lit; g.fill(circ(x1, y1, w * 0.45)); }
+  };
+  for (const a of [-2.2, -1.6, -1.0]) seg(x, y, a + (r() - 0.5) * 0.2, s * 0.38, s * 0.12, 3);
+}
+function table(g, x, y, s, c) {
+  const stalk = poly([[x - s * 0.08, y], [x - s * 0.05, y - s * 0.4], [x + s * 0.05, y - s * 0.4], [x + s * 0.08, y]]);
+  g.fillStyle = c.shade; g.fill(stalk); if (c.line) { g.lineWidth = 1; g.strokeStyle = c.line; g.stroke(stalk); }
+  const T = ell(x, y - s * 0.45, s, s * 0.16);
+  g.fillStyle = c.base; g.fill(T);
+  g.save(); g.clip(T); g.fillStyle = c.shade; g.fill(ell(x, y - s * 0.38, s, s * 0.12)); g.fillStyle = c.lit; g.fill(ell(x - s * 0.2, y - s * 0.52, s * 0.6, s * 0.06)); g.restore();
+  if (c.line) { g.lineWidth = 1.2; g.strokeStyle = c.line; g.stroke(T); }
+}
+function sponge(g, x, y, s, c, r) {
+  for (let i = 0; i < 3; i++) {
+    const tx = x + (i - 1) * s * 0.32, h = s * (0.6 + r() * 0.6), w = s * (0.14 + r() * 0.06);
+    const T = A.rr(tx - w, y - h, w * 2, h, w * 0.8);
+    g.fillStyle = c.base; g.fill(T);
+    g.save(); g.clip(T); g.fillStyle = c.shade; g.fillRect(tx + w * 0.2, y - h, w * 0.8, h); g.fillStyle = c.lit; g.fillRect(tx - w * 0.65, y - h, w * 0.35, h); g.restore();
+    g.fillStyle = c.line || c.shade; g.fill(ell(tx, y - h + w * 0.4, w * 0.75, w * 0.32));
+    if (c.line) { g.lineWidth = 1.2; g.strokeStyle = c.line; g.stroke(T); }
+  }
+}
+const FORMS = [brain, staghorn, table, sponge];
+A.reef = { brain, staghorn, table, sponge };
 function fan(g, x, y, h, color, lw, r) {
   // a sea fan: a lattice of branching twigs
   const branch = (x0, y0, a, len, d) => {
@@ -79,27 +124,26 @@ function fan(g, x, y, h, color, lw, r) {
   };
   branch(x, y, -Math.PI / 2 + (r() - 0.5) * 0.3, h * 0.32, 4);
 }
+const fogPal = (c, f) => ({ shade: mix(c[0], FOG, f), base: mix(c[1], FOG, f), lit: mix(c[2], FOG, f) });
+const CORALS = [['#7a5a8a', '#a083b0', '#c9b0d6'], ['#b06a4a', '#d9946a', '#f2c28e'], ['#4f8a7a', '#78b09a', '#a8d6bc'], ['#a84a5a', '#d6707a', '#f2a0a0'], ['#9a8a4a', '#c8b46a', '#e8d894']];
 layer({
   id: 'far-bed', z: 4, still: true,
   draw(g) {
     const v = st.view;
     // farthest: barely a shape in the haze
     ridge(g, 905, 60, 11, mix('#3f8f9c', FOG, 0.55), null, (pts, r) => {
-      for (let i = 0; i < 16; i++) { const [x, y] = pts[Math.floor(r() * pts.length)]; coralHead(g, x, y + 6, 16 + r() * 22, { shade: mix('#3d8a99', FOG, 0.6), base: mix('#4a97a2', FOG, 0.6), lit: mix('#5aa5aa', FOG, 0.6), union: true }); }
+      for (let i = 0; i < 22; i++) { const [x, y] = pts[Math.floor(r() * pts.length)]; FORMS[i % 4](g, x, y + 6, 14 + r() * 22, fogPal(CORALS[i % 5], 0.72), r); }
     });
-    ridge(g, 975, 70, 23, mix('#3b8192', FOG, 0.35), null, (pts, r) => {
-      for (let i = 0; i < 14; i++) { const [x, y] = pts[Math.floor(r() * pts.length)]; fan(g, x, y + 8, 60 + r() * 70, mix('#5b8a9c', FOG, 0.45), 1.4, r); }
-      for (let i = 0; i < 18; i++) { const [x, y] = pts[Math.floor(r() * pts.length)]; coralHead(g, x, y + 8, 18 + r() * 26, { shade: mix('#386f86', FOG, 0.4), base: mix('#4a8796', FOG, 0.4), lit: mix('#6aa4a8', FOG, 0.4), union: true }); }
+    ridge(g, 975, 70, 23, mix('#3b8192', FOG, 0.38), null, (pts, r) => {
+      for (let i = 0; i < 10; i++) { const [x, y] = pts[Math.floor(r() * pts.length)]; fan(g, x, y + 8, 60 + r() * 70, mix('#7a6a9c', FOG, 0.5), 1.4, r); }
+      for (let i = 0; i < 24; i++) { const [x, y] = pts[Math.floor(r() * pts.length)]; FORMS[(i + 1) % 4](g, x, y + 8, 18 + r() * 26, fogPal(CORALS[(i + 2) % 5], 0.48), r); }
     });
-    ridge(g, 1040, 55, 37, mix('#5f8f95', FOG, 0.12), mix('#2f5e70', FOG, 0.2), (pts, r) => {
-      for (let i = 0; i < 12; i++) { const [x, y] = pts[Math.floor(r() * pts.length)]; fan(g, x, y + 10, 70 + r() * 90, ['#b56a83', '#c98a5e', '#8f6fa8'][i % 3], 1.8, r); }
-      for (let i = 0; i < 22; i++) {
+    ridge(g, 1040, 55, 37, mix('#6a8f92', FOG, 0.14), mix('#2f5e70', FOG, 0.2), (pts, r) => {
+      for (let i = 0; i < 9; i++) { const [x, y] = pts[Math.floor(r() * pts.length)]; fan(g, x, y + 10, 70 + r() * 90, mix(['#b56a83', '#c98a5e', '#8f6fa8'][i % 3], FOG, 0.15), 1.8, r); }
+      for (let i = 0; i < 26; i++) {
         const [x, y] = pts[Math.floor(r() * pts.length)];
-        const k = i % 3;
-        coralHead(g, x, y + 10, 20 + r() * 30, [
-          { line: '#2f5468', lw: 1.2, shade: '#4f7f8d', base: '#6a9b9c', lit: '#94bfae' },
-          { line: '#3b4a6a', lw: 1.2, shade: '#7d6f9a', base: '#9a8db4', lit: '#c0b3cf' },
-          { line: '#4b4a5a', lw: 1.2, shade: '#a77a6a', base: '#c39a7b', lit: '#e2c095' }][k]);
+        const c = fogPal(CORALS[i % 5], 0.18); c.line = mix('#2f4058', FOG, 0.25);
+        FORMS[(i * 3) % 4](g, x, y + 12, 18 + r() * 28, c, r);
       }
     });
     // a wash of water over all of it, thicker with height (it's further away)
@@ -210,6 +254,135 @@ layer({
   },
 });
 
+// ------------------------------------------------------------------ the near reef: rocks in the foreground
+function rock(g, x, y, w, h, seed) {
+  // a mound of lumpy boulders, lit warm on top, cool and dark where it sits in the sand
+  const r = rng(seed), circles = [];
+  const n = 5 + Math.floor(w / 40);
+  for (let i = 0; i < n; i++) {
+    const u = (i + 0.5) / n, cx = x - w + u * w * 2, top = Math.sin(u * Math.PI);
+    const rad = h * (0.35 + 0.5 * top) * (0.8 + r() * 0.4);
+    circles.push([cx, y - rad * 0.55 - top * h * 0.3, rad]);
+  }
+  for (let i = 0; i < n - 2; i++) { const u = 0.2 + r() * 0.6; circles.push([x - w + u * w * 2, y - h * (0.6 + r() * 0.3), h * (0.25 + r() * 0.25)]); }
+  g.fillStyle = 'rgba(40,60,70,0.35)'; g.fill(ell(x + w * 0.15, y + 4, w * 1.15, h * 0.18));
+  g.save(); g.beginPath(); g.rect(x - w * 2, y - h * 3, w * 4, h * 3 + 2); g.clip();
+  A.lumps(g, circles, { line: LINE, lw: 1.8, shade: '#5f5a72', base: '#8a8090', lit: '#b6a89e', union: true });
+  g.restore();
+  // coralline crusts and pits
+  for (let i = 0; i < 26; i++) { const [cx, cy, cr] = circles[Math.floor(r() * circles.length)]; const a = -Math.PI / 2 + (r() - 0.5) * 2; g.fillStyle = r() < 0.5 ? 'rgba(60,50,70,0.3)' : 'rgba(240,160,170,0.55)'; g.fill(ell(cx + Math.cos(a) * cr * 0.6, cy + Math.sin(a) * cr * 0.6, 1.5 + r() * 3.5, 1 + r() * 2)); }
+  return circles;
+}
+layer({
+  id: 'near-reef', z: 10, still: true,
+  draw(g) {
+    const v = st.view, r = rng(91);
+    // seagrass meadow tufts, painted (the swaying ones are in 'grass')
+    // big rocks at both corners, with their coral
+    const groups = [[60, 1135, 190, 90, 1], [1530, 1140, 200, 95, 2], [-120, 1320, 260, 150, 3], [1700, 1330, 280, 160, 4], [380, 1560, 300, 140, 5], [1250, 1620, 340, 160, 6], [800, 1900, 420, 170, 7]];
+    for (const [x, y, w, h, sd] of groups) {
+      if (y - h > v.y1 + 20) continue;
+      const cs = rock(g, x, y, w, h, sd);
+      // coral growing from the tops of the boulders, biggest on the biggest rocks
+      const tops = cs.slice().sort((p, q) => p[1] - p[2] - (q[1] - q[2])).slice(0, 6);
+      for (let i = 0; i < tops.length; i++) {
+        const [cx, cy, cr] = tops[i];
+        const c = { line: LINE, shade: CORALS[(i + sd) % 5][0], base: CORALS[(i + sd) % 5][1], lit: CORALS[(i + sd) % 5][2] };
+        FORMS[(i + sd) % 4](g, cx + (r() - 0.5) * cr, cy - cr * 0.8, cr * (0.7 + r() * 0.5), c, r);
+      }
+    }
+    // shells and a starfish strewn on the sand
+    const star = (x, y, s, rot) => { const pts = []; for (let i = 0; i < 10; i++) { const a = rot + (i / 10) * TAU, rr = i % 2 ? s * 0.42 : s; pts.push([x + Math.cos(a) * rr, y + Math.sin(a) * rr * 0.55]); } const S = curve(pts); g.fillStyle = '#e8774a'; g.fill(S); g.lineWidth = 1.4; g.strokeStyle = LINE; g.stroke(S); g.fillStyle = '#ffd0a0'; for (let i = 0; i < 5; i++) { const a = rot + (i / 5) * TAU; g.fill(circ(x + Math.cos(a) * s * 0.5, y + Math.sin(a) * s * 0.27, s * 0.06)); } };
+    star(560, 1110, 16, 0.3); star(1210, 1300, 22, 1.1); star(300, 1420, 26, 2);
+    for (const [x, y, s] of [[700, 1095, 7], [460, 1180, 9], [1020, 1250, 10], [1390, 1460, 12], [620, 1350, 11]]) {
+      const S = new Path2D(); S.ellipse(x, y, s, s * 0.6, 0, Math.PI, 0); S.closePath();
+      g.fillStyle = '#f2e0d0'; g.fill(S); g.lineWidth = 1.2; g.strokeStyle = LINE; g.stroke(S);
+      g.lineWidth = 0.8; g.strokeStyle = '#c99a8a'; for (let i = -2; i <= 2; i++) { g.beginPath(); g.moveTo(x, y); g.lineTo(x + i * s * 0.4, y - s * 0.55); g.stroke(); }
+    }
+    // the anchor the ark is moored to, half sunk in the sand
+    const ax = 1125, ay = 1098;
+    g.save(); g.translate(ax, ay); g.rotate(0.35);
+    const shank = A.rr(-3.5, -52, 7, 56, 3);
+    g.fillStyle = '#6a6070'; g.fill(shank); g.lineWidth = 1.6; g.strokeStyle = LINE; g.stroke(shank);
+    g.lineWidth = 7.4; g.strokeStyle = LINE; g.beginPath(); g.arc(0, -10, 26, 0.2, Math.PI - 0.2); g.stroke();
+    g.lineWidth = 5; g.strokeStyle = '#6a6070'; g.stroke();
+    g.lineWidth = 3.4; g.strokeStyle = LINE; g.beginPath(); g.arc(0, -58, 6, 0, TAU); g.stroke(); g.lineWidth = 1.8; g.strokeStyle = '#8a8090'; g.stroke();
+    A.line(g, -12, -40, 12, -40, 5.4); A.line(g, -12, -40, 12, -40, 3.4, '#6a6070');
+    g.fillStyle = 'rgba(240,170,170,0.6)'; g.fill(ell(-2, -30, 3, 6)); g.fill(ell(18, -6, 4, 2));
+    g.restore();
+    // sand heaped over its flukes
+    g.fillStyle = '#e2c898'; g.fill(ell(ax + 4, ay + 8, 44, 9)); g.fillStyle = 'rgba(255,240,200,0.6)'; g.fill(ell(ax, ay + 4, 30, 3));
+  },
+});
+A.ANCHOR = [1125 + Math.sin(0.35) * 58, 1098 - Math.cos(0.35) * 58];
+
+// the mooring line, from a ring on the keel down to the anchor, slack and swaying with the ark
+A.KEEL = A.pt(1.15, A.R(1.15) * 0.995);
+layer({
+  id: 'mooring', z: 28,
+  draw(g, t) {
+    const [kx, ky] = A.KEEL, [ax, ay] = A.ANCHOR;
+    const x0 = kx + A.dx + (ky - A.C[1]) * -A.tilt, y0 = ky + A.bob;
+    const len = Math.hypot(ax - x0, ay - y0), slack = Math.max(4, 40 - (len - 150) * 0.6);
+    const pts = []; for (let i = 0; i <= 14; i++) { const u = i / 14; pts.push([lerp(x0, ax, u) + Math.sin(u * Math.PI) * (slack * 0.5 + wind(t, x0) * 8) + Math.sin(t * 0.8 + u * 4) * 2 * u, lerp(y0, ay, u)]); }
+    A.stroke(g, pts, 4.6, LINE); A.stroke(g, pts, 2.8, '#c9a070');
+    g.save(); g.setLineDash([2, 3]); A.stroke(g, pts, 1.2, '#8a6040'); g.restore();
+  },
+});
+
+// garden eels: a colony in the sand, swaying into the current; they duck into their burrows when the
+// pointer comes near and ease back out once it's gone
+const eels = [];
+{ const r = rng(61); for (let i = 0; i < 8; i++) eels.push({ x: 1185 + i * 30 + r() * 22, y: 1090 + r() * 26, h: 50 + r() * 34, out: 1, ph: r() * 6, wait: 0 }); }
+layer({
+  id: 'eels', z: 14,
+  hit: (x, y) => x > 1160 && x < 1430 && y > 1020 && y < 1125,
+  update(dt, t, L) {
+    for (const e of eels) {
+      const near = P.inside && Math.hypot(P.x - e.x, P.y - (e.y - e.h * 0.5)) < (L.hovered ? 140 : 90);
+      if (near) e.wait = 1.2 + Math.random();
+      e.wait -= dt;
+      e.out = Drawn.ease(e.out, e.wait > 0 ? 0 : 1, e.wait > 0 ? 9 : 0.9, dt);
+    }
+  },
+  draw(g, t) {
+    for (const e of eels) {
+      g.fillStyle = 'rgba(70,60,60,0.6)'; g.fill(ell(e.x, e.y, 6, 2.2));
+      if (e.out < 0.04) continue;
+      const h = e.h * e.out, w = wind(t, e.x);
+      const pts = []; for (let i = 0; i <= 10; i++) { const u = i / 10; pts.push([e.x + Math.sin(t * 1.2 + e.ph + u * 3) * 6 * u - (w * 10 + 8) * u * u, e.y - h * u * (1 - 0.15 * u)]); }
+      C_limb(g, pts, 6, 4.5, '#efe6d2', 1.3, '#c9bca4');
+      g.fillStyle = '#4a3a3a'; for (let i = 2; i < 10; i += 2) g.fill(circ(pts[i][0] + 1, pts[i][1], 1.1));
+      const [hx, hy] = pts[10], [px, py] = pts[9];
+      g.save(); g.translate(hx, hy); g.rotate(Math.atan2(hy - py, hx - px) - 0.9);
+      g.fillStyle = '#efe6d2'; g.fill(ell(3, 0, 6, 3.4)); g.lineWidth = 1.2; g.strokeStyle = LINE; g.stroke(ell(3, 0, 6, 3.4));
+      g.fillStyle = '#fff'; g.fill(circ(4.5, -1, 1.6)); g.fillStyle = LINE; g.fill(circ(4.9, -1, 1));
+      g.restore();
+    }
+  },
+});
+const C_limb = (...a) => A.crew.limb(...a);
+
+// sea grass: tufts along the sand, every blade leaning into the current
+const tufts = [];
+{ const r = rng(71); for (let i = 0; i < 26; i++) tufts.push({ x: -100 + r() * 1800, y: 1080 + r() * 60 + (i % 5 === 0 ? r() * 700 : 0), n: 5 + Math.floor(r() * 5), h: 26 + r() * 30, ph: r() * 6 }); }
+layer({
+  id: 'grass', z: 15,
+  draw(g, t) {
+    const v = st.view;
+    for (const tf of tufts) {
+      if (tf.y > v.y1 + 10) continue;
+      const w = wind(t, tf.x), s = 1 + (tf.y - 1080) * 0.0015;
+      for (let i = 0; i < tf.n; i++) {
+        const bx = tf.x + (i - tf.n / 2) * 3 * s, h = tf.h * s * (0.7 + ((i * 7) % 5) / 8);
+        const bend = (w * 0.5 + Math.sin(t * 1.4 + tf.ph + i) * 0.18) * h;
+        const p = new Path2D(); p.moveTo(bx - 1.6 * s, tf.y); p.quadraticCurveTo(bx + bend * 0.4, tf.y - h * 0.6, bx + bend, tf.y - h); p.quadraticCurveTo(bx + bend * 0.4 + 1.5 * s, tf.y - h * 0.55, bx + 1.6 * s, tf.y); p.closePath();
+        g.fillStyle = i % 2 ? '#7a9a4a' : '#5e8a48'; g.fill(p); g.lineWidth = 0.9; g.strokeStyle = LINE; g.stroke(p);
+      }
+    }
+  },
+});
+
 // ------------------------------------------------------------------ kelp
 // a strand: a stem rooted at (x, y) rising h, gas floats and long blades along it, swaying with the
 // current — stronger near the top. Colours fogged by depth.
@@ -218,7 +391,7 @@ function kelpStrand(seed, x, y, h, fog, lw) {
   const r = rng(seed), c = {};
   for (const k in KELP) c[k] = mix(KELP[k], FOG, fog);
   const blades = [];
-  for (let u = 0.06; u < 1; u += 0.045 + r() * 0.04) blades.push({ u, side: blades.length % 2 ? 1 : -1, len: 70 + r() * 60, w: 15 + r() * 9, ph: r() * 6 });
+  for (let u = 0.06; u < 1; u += 0.045 + r() * 0.04) blades.push({ u, side: blades.length % 2 ? 1 : -1, len: 90 + r() * 70, w: 20 + r() * 10, ph: r() * 6 });
   return { x, y, h, c, blades, lw, ph: r() * 10, push: 0, pv: 0 };
 }
 function stemPts(k, t) {
@@ -241,13 +414,13 @@ function drawKelp(g, k, t) {
     const x = lerp(pts[i][0], pts[i + 1][0], f), y = lerp(pts[i][1], pts[i + 1][1], f);
     // a long ruffled blade streaming downstream from a little float, bending along its length
     const w = wind(t, k.x);
-    const a0 = -Math.PI / 2 + b.side * 0.9 + w * 0.5 * (b.side > 0 ? 0.6 : 1.2);
+    const a0 = -Math.PI / 2 + b.side * 0.55 + w * 0.35;
     const L = b.len, W = b.w, seg = 9;
     const spine = [[x, y]];
     let a = a0, px = x, py = y;
     for (let j = 1; j <= seg; j++) {
       const u = j / seg;
-      a += (Math.sin(t * 1.3 + b.ph + u * 3) * 0.16 + (0.18 + w * 0.12) * (b.side > 0 ? 1 : -0.4)) * (0.5 + u);
+      a += (Math.sin(t * 1.3 + b.ph + u * 3) * 0.07 + (0.05 + w * 0.05) * (b.side > 0 ? 1 : -1)) * (0.5 + u);
       px += Math.cos(a) * L / seg; py += Math.sin(a) * L / seg;
       spine.push([px, py]);
     }
@@ -270,8 +443,8 @@ function drawKelp(g, k, t) {
     g.fillStyle = k.c.float; g.fill(ell(x, y, 4.5, 5.5)); g.lineWidth = k.lw * 0.8; g.stroke(ell(x, y, 4.5, 5.5));
   }
 }
-const kelpBack = [kelpStrand(1, 120, 1060, 1400, 0.45, 1.1), kelpStrand(2, 230, 1070, 1150, 0.3, 1.3), kelpStrand(3, 1440, 1060, 1300, 0.42, 1.1), kelpStrand(4, 1530, 1070, 1500, 0.28, 1.3)];
-const kelpFront = [kelpStrand(6, -30, 1180, 1750, 0, 1.8), kelpStrand(7, 1650, 1190, 1700, 0, 1.8)];
+const kelpBack = [kelpStrand(1, 70, 1000, 1350, 0.5, 1.1), kelpStrand(2, 260, 1060, 900, 0.32, 1.3), kelpStrand(3, 1475, 1010, 1300, 0.5, 1.1)];
+const kelpFront = [kelpStrand(6, -60, 1180, 1750, 0, 1.8), kelpStrand(7, 1640, 1200, 1500, 0, 1.8)];
 A.kelp = [...kelpBack, ...kelpFront];
 function kelpUpdate(list, dt, t) {
   for (const k of list) {

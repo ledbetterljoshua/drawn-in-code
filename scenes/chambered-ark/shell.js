@@ -108,16 +108,15 @@ function paintFace(g) {
   for (const ch of A.chambers) g.stroke(ch.path);
   // the siphuncle: a pearl tube, cut open, collared where it passes each septum
   const sp = A.siphPts;
-  A.stroke(g, sp, 9.5, LINE);
-  A.stroke(g, sp, 7, '#e9d6c6');
-  A.stroke(g, sp, 3.2, '#8a6f78');
+  A.stroke(g, sp, 8, LINE);
+  A.stroke(g, sp, 5.8, '#e9d6c6');
+  A.stroke(g, sp, 2.6, '#9a7f88');
   A.stroke(g, sp.map(([x, y]) => [x - 1.4, y - 1.6]), 1.3, '#fff6ec');
   for (const s of A.septa) {
     if (s.th < thMin + 0.25 || s.th > th0 + 0.05) continue;
-    const [x, y] = A.pt(s.th, A.siphR(s.th)), w = Math.max(2.5, A.R(s.th) * 0.03);
+    const [x, y] = A.pt(s.th, A.siphR(s.th)), w = Math.max(1.6, A.R(s.th) * 0.02), hgt = Math.min(11, 4 + A.R(s.th) * 0.03);
     g.save(); g.translate(x, y); g.rotate(s.th + Math.PI / 2);
-    crewInk(g, A.rr(-w * 0.6, -6.5, w * 1.2, 13, 2), '#c9a258', 1.2);
-    g.fillStyle = '#f4dc9a'; g.fillRect(-w * 0.45, -5, w * 0.25, 10);
+    crewInk(g, A.rr(-w * 0.6, -hgt / 2, w * 1.2, hgt, 1.5), '#e7d4c2', 0.9);
     g.restore();
   }
   for (const f of faceItems) { g.save(); f(g); g.restore(); }
