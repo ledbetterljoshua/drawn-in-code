@@ -1,0 +1,149 @@
+/* mole.js — the rig every mole in Kilnhill is drawn with.
+   A mole stands upright, feet at its anchor, ~44 units tall at s = 1, facing right (flip for left).
+   Velvet fur takes the firelight as a warm rim on the side facing the fire and falls into cool
+   indigo on the far side; the pink hands and snout catch the light more. Every mole blinks on its
+   own clock and breathes. Options:
+     flip, lean (rad), squash, breathe (0..1 phase-driven), look [-1..1], open (eyes 0..1), smile,
+     hands: { f: [x, y], b: [x, y] } front/back hand in mole space (default at the belly),
+     apron: colour, cap: colour, specs: true, scarf: colour, sleep: true, mouth (0..1 open),
+     snout (sniff offset), lx/ly: world position for lighting (defaults to x, y)
+   Returns the world positions of the two hands so callers can draw the tools they hold. */
+(function () {
+  const { clamp, lerp, circ, ell, curve, poly, grad } = Drawn;
+  const K = window.Kiln, M = K.M;
+
+  // direction (unit) toward where most of the light at a point comes from, and how much there is
+  K.keyAt = (x, y) => {
+    let sx = 0, sy = 0, tot = 0;
+    for (const L of K.lights) {
+      const dx = L.x - x, dy = L.y - y, d = Math.hypot(dx, dy);
+      if (d > L.r || d < 1) continue;
+      const f = (1 - d / L.r) ** 2 * L.k * (L.col[0] + L.col[1]);
+      sx += (dx / d) * f; sy += (dy / d) * f; tot += f;
+    }
+    const m = Math.hypot(sx, sy) || 1;
+    return { dx: sx / m, dy: sy / m, I: tot };
+  };
+
+  const bodyPts = [[-14, -1], [-17, -14], [-15, -28], [-8, -39], [3, -42], [12, -37], [16, -28], [17, -14], [14, -3], [0, 1]];
+  const BODY = curve(bodyPts);
+  const APRON = curve([[-4, -27], [10, -27], [15, -16], [15, -5], [8, -1], [-6, -1], [-8, -12]]);
+
+  function paw(g, x, y, ang, s, col, line, lw, rim) {
+    g.save(); g.translate(x, y); g.rotate(ang);
+    const p = ell(0, 0, 5.6, 4.2);
+    g.lineWidth = lw * 2; g.strokeStyle = line; g.stroke(p);
+    g.fillStyle = col; g.fill(p);
+    if (rim) { g.fillStyle = rim; g.fill(ell(-1, -1.6, 3.6, 1.6)); }
+    // five pale claws fanned along the far edge
+    g.lineWidth = 1.1; g.strokeStyle = '#efe4d4';
+    for (let i = 0; i < 5; i++) { const a = -0.9 + i * 0.45; g.beginPath(); g.moveTo(Math.cos(a) * 5, Math.sin(a) * 3.8); g.lineTo(Math.cos(a) * 7.6, Math.sin(a) * 5.4); g.stroke(); }
+    g.restore();
+  }
+
+  K.mole = function (g, x, y, s = 1, o = {}) {
+    const lx = o.lx == null ? x : o.lx, ly = o.ly == null ? y - 22 * s : o.ly;
+    const key = K.keyAt(lx, ly);
+    const flip = o.flip ? -1 : 1;
+    // the key direction in mole space
+    const kdx = key.dx * flip, kdy = key.dy;
+    const I = clamp(key.I * 0.55, 0, 1.6);
+    const fur = K.lit(M.fur, lx, ly, [key.dx, key.dy, 0.4]);
+    const furShade = K.css(K.mix(K.lit(M.furDark, lx, ly), [0.05, 0.05, 0.12], 0.4));
+    const furBase = K.css(fur);
+    const rim = K.css(K.mix(fur, [1, 0.72, 0.42], clamp(I * 0.75, 0, 0.95)));
+    const skin = K.css(K.lit(M.skin, lx, ly, [key.dx, key.dy, 0.6], 0.25));
+    const skinRim = K.css(K.mix(K.lit(M.skin, lx, ly), [1, 0.86, 0.7], clamp(I * 0.6, 0, 0.9)));
+    const line = K.inkAt(lx, ly, 0.6);
+    const lw = 1.7 / s;
+    const br = o.breathe == null ? 0 : o.breathe;
+    const hands = o.hands || {};
+    const hf = hands.f || [12, -14], hb = hands.b || [-8, -15];
+
+    g.save();
+    g.translate(x, y);
+    g.scale(s * flip, s * (o.squash || 1));
+    if (o.lean) g.rotate(o.lean);
+    // contact shadow
+    g.fillStyle = 'rgba(8,4,10,0.45)'; g.fill(ell(1, 0.5, 15, 3.2));
+    // back arm, behind the body
+    const armB = Drawn.seg(-6, -24, hb[0], hb[1]);
+    g.lineCap = 'round';
+    g.lineWidth = 6 + lw * 2; g.strokeStyle = line; g.stroke(armB);
+    g.lineWidth = 6; g.strokeStyle = furShade; g.stroke(armB);
+    paw(g, hb[0], hb[1], Math.atan2(hb[1] + 24, hb[0] + 6), s, skin, line, lw, null);
+    // feet
+    for (const fx of [-7, 6]) { const p = ell(fx + 2, -1, 5.5, 2.6); g.lineWidth = lw * 2; g.strokeStyle = line; g.stroke(p); g.fillStyle = skin; g.fill(p); }
+    // body: breathing swells the chest a touch
+    g.save();
+    g.translate(0, -20); g.scale(1 + br * 0.03, 1 + br * 0.02); g.translate(0, 20);
+    g.lineWidth = lw * 2.2; g.strokeStyle = line; g.stroke(BODY);
+    g.fillStyle = grad(g, -kdx * 18, -20 - kdy * 18, kdx * 18, -20 + kdy * 18, [[0, furShade], [0.55, furBase], [1, furBase]]);
+    g.fill(BODY);
+    g.save(); g.clip(BODY);
+    // velvet sheen and the warm rim on the fire side
+    g.lineWidth = 5;
+    g.strokeStyle = grad(g, -kdx * 16, -20 - kdy * 16, kdx * 16, -20 + kdy * 16, [[0, 'rgba(0,0,0,0)'], [0.6, 'rgba(0,0,0,0)'], [1, rim]]);
+    g.stroke(BODY);
+    g.fillStyle = 'rgba(255,240,230,0.05)'; g.fill(ell(4, -32, 7, 4));
+    if (o.apron) {
+      const ap = K.lit(o.apron, lx, ly, [key.dx, key.dy, 0.7]);
+      g.fillStyle = grad(g, -kdx * 14, -14, kdx * 14, -14, [[0, K.css(K.mul(ap, 0.55))], [1, K.css(ap)]]);
+      g.fill(APRON);
+      // clay smears and the strings
+      g.fillStyle = K.css(K.mix(ap, K.lit(M.clay, lx, ly), 0.6), 0.8); g.fill(ell(6, -10, 3.5, 2)); g.fill(ell(10, -18, 2, 1.4));
+      g.lineWidth = 0.9; g.strokeStyle = line; g.stroke(APRON);
+      g.beginPath(); g.moveTo(-4, -27); g.quadraticCurveTo(-10, -26, -15, -20); g.stroke();
+    }
+    g.restore();
+    if (o.scarf) {
+      const sc = K.css(K.lit(o.scarf, lx, ly, [key.dx, key.dy, 0.7]));
+      const p = curve([[-13, -30], [0, -27], [14, -30], [14, -26], [0, -23], [-14, -26]]);
+      g.lineWidth = lw * 2; g.strokeStyle = line; g.stroke(p); g.fillStyle = sc; g.fill(p);
+      const tail = poly([[-10, -27], [-16, -14], [-11, -13], [-7, -25]]);
+      g.stroke(tail); g.fill(tail);
+    }
+    g.restore();
+
+    // head details: snout, eyes, whiskers, mouth
+    const sn = o.snout || 0;
+    const snout = curve([[11, -38], [20, -36.5 + sn * 0.4], [26.5, -33.5 + sn], [26, -30.5 + sn], [19, -29], [12, -30]]);
+    g.lineWidth = lw * 2; g.strokeStyle = line; g.stroke(snout);
+    g.fillStyle = skin; g.fill(snout);
+    g.save(); g.clip(snout); g.fillStyle = skinRim; g.fill(ell(19 + kdx * 3, -34 - Math.max(0, -kdy) * 2, 6, 2.4)); g.restore();
+    g.fillStyle = K.css(K.lit('#c05a64', lx, ly)); g.fill(ell(26, -32 + sn, 2.2, 2));
+    g.lineWidth = 0.6; g.strokeStyle = 'rgba(255,230,220,0.55)';
+    for (const [a, b] of [[-36, -40], [-32, -32], [-34, -27]]) { g.beginPath(); g.moveTo(22, -32 + sn); g.quadraticCurveTo(28, (a + b) / 2, 33, b + 4); g.stroke(); }
+    if (o.mouth) { g.fillStyle = '#5a1a24'; g.fill(ell(19, -28, 3 * o.mouth, 2 * o.mouth)); }
+    else { g.lineWidth = 0.9; g.strokeStyle = line; g.beginPath(); g.moveTo(15, -29); g.quadraticCurveTo(17.5, -27 + (o.smile || 0.6) * 1.2, 20, -29); g.stroke(); }
+    const open = o.sleep ? 0 : o.open == null ? 1 : o.open, lk = o.look || [0, 0];
+    if (open > 0.3) {
+      g.fillStyle = '#05030a'; g.fill(ell(9.5 + lk[0] * 0.8, -35 + lk[1] * 0.6, 1.7, 1.6 * open));
+      g.fillStyle = K.css(K.mix([0.8, 0.7, 0.6], [1, 0.85, 0.5], clamp(I, 0, 1))); g.fill(circ(10.1 + lk[0] * 0.8, -35.6 + lk[1] * 0.6, 0.55));
+    } else {
+      g.lineWidth = 0.9; g.strokeStyle = line; g.beginPath(); g.moveTo(7.6, -35); g.quadraticCurveTo(9.5, -33.6, 11.4, -35); g.stroke();
+    }
+    if (o.specs) {
+      const glint = K.css(K.mix([0.7, 0.6, 0.6], [1, 0.9, 0.6], clamp(I * 0.9, 0, 1)), 0.9);
+      g.lineWidth = 0.9; g.strokeStyle = '#c8a050';
+      g.stroke(circ(10, -35, 3.4)); g.beginPath(); g.moveTo(6.6, -35.5); g.lineTo(-2, -37); g.stroke();
+      g.fillStyle = glint; g.fill(ell(11, -36.4, 1.3, 0.8));
+    }
+    if (o.cap) {
+      const cp = K.lit(o.cap, lx, ly, [key.dx, key.dy, 0.6]);
+      const p = curve([[-11, -36], [-6, -45], [5, -47], [12, -41], [10, -38], [-2, -39]]);
+      g.lineWidth = lw * 2; g.strokeStyle = line; g.stroke(p);
+      g.fillStyle = K.css(cp); g.fill(p);
+      g.fillStyle = K.css(K.mul(cp, 0.6)); g.fill(curve([[4, -41], [15, -40], [12, -38], [4, -39]]));
+    }
+    // front arm and paw, in front of everything
+    const armF = Drawn.seg(7, -24, hf[0], hf[1]);
+    g.lineWidth = 6.4 + lw * 2; g.strokeStyle = line; g.stroke(armF);
+    g.lineWidth = 6.4; g.strokeStyle = furBase; g.stroke(armF);
+    g.lineWidth = 1.6; g.strokeStyle = rim; g.stroke(Drawn.seg(7 + kdx, -24 - 1.5, hf[0] + kdx, hf[1] - 1.5));
+    paw(g, hf[0], hf[1], Math.atan2(hf[1] + 24, hf[0] - 7), s, skin, line, lw, skinRim);
+    g.restore();
+    const W = (p) => [x + p[0] * s * flip, y + p[1] * s * (o.squash || 1)];
+    return { f: W(hf), b: W(hb), head: W([12, -34]) };
+  };
+})();
