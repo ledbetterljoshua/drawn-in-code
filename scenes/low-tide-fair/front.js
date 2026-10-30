@@ -269,7 +269,7 @@ layer({
     const rock = curve(rockPts, true);
     const S = F.PAL.stone;
     g.lineWidth = 5; g.strokeStyle = LINE; g.stroke(rock);
-    g.fillStyle = grad(g, -100, 870, 300, 1100, [S.lit, S.base, S.shade, S.deep]); g.fill(rock);
+    g.fillStyle = grad(g, -100, 870, 300, 1100, ['#c4b0b0', S.lit, S.base, S.shade]); g.fill(rock);
     g.save(); g.clip(rock);
     // facets: a few big planes, lit on their sun-facing (left, top) sides
     const r = rng(8);
@@ -282,12 +282,22 @@ layer({
     // a skirt of weed and mussels round the bottom, wet and dark
     g.fillStyle = '#3c3048'; g.fill(curve([[-160, 1040], [40, 1030], [180, 1050], [300, 1080], [340, 1120], [-160, 1120]]));
     for (let i = 0; i < 60; i++) { const x = -120 + r() * 440, y = 1030 + r() * 70; if (y < 1030 + (x > 200 ? (x - 200) * 0.5 : 0)) continue; ink(g, ell(x, y, 7 + r() * 4, 3.2, undefined, (r() - 0.5) * 1.2), r() < 0.5 ? '#2e2a48' : '#46406a', 0.9); g.fillStyle = 'rgba(160,170,220,0.6)'; g.fill(ell(x - 2, y - 1, 3, 0.8)); }
-    // barnacles: little volcanoes, catching the light on the left
-    for (let i = 0; i < 140; i++) {
-      const x = -140 + r() * 440, y = 880 + r() * 170, rr = 1.8 + r() * 3;
+    // cracks: a few long fissures following the facets, with lit lips
+    const cracks = [[[-80, 900], [-20, 930], [30, 925], [90, 960], [120, 1010]], [[150, 905], [170, 950], [220, 975], [240, 1020]], [[-140, 990], [-60, 1000], [10, 1030]]];
+    for (const c of cracks) { const p = curve(c, false); g.lineWidth = 3; g.strokeStyle = 'rgba(30,22,46,0.6)'; g.stroke(p); g.save(); g.translate(-1.5, -1.5); g.lineWidth = 1.2; g.strokeStyle = 'rgba(200,180,200,0.5)'; g.stroke(p); g.restore(); }
+    // barnacles: clustered along the cracks and the wet lower half, catching the light on the left
+    const spots = [];
+    for (const c of cracks) for (let i = 0; i < 26; i++) { const k = r() * (c.length - 1), j = Math.floor(k), f = k - j, a = c[j], b = c[j + 1]; spots.push([a[0] + (b[0] - a[0]) * f + (r() - 0.5) * 26, a[1] + (b[1] - a[1]) * f + (r() - 0.5) * 18]); }
+    for (let i = 0; i < 50; i++) spots.push([-140 + r() * 460, 1000 + r() ** 0.6 * 50]);
+    for (const [x, y] of spots) {
+      const rr = 1.4 + r() * 2.8;
       if (Math.hypot((x - pool.x) / pool.rx, (y - pool.y) / pool.ry) < 1.3) continue;
-      g.fillStyle = '#e8dccb'; g.fill(circ(x, y, rr)); g.fillStyle = '#8a8098'; g.fill(circ(x + rr * 0.25, y + rr * 0.1, rr * 0.45)); g.fillStyle = '#3a3048'; g.fill(circ(x + rr * 0.25, y + rr * 0.1, rr * 0.2));
+      g.fillStyle = 'rgba(30,24,44,0.4)'; g.fill(circ(x + rr * 0.4, y + rr * 0.4, rr));
+      g.fillStyle = '#d9cfc4'; g.fill(circ(x, y, rr)); g.fillStyle = '#8a8098'; g.fill(circ(x + rr * 0.25, y + rr * 0.1, rr * 0.45)); g.fillStyle = '#3a3048'; g.fill(circ(x + rr * 0.25, y + rr * 0.1, rr * 0.2));
     }
+    // limpets and a patch of pink coralline crust near the pool
+    for (let i = 0; i < 7; i++) { const x = 30 + r() * 220, y = 930 + r() * 80; ink(g, ell(x, y, 5, 3.4), '#b9aa9a', 1); g.fillStyle = 'rgba(255,240,220,0.6)'; g.fill(ell(x - 1.6, y - 1.2, 2, 1)); }
+    g.fillStyle = 'rgba(214,140,160,0.45)'; g.fill(curve([[40, 985], [90, 975], [150, 990], [180, 1005], [100, 1008], [50, 1000]]));
     // bladderwrack drooping over the top edge
     for (let i = 0; i < 9; i++) {
       const x = -100 + i * 40 + r() * 10, y = 870 + (x > 60 ? (x - 60) * 0.35 : 0);
@@ -392,12 +402,14 @@ layer({
   draw(g) {
     const v = st.view, r = rng(61);
     const crest = [];
-    for (let x = v.x0 - 40; x <= v.x1 + 80; x += 60) crest.push([x, 1092 + Math.sin(x * 0.006) * 10 + Math.sin(x * 0.017 + 1) * 5]);
+    // higher at the left by the rock, dipping in the middle so the fair shows through, rising right
+    const base = (x) => x < 360 ? 1050 + (x - 360) * -0.12 : x < 700 ? D.lerp(1050, 1108, (x - 360) / 340) : x < 1500 ? 1108 + Math.sin(x * 0.01) * 6 : x < 1980 ? D.lerp(1108, 1084, (x - 1500) / 480) : 1084;
+    for (let x = v.x0 - 40; x <= v.x1 + 80; x += 30) crest.push([x, base(x) + Math.sin(x * 0.023) * 5 + Math.sin(x * 0.061 + 1) * 2.5]);
     const bar = new Path2D(); bar.moveTo(v.x0 - 40, v.y1 + 20); crest.forEach(([x, y]) => bar.lineTo(x, y)); bar.lineTo(v.x1 + 80, v.y1 + 20); bar.closePath();
     g.fillStyle = grad(g, 0, 1080, 0, v.y1, ['#d5a874', '#c08e5e', '#a87a54']); g.fill(bar);
     // the lit crest facing the sun, and the cool lee where it drops toward the wet sand
     g.save(); g.clip(bar);
-    g.fillStyle = 'rgba(255,226,180,0.55)'; for (const [x, y] of crest) g.fill(ell(x, y + 4, 40, 4));
+    g.fillStyle = 'rgba(255,226,180,0.5)'; for (const [x, y] of crest) g.fill(ell(x, y + 3, 22, 3));
     g.fillStyle = 'rgba(90,60,70,0.25)'; g.fillRect(v.x0, v.y1 - 30, v.x1 - v.x0, 40);
     // wind-blown dry ripples, a trail of footprints, a few big shells
     g.strokeStyle = 'rgba(140,96,70,0.35)'; g.lineWidth = 1.4;

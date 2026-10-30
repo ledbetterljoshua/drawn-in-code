@@ -178,3 +178,23 @@ My five worst, from that:
    shell seated higher so a thick fleshy foot shows under the whole shell.
 5. **Empty middle.** *Fix:* a toppled parcel cart under the bunting, a picnic between the book
    snail and the tower, shrimpers with push-nets in the creek right of the tea-house.
+
+## Round 6
+
+Round 5's five done: rest poses no longer stick an arm out (crowds face the band and the race);
+shadows shortened to a 0.95 shear and darkened so each visibly starts at its object; near ripples
+thinned and the near wet sand now mirrors the sky; steeper sutures make the tower a helix, windows
+tilt with them, and the shell sits higher on a fat, visible foot; a toppled parcel cart under the
+bunting (hover: they stack it back), a picnic with a sandwich-thief gull, shrimpers in the creek.
+
+The five worst now:
+
+1. **The bottom edge was a flat stage-floor stripe** once I added a dry bar. *Fixed:* the dune's
+   foot rises by the rock, dips in the middle so the fair shows through, rises again on the right.
+2. **The corner rock** was a near-black blob with evenly spaced white dots. *Fixed:* lighter
+   top facets, three fissures with lit lips, barnacles clustered along the cracks and the wet lower
+   half, limpets, a patch of pink coralline crust by the pool.
+3. **One cloud template.** *Fixed:* a small high puff, a long thin deck, a taller heap on the right,
+   and high cirrus brushed across the top of the sky.
+4. **The tea-house veranda floats** — its posts stop short of the foot. (Next.)
+5. **The far headland's foot is a pink band of fog** that cuts the cliffs in half. (Next.)

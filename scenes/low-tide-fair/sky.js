@@ -24,6 +24,16 @@ layer({
     g.restore();
     g.fillStyle = radial(g, -200, 120, 0, 900, [[0, 'rgba(255,232,190,0.55)'], [1, 'rgba(255,225,180,0)']]);
     g.fillRect(v.x0, v.y0, v.x1 - v.x0, HZ - v.y0 + 20);
+    // mares' tails: high cirrus brushed across the top of the sky, lit gold from underneath
+    const rc = rng(57);
+    for (let i = 0; i < 9; i++) {
+      const x = 200 + rc() * 1900, y = -20 + rc() * 120, L = 160 + rc() * 260;
+      for (let k = 0; k < 5; k++) {
+        const yy = y + k * 5 + rc() * 3, x0 = x + k * 14 + rc() * 20;
+        g.beginPath(); g.moveTo(x0, yy); g.bezierCurveTo(x0 + L * 0.3, yy - 8, x0 + L * 0.7, yy + 6, x0 + L, yy - 14 - rc() * 10);
+        g.lineWidth = 2 + rc() * 3; g.strokeStyle = `rgba(255,236,214,${0.12 + rc() * 0.14})`; g.lineCap = 'round'; g.stroke();
+      }
+    }
     // a pale band of haze sitting on the horizon
     g.fillStyle = grad(g, 0, HZ - 70, 0, HZ + 4, [[0, 'rgba(250,236,214,0)'], [1, 'rgba(250,238,218,0.85)']]);
     g.fillRect(v.x0, HZ - 70, v.x1 - v.x0, 76);
@@ -52,8 +62,9 @@ function streak(seed, w, h) {
 }
 const clouds = [
   { x: 1530, y: 120, w: 560, h: 46, seed: 3, sp: 2.4, col: CL },
-  { x: 1960, y: 210, w: 380, h: 34, seed: 7, sp: 3.1, col: CL },
-  { x: 260, y: 95, w: 480, h: 40, seed: 11, sp: 1.8, col: CL },
+  { x: 900, y: 60, w: 220, h: 30, seed: 31, sp: 3.4, col: CL },
+  { x: 1960, y: 210, w: 300, h: 52, seed: 7, sp: 3.1, col: CL },
+  { x: 260, y: 95, w: 640, h: 28, seed: 11, sp: 1.8, col: CL },
   { x: 1180, y: 250, w: 300, h: 24, seed: 17, sp: 2.7, col: CL_FAR },
   { x: 600, y: 300, w: 260, h: 18, seed: 23, sp: 2.2, col: CL_FAR },
   { x: 1800, y: 300, w: 420, h: 22, seed: 29, sp: 2.0, col: CL_FAR },
