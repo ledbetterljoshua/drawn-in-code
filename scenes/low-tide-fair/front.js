@@ -165,17 +165,22 @@ const hermits = [];
 }
 const whelk = { x: 2070, y: 1006, size: 1.75, empty: true };
 const queue = { swap: 0, done: false, back: 0 };
-function hermitShell(g, x, y, sz, col, kind, line) {
-  // a spiral whelk-ish shell lying on its side, aperture toward +x
+function hermitShell(g, x, y, sz, col) {
+  // a whelk-ish shell lying on its side, aperture toward +x, sitting on the sand at (x, y)
   const S = sz;
+  g.save(); g.translate(x, y);
   const p = curve([[-14 * S, 0], [-15 * S, -8 * S], [-8 * S, -15 * S], [2 * S, -16 * S], [10 * S, -11 * S], [12 * S, -3 * S], [6 * S, 1 * S]]);
-  ink(g, p, col, 1.4, line);
+  ink(g, p, col, 1.3);
   g.save(); g.clip(p);
-  g.fillStyle = grad(g, x - 15 * S, 0, x + 12 * S, 0, ['#fff4e4', col, F.mix(col, '#6a5080', 0.35)]);
-  g.translate(x, y); g.fillRect(-16 * S, -18 * S, 30 * S, 20 * S); g.translate(-x, -y);
-  g.strokeStyle = F.mix(col, '#5a3a50', 0.4); g.lineWidth = 1;
-  for (let k = 0; k < 3; k++) { g.beginPath(); g.arc(x - 4 * S, y - 7 * S, (4 + k * 3.8) * S, Math.PI * 0.9, Math.PI * 2.1); g.stroke(); }
-  g.fillStyle = 'rgba(80,50,90,0.3)'; g.fill(ell(x + 4 * S, y - 1 * S, 10 * S, 3 * S));
+  g.fillStyle = grad(g, -15 * S, -14 * S, 12 * S, 0, ['#fff6e8', col, F.mix(col, '#5a4078', 0.4)]);
+  g.fillRect(-16 * S, -18 * S, 30 * S, 20 * S);
+  g.strokeStyle = F.mix(col, '#5a3a50', 0.45); g.lineWidth = Math.max(0.6, 0.9 * S);
+  for (let k = 0; k < 3; k++) { g.beginPath(); g.arc(-4 * S, -7 * S, (3.5 + k * 3.8) * S, Math.PI * 0.85, Math.PI * 2.05); g.stroke(); }
+  g.fillStyle = F.rgba(F.mix(col, '#a0503a', 0.5), 0.5); for (let k = 0; k < 5; k++) g.fill(ell(-10 * S + k * 4 * S, -9 * S + Math.sin(k) * 3 * S, 1.2 * S, 2.2 * S, undefined, 0.4));
+  g.fillStyle = 'rgba(80,50,90,0.32)'; g.fill(ell(4 * S, -1 * S, 10 * S, 3 * S));
+  g.restore();
+  // the dark mouth of the aperture
+  ink(g, ell(9 * S, -4 * S, 3.6 * S, 4.4 * S, undefined, 0.3), '#4a3346', 0.9);
   g.restore();
 }
 function hermitPeek(g, x, y, ps, h, t, cheer) {
@@ -350,6 +355,37 @@ layer({
       ink(g, ell(c.x - 1.2 * s, c.y - br * 2 * s, 1.2 * s, (0.8 + br) * s), '#d9c0aa', 0.6);
       ink(g, ell(c.x + 1.2 * s, c.y - br * 1.6 * s, 1.1 * s, (0.7 + br) * s), '#d9c0aa', 0.6);
     }
+  },
+});
+})();
+
+// the dune behind us throws a long cool shadow across the very front of the flats
+(() => {
+const D = Drawn, F = Fair;
+const { grad, curve, st, layer } = D;
+layer({
+  id: 'near-shadow', z: 38, still: true,
+  draw(g) {
+    const v = st.view;
+    const edge = [[v.x0 - 20, 1010]];
+    for (let x = v.x0; x <= v.x1 + 40; x += 80) edge.push([x, 1050 + Math.sin(x * 0.004) * 22 + Math.sin(x * 0.011 + 2) * 10 + (x - v.x0) * 0.03]);
+    const p = new Path2D(); p.moveTo(v.x0 - 20, v.y1 + 20);
+    edge.forEach(([x, y]) => p.lineTo(x, y));
+    p.lineTo(v.x1 + 40, v.y1 + 20); p.closePath();
+    g.save(); g.globalCompositeOperation = 'multiply';
+    g.fillStyle = grad(g, 0, 1020, 0, v.y1, ['rgba(196,170,200,0.6)', 'rgba(170,140,186,0.8)']);
+    g.fill(p);
+    // the shadows of the marram grass on the dune's crest, laid along the edge
+    const r = D.rng(31);
+    g.fillStyle = 'rgba(170,140,190,0.7)';
+    for (const [x, y] of edge) for (let k = 0; k < 6; k++) {
+      const bx = x + r() * 80, by = y - 4 + r() * 6, L = 18 + r() * 40, a = -0.25 - r() * 0.35;
+      g.beginPath(); g.moveTo(bx - 3, by + 2); g.quadraticCurveTo(bx + Math.cos(a) * L * 0.5, by + Math.sin(a) * L * 0.5 - 4, bx + Math.cos(a) * L, by + Math.sin(a) * L * 0.4); g.lineTo(bx + 3, by + 2); g.fill();
+    }
+    g.restore();
+    // its soft edge
+    g.save(); g.globalCompositeOperation = 'multiply'; g.lineWidth = 18; g.strokeStyle = 'rgba(170,150,200,0.25)';
+    g.beginPath(); edge.forEach(([x, y], i) => (i ? g.lineTo(x, y - 6) : g.moveTo(x, y - 6))); g.stroke(); g.restore();
   },
 });
 })();

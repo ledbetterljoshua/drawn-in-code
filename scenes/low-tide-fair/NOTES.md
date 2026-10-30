@@ -38,3 +38,40 @@
 Eye-level a little above the sand: horizon at y = 380 on a 2200 × 1100 artboard. Everything
 stands on that ground plane; size scales with distance below the horizon, and every shadow is the
 same shear (sun low left, slightly in front).
+
+## Block-in
+
+Four greys. The tower reads at thumbnail size and the creek is a good bright leading line from the
+near left corner, under the tower, out to the sea. But the headland sat to the *left* of the tower,
+so the brightest shape in the picture was against mid-grey sky. Moved the headland's high point to
+run behind the tower so the lit shell sits on the darkest far mass. Dark corners (rock lower left,
+weed lower right) frame the flats.
+
+## Round 1 (first full pass: sky, headland, flats, six snails, eleven folk groups, foreground)
+
+The five worst things:
+
+1. **The fair is all in a thin band in the middle distance.** Everything happens between y 560 and
+   800, where a folk is 15 px tall on a desktop; the bottom third of the frame is empty sand and a
+   big blank pool. A wimmelbild needs the crowd to come right down to the viewer's feet, large.
+   *Fix:* move the band, bakery, chimes, kite kid, porters and the couple forward (y 900–1080), add
+   more folk near the front, shrink the big pool to a few small ones.
+2. **No value structure.** The pink soft-light grade and the lilac sand flatten it into one pale
+   mid-light. The only dark is the corner rock. *Fix:* warm, deeper sand in the light and cool
+   violet in the shadows; a darker, cooler headland behind the tower; heavier snail shadows; cut the
+   grade's pink.
+3. **The tower isn't a shell.** Its silhouette is one smooth cone; whorls only show as the ledges.
+   The colour bands are salmon rectangles that read as bricks. *Fix:* each whorl a barrel with a
+   notch at the suture so the outline scallops; the bands thin, continuous and spiral, broken by
+   small flame marks instead of slabs.
+4. **The snails look like grey rocks with pipes.** Their feet are hidden under the shells and the
+   heads are lumps spotted with circles. *Fix:* longer feet that show in front and behind, the shell
+   seated higher so a skirt shows under it, a smooth rising neck, a defined head, and skin with
+   fine reticulation instead of dots.
+5. **Clouds and headland are generic.** The clouds are strings of identical pearls; the headland is
+   a wall of evenly spaced vertical stripes under a flat ribbon of grass. *Fix:* long flat cloud
+   decks with a few lumps on top and a lit underside; bluffs and coves with horizontal bedding and a
+   ragged grassy edge.
+
+Also: the hermit-crab shells were drawn at the artboard origin (path built without the offset), and
+the tea tables on round stones read as carts.

@@ -44,7 +44,7 @@ const creek = creekOutline();
 F.creek = creek;
 const creekPath = poly([...creek.L, ...creek.R.slice().reverse()]);
 // tide pools: [x, y, rx, seed]; ry follows the perspective
-const POOLS = [[440, 940, 150, 1], [1190, 1012, 175, 2], [1665, 772, 92, 3], [290, 652, 76, 4], [1950, 612, 70, 5], [770, 1062, 90, 6], [1415, 868, 70, 7], [2120, 760, 80, 8]];
+const POOLS = [[440, 942, 150, 1], [1000, 1078, 66, 2], [1665, 772, 92, 3], [290, 652, 76, 4], [1950, 612, 70, 5], [800, 1090, 52, 6], [1560, 900, 60, 7], [2120, 760, 80, 8], [1300, 860, 46, 9]];
 function poolPath(x, y, rx, seed) {
   const r = rng(seed * 13), pts = [], n = 14, ry = rx * flat(y) * 1.15;
   for (let i = 0; i < n; i++) { const a = (i / n) * TAU, k = 0.82 + r() * 0.3; pts.push([x + Math.cos(a) * rx * k, y + Math.sin(a) * ry * k]); }
@@ -69,19 +69,20 @@ layer({
     const v = st.view;
     const y0 = HZ + 60;
     // the sand: hazy and pale far off, warmer and deeper close to
-    g.fillStyle = grad(g, 0, HZ + 40, 0, v.y1, [[0, '#e3cfbf'], [0.15, '#e0c6ab'], [0.45, '#dcbc98'], [1, '#cfa983']]);
+    g.fillStyle = grad(g, 0, HZ + 40, 0, v.y1, [[0, '#e4cfbc'], [0.12, '#e1c3a0'], [0.4, '#d9b083'], [0.75, '#cd9f70'], [1, '#c29264']]);
     g.fillRect(v.x0 - 10, HZ + 40, v.x1 - v.x0 + 20, v.y1 - HZ);
     // a soft blend up into the far flats
     g.fillStyle = grad(g, 0, HZ + 30, 0, HZ + 95, ['rgba(232,218,206,1)', 'rgba(232,218,206,0)']);
     g.fillRect(v.x0 - 10, HZ + 30, v.x1 - v.x0 + 20, 66);
 
-    // wet sand: broad darker, cooler, glossier sheets between the dry ridges
+    // wet sand: long low bars of darker, cooler, glossier sand between the dry ridges, the way the
+    // ebb leaves them, longer and thinner toward the horizon
     const r = rng(3);
-    for (let i = 0; i < 70; i++) {
-      const y = y0 + r() ** 0.8 * (v.y1 - y0 + 60), s = pxu(y), x = v.x0 - 100 + r() * (v.x1 - v.x0 + 200);
-      const w = (90 + r() * 260) * s, h = w * flat(y) * (0.5 + r() * 0.6);
-      g.fillStyle = r() < 0.55 ? 'rgba(160,136,150,0.16)' : 'rgba(232,220,214,0.22)';
-      g.fill(ell(x, y, w, h, undefined, (r() - 0.5) * 0.08));
+    for (let i = 0; i < 90; i++) {
+      const y = y0 + r() ** 0.9 * (v.y1 - y0 + 40), s = pxu(y), x = v.x0 - 200 + r() * (v.x1 - v.x0 + 400);
+      const w = (160 + r() * 420) * s, h = Math.max(2, w * flat(y) * (0.18 + r() * 0.22));
+      g.fillStyle = r() < 0.62 ? 'rgba(128,102,126,0.2)' : 'rgba(240,222,200,0.25)';
+      g.fill(ell(x, y, w, h, undefined, (r() - 0.5) * 0.04));
     }
     // standing water films: thin sheets that mirror the sky in long horizontal strokes
     for (let i = 0; i < 46; i++) {
@@ -133,7 +134,7 @@ layer({
     g.beginPath(); creek.R.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y)));
     g.lineWidth = 9; g.strokeStyle = 'rgba(150,126,140,0.3)'; g.stroke();
     g.restore();
-    for (const p of pools) { g.save(); g.translate(0, -p.rx * flat(p.y) * 0.18); g.lineWidth = Math.max(2, p.rx * 0.05); g.strokeStyle = 'rgba(128,104,122,0.35)'; g.stroke(p.path); g.restore(); }
+    for (const p of pools) { g.save(); g.translate(0, -p.rx * flat(p.y) * 0.12); g.lineWidth = Math.max(3, p.rx * 0.08); g.strokeStyle = 'rgba(118,92,116,0.18)'; g.stroke(p.path); g.lineWidth = Math.max(1.5, p.rx * 0.03); g.strokeStyle = 'rgba(110,84,108,0.3)'; g.stroke(p.path); g.restore(); }
     // the water itself: the sky, upside down
     g.fillStyle = waterGrad(g); g.fill(water);
     g.save(); g.clip(water);

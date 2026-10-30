@@ -129,7 +129,7 @@
   // drag sideways to look along it. Still layers are baked across the whole pannable width, so a
   // pan is only an offset blit. ?pan=x starts the view centred on artboard x.
   const st = { W: 1600, H: 1600, slack: 0.86, t: dev.t0, s: 1, ox: 0, oy: 0, dpr: 1, R: 1, view: { x0: 0, y0: 0, x1: 1600, y1: 1600 }, hovered: null,
-    pan: { on: false, x: 0, v: 0, min: 0, max: 0, focus: 800, panW: 900, fill: 0.55 } };
+    pan: { on: false, x: 0, v: 0, min: 0, max: 0, focus: 800, panW: 900, fill: 0.55, skyBias: 0.5 } };
   const P = { x: -9999, y: -9999, px: -9999, py: -9999, vx: 0, vy: 0, sp: 0, inside: false };
   const layers = [], layoutFns = [];
   let cv, ctx, buckets = [], ready = false, readyResolve;
@@ -172,8 +172,10 @@
     // (at least pn.fill of the screen's height, or pn.panW artboard units across) and pans
     const fit = Math.min(vw / (st.W * st.slack), vh / st.H);
     const s = Math.max(fit, Math.min((vh * pn.fill) / st.H, vw / pn.panW));
-    st.s = s; st.oy = (vh - st.H * s) / 2;
+    st.s = s;
     pn.on = st.W * s > vw + 1;
+    // when panning (a tall screen) show more of the sky above than of the sand below
+    st.oy = (vh - st.H * s) * (pn.on ? pn.skyBias : 0.5);
     if (pn.on) {
       pn.min = vw / 2 / s; pn.max = st.W - pn.min;
       if (!pn.placed) { pn.x = dev.pan != null ? dev.pan : pn.focus; pn.placed = true; }
@@ -334,11 +336,12 @@
     }
   }
 
-  function start({ W = 1600, H = 1600, slack = 0.86, canvas, hint = 'hover or tap anything', focus, panW, fill } = {}) {
+  function start({ W = 1600, H = 1600, slack = 0.86, canvas, hint = 'hover or tap anything', focus, panW, fill, skyBias } = {}) {
     st.W = W; st.H = H; st.slack = slack;
     if (focus != null) st.pan.focus = focus;
     if (panW) st.pan.panW = panW;
     if (fill) st.pan.fill = fill;
+    if (skyBias != null) st.pan.skyBias = skyBias;
     cv = canvas || document.querySelector('canvas');
     ctx = cv.getContext('2d');
     let rt;

@@ -64,7 +64,7 @@ F.castShadow = (g, x, y, fn, alpha = 0.5) => {
   g.transform(1, 0, -F.SHX, F.SHY, 0, 0);
   g.globalCompositeOperation = 'multiply';
   g.globalAlpha = alpha;
-  g.fillStyle = '#8c7fae';
+  g.fillStyle = '#7d6ca8';
   fn(g);
   g.restore();
 };

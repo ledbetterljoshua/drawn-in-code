@@ -33,12 +33,14 @@ F.spire = (o) => {
 // a whorl band's outline
 F.bandPath = (w) => {
   const { cx, yb, yt, rb, rt, h, s } = w;
+  // a barrel: the top tucks in under the whorl above (so the silhouette notches at each suture),
+  // the sides swell, the bottom rolls under
   const p = new Path2D();
-  p.moveTo(cx - rt, yt + s * 0.5);
-  p.bezierCurveTo(cx - rt * 1.05 - (rb - rt) * 0.4, yt + h * 0.3, cx - rb * 1.06, yb - h * 0.25, cx - rb, yb + s);
-  p.quadraticCurveTo(cx, yb + h * 0.3, cx + rb, yb - s);
-  p.bezierCurveTo(cx + rb * 1.06, yb - h * 0.25 - s, cx + rt * 1.05 + (rb - rt) * 0.4, yt + h * 0.3 - s, cx + rt, yt - s * 0.5);
-  p.quadraticCurveTo(cx, yt - h * 0.06, cx - rt, yt + s * 0.5);
+  p.moveTo(cx - rt * 0.88, yt + s * 0.5);
+  p.bezierCurveTo(cx - rt * 1.02 - (rb - rt) * 0.3, yt + h * 0.08, cx - rb * 1.17, yb - h * 0.48, cx - rb, yb + s);
+  p.quadraticCurveTo(cx, yb + h * 0.32, cx + rb, yb - s);
+  p.bezierCurveTo(cx + rb * 1.17, yb - h * 0.48 - s, cx + rt * 1.02 + (rb - rt) * 0.3, yt + h * 0.08 - s, cx + rt * 0.88, yt - s * 0.5);
+  p.quadraticCurveTo(cx, yt - h * 0.06, cx - rt * 0.88, yt + s * 0.5);
   return p;
 };
 // the y of a band's bottom edge (a quadratic bulge) at x, and its top (suture) at x
@@ -68,19 +70,24 @@ F.paintSpire = (g, sp, pal, seed = 1) => {
     // the curved face: lit on the sun's side, cool where it turns away, warm bounce at the far rim
     g.fillStyle = grad(g, cx - rb * 1.1, 0, cx + rb * 1.1, 0, [[0, pal.base], [0.12, pal.lit], [0.3, pal.lit], [0.55, pal.base], [0.82, pal.shade], [1, pal.bounce]]);
     g.fillRect(cx - rb * 1.2, yt - h, rb * 2.4, h * 2.6);
-    // colour bands following the spiral, broken into flames
-    for (const [v, wdt, col] of [[0.28, 0.14, pal.band], [0.62, 0.08, pal.band2 || pal.band]]) {
-      let a = -1.55;
-      while (a < 1.55) {
-        const len = 0.12 + r() * 0.32, gap = 0.03 + r() * 0.12;
-        if (r() < 0.85) {
-          g.beginPath();
-          for (let k = 0; k <= 6; k++) { const aa = a + (len * k) / 6; const [x, y] = F.bandAt(w, aa, v + Math.sin(aa * 9 + seed) * 0.03); k ? g.lineTo(x, y) : g.moveTo(x, y); }
-          g.lineWidth = h * wdt * (0.7 + r() * 0.6); g.strokeStyle = col; g.globalAlpha = 0.55 + r() * 0.3; g.lineCap = 'butt'; g.stroke();
-          g.globalAlpha = 1;
-        }
-        a += len + gap;
+    // pattern: a fine dark spiral line, a soft broad band, and axial flame marks between them
+    const line = (v, wdt, col, a, dash) => {
+      g.beginPath();
+      for (let k = 0; k <= 24; k++) { const aa = -1.6 + (3.2 * k) / 24; const [x, y] = F.bandAt(w, aa, v + Math.sin(aa * 7 + seed) * 0.012); k ? g.lineTo(x, y) : g.moveTo(x, y); }
+      g.setLineDash(dash || []); g.lineWidth = Math.max(0.6, h * wdt); g.strokeStyle = col; g.globalAlpha = a; g.lineCap = 'round'; g.stroke(); g.setLineDash([]); g.globalAlpha = 1;
+    };
+    line(0.5, 0.2, pal.band2 || pal.band, 0.14);
+    line(0.2, 0.028, pal.band, 0.6);
+    line(0.82, 0.02, pal.band2 || pal.band, 0.45, [h * 0.06, h * 0.05]);
+    let a = -1.5 + r() * 0.2;
+    while (a < 1.5) {
+      const k = Math.cos(a);
+      if (r() < 0.8) {
+        g.beginPath();
+        for (let j = 0; j <= 6; j++) { const v = 0.28 + (j / 6) * 0.46, zig = (j % 2 ? 1 : -1) * (0.02 + r() * 0.05) * k; const [x, y] = F.bandAt(w, a + zig + v * 0.08, v); j ? g.lineTo(x, y) : g.moveTo(x, y); }
+        g.lineWidth = Math.max(0.5, h * (0.012 + r() * 0.02) * k); g.strokeStyle = pal.band; g.globalAlpha = 0.14 + r() * 0.18; g.lineJoin = 'round'; g.stroke(); g.globalAlpha = 1;
       }
+      a += 0.16 + r() * 0.34;
     }
     // growth lines: fine, slightly bowed, bunched toward the edges as the surface turns away
     const ng = Math.round(10 + rb / 6);
@@ -132,28 +139,21 @@ F.paintGlobe = (g, gl, pal, seed = 1) => {
   // bounce from the sand along the bottom
   g.fillStyle = grad(g, 0, cy + R * 0.5, 0, cy + R, ['rgba(232,176,136,0)', 'rgba(232,176,136,0.42)']);
   g.fillRect(cx - R * 1.3, cy + R * 0.4, R * 2.6, R);
-  // colour bands following the coil, broken into flames
+  // colour bands following the coil: a fine line near each suture and a soft band mid-coil
   const N = Math.round(gl.turns * 64);
-  for (const [off, wd, col] of [[0.32, 0.12, pal.band], [0.62, 0.06, pal.band2 || pal.band]]) {
-    let i = 0;
-    while (i < N - 2) {
-      const len = 4 + Math.floor(r() * 10);
-      if (r() < 0.82) {
-        g.beginPath();
-        for (let k = 0; k <= len && i + k < N; k++) {
-          const th = ((i + k) / 64) * TAU, th2 = th + TAU;
-          const [x0, y0] = gl.spiral(th), [x1, y1] = gl.spiral(th2 > gl.turns * TAU ? th : th2);
-          const x = lerp(x0, x1, off), y = lerp(y0, y1, off);
-          k ? g.lineTo(x, y) : g.moveTo(x, y);
-        }
-        const rr = R * Math.exp(-Math.log(1 / 0.06) * (i / N));
-        g.lineWidth = Math.max(0.6, rr * wd); g.strokeStyle = col; g.globalAlpha = 0.5 + r() * 0.3; g.stroke(); g.globalAlpha = 1;
-      }
-      i += len + 1 + Math.floor(r() * 3);
+  for (const [off, wd, col, al, dash] of [[0.5, 0.22, pal.band2 || pal.band, 0.16], [0.2, 0.035, pal.band, 0.6], [0.78, 0.025, pal.band2 || pal.band, 0.45, true]]) {
+    for (let i = 0; i < N - 2; i += 2) {
+      if (dash && (i >> 2) % 2) continue;
+      const th = (i / 64) * TAU, th2 = ((i + 2) / 64) * TAU;
+      if (th + TAU > gl.turns * TAU) break;
+      const p0 = gl.spiral(th), p1 = gl.spiral(th + TAU), q0 = gl.spiral(th2), q1 = gl.spiral(th2 + TAU);
+      const ww = Math.hypot(p1[0] - p0[0], p1[1] - p0[1]);
+      g.beginPath(); g.moveTo(lerp(p0[0], p1[0], off), lerp(p0[1], p1[1], off)); g.lineTo(lerp(q0[0], q1[0], off), lerp(q0[1], q1[1], off));
+      g.lineWidth = Math.max(0.5, ww * wd); g.strokeStyle = col; g.globalAlpha = al; g.lineCap = 'round'; g.stroke(); g.globalAlpha = 1;
     }
   }
   // growth lines: short strokes across each coil, from one suture to the next
-  for (let i = 4; i < N - 70; i += 1 + Math.floor(r() * 2)) {
+  for (let i = 4; i < N - 64; i += 1 + Math.floor(r() * 2)) {
     const th = (i / 64) * TAU;
     const [x0, y0] = gl.spiral(th), [x1, y1] = gl.spiral(th + TAU);
     g.beginPath(); g.moveTo(x0, y0); g.quadraticCurveTo((x0 + x1) / 2 + (r() - 0.5) * 3, (y0 + y1) / 2 + (r() - 0.5) * 3, x1, y1);

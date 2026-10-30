@@ -66,14 +66,19 @@ function grounded(g, x, y, h, w, fn) {
 
 // ============================================================ the band
 const band = {
-  x: 1085, y: 876, tempo: 1, toot: 0, beat: 0,
+  x: 1120, y: 990, tempo: 1, toot: 0, beat: 0,
   crabs: [{ dx: -26, col: '#d9644a', inst: 'fiddle' }, { dx: 0, col: '#e88a4a', inst: 'drum' }, { dx: 26, col: '#c45a5a', inst: 'conch' }],
-  dancers: [folk({ sp: 'hare', x: 1010, y: 900, coat: '#a8689b', acc: '#f2c95c', cloth: 'smock', dir: 1 }), folk({ sp: 'vole', x: 1150, y: 908, coat: '#4f8fa3', acc: '#e07f62', dir: -1 }), folk({ sp: 'otter', x: 960, y: 872, coat: '#e7a43c', dir: 1, k: 0.9 })],
+  dancers: [folk({ sp: 'hare', x: 1030, y: 1018, coat: '#a8689b', acc: '#f2c95c', cloth: 'smock', dir: 1 }), folk({ sp: 'vole', x: 1215, y: 1024, coat: '#4f8fa3', acc: '#e07f62', dir: -1 }), folk({ sp: 'otter', x: 1160, y: 1050, coat: '#e7a43c', dir: -1, k: 0.95 })],
   spin: [0, 0, 0],
+  crowd: [
+    folk({ sp: 'mole', x: 985, y: 1000, coat: '#d65a4a', dir: 1, hat: F.HATS.straw() }), folk({ sp: 'otter', x: 1255, y: 1000, coat: '#6f9d58', acc: '#f4efe6', dir: -1 }),
+    folk({ sp: 'shrew', x: 1270, y: 1040, coat: '#f2c95c', dir: -1, k: 0.8 }), folk({ sp: 'hare', x: 1080, y: 1064, coat: '#5a7b8c', acc: '#e07f62', dir: 1, k: 1.05 }),
+    folk({ sp: 'vole', x: 960, y: 1052, coat: '#efe2c8', cloth: 'smock', acc: '#a8689b', dir: 1, k: 0.75 }),
+  ],
 };
 layer({
   id: 'band', z: F.zOf(band.y),
-  hit: (x, y) => Math.abs(x - band.x) < 150 && y > band.y - 70 && y < band.y + 40,
+  hit: (x, y) => Math.abs(x - band.x) < 170 && y > band.y - 80 && y < band.y + 80,
   onEnter() { band.spin = band.spin.map(() => 1); },
   update(dt, t, L) {
     band.tempo = ease(band.tempo, L.hovered ? 2.1 : 1, 2, dt);
@@ -81,6 +86,7 @@ layer({
     band.toot = ease(band.toot, L.hovered && L.since > 0.8 ? 1 : 0, 3, dt);
     band.spin = band.spin.map((s) => Math.max(0, s - dt * 0.9));
     for (const d of band.dancers) stepFolk(d, dt);
+    for (const d of band.crowd) stepFolk(d, dt);
     if (Math.random() < dt * band.tempo * 1.3) F.spawn({ kind: 'note', alt: Math.random() < 0.4, x: band.x + (Math.random() - 0.5) * 60, y: band.y - 60, vx: (Math.random() - 0.5) * 20, vy: -30, life: 1.8, size: 0.8 + band.toot * 0.4 });
   },
   draw(g, t) {
@@ -104,12 +110,21 @@ layer({
       if (c.inst === 'conch') { g.save(); g.translate(7, -12); g.rotate(-0.6 - band.toot * 0.5); ink(g, curve([[0, 0], [9, -3], [13, 1], [9, 4], [2, 3]]), '#f3d3c0', 0.9); g.fillStyle = '#e8a08a'; g.fill(ell(10, 0.5, 2.4, 2.6)); g.restore(); }
       g.restore();
     }
+    // the audience, clapping along once it gets going (behind the dancers or in front, by depth)
+    const clap = clamp((band.tempo - 1.2) / 0.8, 0, 1);
+    const audience = (front) => band.crowd.forEach((d, i) => {
+      if ((d.y > band.y + 30) !== front) return;
+      const c = Math.sin(b * Math.PI * 2 + i) * clap;
+      drawFolk(g, d, t, { armR: -1.3 + c * 0.5 - clap * 0.2, armL: -1.1 - c * 0.5 - clap * 0.2, happy: clap > 0.5, bob: -Math.max(0, Math.sin(b * Math.PI + i)) * clap * 1.5, look: [d.dir * 0.5, 0] });
+    });
+    audience(false);
     // dancers: a hop on the beat, swinging arms, spinning when you arrive
     band.dancers.forEach((d, i) => {
       const ph = b * Math.PI + i * 2, hop = Math.max(0, Math.sin(ph)) * 3 * band.tempo;
       const spin = band.spin[i], dir = spin > 0.05 ? (Math.sin(spin * 18) > 0 ? 1 : -1) : d.dir;
       drawFolk(g, d, t, { bob: -hop, armR: -1.4 + Math.sin(ph) * 1.1, armL: -1.2 - Math.sin(ph) * 1.1, happy: band.tempo > 1.4, dir, step: i === 2 ? (b * 0.5) % 1 : undefined, mouth: band.tempo > 1.4 ? 0.5 : 0 });
     });
+    audience(true);
   },
 });
 
@@ -148,7 +163,7 @@ layer({
       }
       // the table: a driftwood slab on two stones, with a teapot and a plate of something
       grounded(g, tb.x, tb.y + 4 * s, 10 * s, 50 * s, (g) => {
-        for (const k of [-1, 1]) ink(g, ell(tb.x + k * 15 * s, tb.y + 2 * s, 5 * s, 4 * s), '#8f8aa0', 1);
+        for (const k of [-1, 1]) F.post(g, tb.x + k * 18 * s, tb.y - 4 * s, tb.y + 1 * s, 2.6 * s, F.PAL.drift, 1);
         F.plank(g, [tb.x - 27 * s, tb.y - 4 * s], [tb.x + 27 * s, tb.y - 3 * s], 4 * s, F.PAL.drift, Math.round(tb.x), 1.2);
         const px = tb.x + 4 * s, py = tb.y - 6 * s, pr = 5 * s;
         g.save(); g.translate(px, py); g.rotate(teaT.lift * -0.4);
@@ -192,7 +207,7 @@ function stall(g, x, y, t, o) {
   g.fillStyle = 'rgba(70,40,90,0.18)'; g.fillRect(x - w / 2, ay + hem, w, 10 * s);
 }
 // the bakery
-const bakery = { x: 985, y: 842, offer: 0, vendor: folk({ sp: 'vole', coat: '#efe2c8', cloth: 'apron', acc: '#d65a4a', dir: 1, hat: F.HATS.kerchief('#f4efe6') }), cust: folk({ sp: 'mole', coat: '#6f9d58', dir: -1 }) };
+const bakery = { x: 905, y: 948, offer: 0, vendor: folk({ sp: 'vole', coat: '#efe2c8', cloth: 'apron', acc: '#d65a4a', dir: 1, hat: F.HATS.kerchief('#f4efe6') }), cust: folk({ sp: 'mole', coat: '#6f9d58', dir: -1 }) };
 layer({
   id: 'bakery', z: F.zOf(bakery.y),
   hit: (x, y) => Math.abs(x - bakery.x - 20) < 70 && y > bakery.y - 70 && y < bakery.y + 10,
@@ -211,7 +226,7 @@ layer({
   },
 });
 // the shell-chime stall, next to gran
-const chimes = { x: 585, y: 868, swing: [0, 1, 2, 3, 4].map((i) => F.pendulum({ k: 26, damp: 1.4, lean: 0.12, x: 585 + i * 10 })), vendor: folk({ sp: 'mole', coat: '#a8689b', acc: '#f2c95c', dir: 1, hat: F.HATS.cap('#5a7b8c') }) };
+const chimes = { x: 655, y: 880, swing: [0, 1, 2, 3, 4].map((i) => F.pendulum({ k: 26, damp: 1.4, lean: 0.12, x: 585 + i * 10 })), vendor: folk({ sp: 'mole', coat: '#a8689b', acc: '#f2c95c', dir: 1, hat: F.HATS.cap('#5a7b8c') }) };
 layer({
   id: 'chimes', z: F.zOf(chimes.y),
   hit: (x, y) => Math.abs(x - chimes.x) < 60 && y > chimes.y - 80 && y < chimes.y + 10,
@@ -238,7 +253,7 @@ layer({
 });
 
 // ============================================================ the kite
-const kite = { kid: folk({ sp: 'hare', x: 1560, y: 830, coat: '#f2c95c', acc: '#4f8fa3', dir: 1, acts: [['look', 2]] }), x: 1700, y: 160, climb: 0, sx: 1700, sy: 160, vx: 0, vy: 0 };
+const kite = { kid: folk({ sp: 'hare', x: 1455, y: 960, coat: '#f2c95c', acc: '#4f8fa3', dir: 1, acts: [['look', 2]] }), x: 1700, y: 160, climb: 0, sx: 1700, sy: 160, vx: 0, vy: 0 };
 layer({
   id: 'kite', z: F.zOf(kite.kid.y),
   hit(x, y) { return Math.hypot(x - kite.x, y - kite.y) < 60 || (Math.abs(x - kite.kid.x) < 26 && y > kite.kid.y - 50 && y < kite.kid.y + 6); },
@@ -324,7 +339,7 @@ layer({
 });
 
 // ============================================================ the sandcastle
-const castle = { x: 650, y: 1040, flag: 0, clap: 0, kids: [folk({ sp: 'vole', dx: -40, coat: '#d65a4a', dir: 1, k: 0.75 }), folk({ sp: 'shrew', dx: 44, coat: '#4f8fa3', acc: '#f2c95c', dir: -1, k: 0.72 })] };
+const castle = { x: 545, y: 1062, flag: 0, clap: 0, kids: [folk({ sp: 'vole', dx: -40, coat: '#d65a4a', dir: 1, k: 0.75 }), folk({ sp: 'shrew', dx: 44, coat: '#4f8fa3', acc: '#f2c95c', dir: -1, k: 0.72 })] };
 layer({
   id: 'castle', z: F.zOf(castle.y),
   hit: (x, y) => Math.abs(x - castle.x) < 90 && y > castle.y - 70 && y < castle.y + 20,
@@ -370,7 +385,7 @@ layer({
 // ============================================================ the porters
 const porters = { a: folk({ sp: 'otter', k: 1 }), b: folk({ sp: 'otter', k: 1 }), stumble: 0, fish: 0, t0: 0 };
 layer({
-  id: 'porters', z: F.zOf(925),
+  id: 'porters', z: F.zOf(1030),
   hit(x, y) { return Math.abs(x - porters.cx) < 50 && Math.abs(y - porters.cy + 10) < 30; },
   onEnter() { porters.stumble = 1; porters.fish = 1; },
   update(dt, t) { porters.stumble = Math.max(0, porters.stumble - dt * 0.7); porters.fish = Math.max(0, porters.fish - dt * 0.6); },
@@ -379,9 +394,9 @@ layer({
     const sp = 0.03 * (1 - porters.stumble * 0.8);
     porters.t0 += sp * (1 / 60);
     const u = (t * 0.035) % 2, fwd = u < 1, k = fwd ? u : 2 - u;
-    const x = lerp(760, 930, F.smooth(k)), y = 925 + Math.sin(k * Math.PI) * 6;
+    const x = lerp(700, 1010, F.smooth(k)), y = 1030 + Math.sin(k * Math.PI) * 8;
     porters.cx = x; porters.cy = y;
-    const s = pxu(y), dir = fwd ? 1 : -1, step = (t * 1.3) % 1, wob = porters.stumble * Math.sin(t * 14) * 0.25;
+    const s = pxu(y) * 0.82, dir = fwd ? 1 : -1, step = (t * 1.3) % 1, wob = porters.stumble * Math.sin(t * 14) * 0.25;
     const lead = [x + dir * 18 * s, y], back = [x - dir * 18 * s, y];
     const ln = (hand) => hand;
     // pole and basket between them
@@ -409,12 +424,12 @@ layer({
 // ============================================================ the strolling couple
 const couple = { a: folk({ sp: 'mole', coat: '#5a7b8c', acc: '#efe2c8', dir: 1, hat: null }), b: folk({ sp: 'mole', coat: '#a8689b', cloth: 'smock', acc: '#f2c95c', dir: 1, hat: F.HATS.kerchief('#e07f62') }), stop: 0, u: 0 };
 layer({
-  id: 'wander', z: F.zOf(985),
+  id: 'wander', z: F.zOf(1062),
   hit(x, y) { return Math.abs(x - couple.x) < 50 && y > couple.y - 60 && y < couple.y + 8; },
   update(dt, t, L) { couple.stop = ease(couple.stop, L.hovered ? 1 : 0, 3, dt); couple.u += dt * 0.012 * (1 - couple.stop); stepFolk(couple.a, dt); stepFolk(couple.b, dt); },
   draw(g, t) {
     const u = couple.u % 2, k = u < 1 ? u : 2 - u, dir = u < 1 ? 1 : -1;
-    const x = lerp(860, 1330, k), y = 985 + Math.sin(k * 7) * 5;
+    const x = lerp(1250, 1520, k), y = 1062 + Math.sin(k * 7) * 4;
     couple.x = x; couple.y = y;
     const s = pxu(y), step = (t * 0.7) % 1;
     const hatUp = couple.stop;
@@ -493,6 +508,27 @@ layer({
   id: 'far-folk', z: F.zOf(480),
   update(dt) { for (const f of far) { stepFolk(f, dt); if (f.walk) { f.x += f.walk * dt; f.dir = f.walk > 0 ? 1 : -1; if (Math.abs(f.x - (f.x0 ??= f.x)) > 90) f.walk *= -1; } } },
   draw(g, t) { for (const f of far) drawFolk(g, f, t, { step: f.walk ? (t * 0.8 + f.ph) % 1 : undefined }); },
+});
+
+// ============================================================ kids chasing a runaway crab
+const chase = { kids: [folk({ sp: 'vole', coat: '#e07f62', dir: 1, k: 0.72 }), folk({ sp: 'hare', coat: '#a8689b', acc: '#f2c95c', dir: 1, k: 0.75 }), folk({ sp: 'otter', coat: '#f2c95c', dir: 1, k: 0.7 })], fast: 0 };
+layer({
+  id: 'chase', z: F.zOf(905),
+  hit(x, y) { return Math.abs(x - (chase.cx || 0)) < 80 && Math.abs(y - (chase.cy || 0) + 10) < 30; },
+  update(dt, t, L) { chase.fast = ease(chase.fast, L.hovered ? 1 : 0, 3, dt); chase.ph = (chase.ph || 0) + dt * (0.05 + chase.fast * 0.06); for (const k of chase.kids) stepFolk(k, dt); },
+  draw(g, t) {
+    // a loop round the stalls between gran and the band: the crab leads, the kids follow
+    const at = (u) => { const a = u * TAU; return [760 + Math.cos(a) * 150, 905 + Math.sin(a) * 26]; };
+    const u0 = chase.ph % 1;
+    const items = [];
+    const [cx, cy] = at(u0); chase.cx = cx; chase.cy = cy;
+    items.push({ y: cy, d: () => { const s = pxu(cy); F.contact(g, cx, cy, 6 * s, 0.4); F.crab(g, cx, cy - Math.abs(Math.sin(t * 14)) * 2 * s, { sc: s * 0.9, col: '#d9644a', walk: t * 6, wave: 1 }); } });
+    chase.kids.forEach((k, i) => {
+      const u = u0 - 0.035 * (i + 1), [x, y] = at(u), [x2] = at(u + 0.01), dir = x2 > x ? 1 : -1;
+      items.push({ y, d: () => drawFolk(g, k, t, { x, y, dir, step: (t * (1.8 + chase.fast) + i * 0.3) % 1, armR: -1.6 - Math.sin(t * 10 + i) * 0.4, armL: 0.6, lean: dir * 0.12, happy: true, mouth: 0.6 }) });
+    });
+    items.sort((a, b) => a.y - b.y).forEach((it) => it.d());
+  },
 });
 
 F.drawFolk = drawFolk; F.makeFolk = folk; F.stepFolk = stepFolk; F.grounded = grounded;

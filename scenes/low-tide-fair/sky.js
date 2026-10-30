@@ -32,14 +32,21 @@ layer({
 
 // ------------------------------------------------------------ clouds
 // long, low golden-hour streaks: lilac bodies, warm undersides lit from the left by the low sun
-const CL = { union: true, line: 'rgba(150,104,140,0.32)', lw: 1.2, shade: '#c8b6cc', base: '#ead9d8', lit: '#fbeadc' };
-const CL_FAR = { union: true, line: 0, shade: '#d6c8d2', base: '#eadfdc', lit: '#f7ece2' };
+const CL = { union: true, line: 'rgba(130,96,140,0.35)', lw: 1.2, shade: '#b9a9c6', base: '#e2d4d8', lit: '#fbf0e6' };
+const CL_FAR = { union: true, line: 0, shade: '#cdc0d0', base: '#e5dbdc', lit: '#f5ece4' };
+// a flat-bottomed deck: a run of small lumps along the top with one or two bigger heads, tapering
+// at both ends; sat on a flat base the low sun lights from underneath
 function streak(seed, w, h) {
-  const r = rng(seed), cs = [], n = Math.max(5, Math.round(w / 34));
-  for (let i = 0; i < n; i++) {
-    const u = i / (n - 1), env = Math.sin(Math.PI * (0.04 + u * 0.92)) ** 0.7;
-    const rr = h * (0.3 + 0.5 * env) * (0.8 + r() * 0.4);
-    cs.push([(u - 0.5) * w + (r() - 0.5) * 10, -rr * 0.45 - r() * h * 0.25 * env, rr]);
+  const r = rng(seed), cs = [];
+  const heads = [0.25 + r() * 0.2, 0.6 + r() * 0.25];
+  let x = -w / 2;
+  while (x < w / 2) {
+    const u = (x + w / 2) / w, env = Math.sin(Math.PI * clamp(u, 0, 1)) ** 0.6;
+    const head = Math.max(...heads.map((hu) => Math.exp(-(((u - hu) / 0.1) ** 2)))) * (0.6 + r() * 0.5);
+    const rr = h * (0.18 + 0.32 * env + head * 0.45) * (0.75 + r() * 0.5);
+    cs.push([x, -rr * 0.55 - head * h * 0.25, rr]);
+    if (r() < 0.5) cs.push([x + rr * 0.4, -rr * 0.2, rr * 0.7]);
+    x += rr * (0.55 + r() * 0.5);
   }
   return cs;
 }
@@ -56,12 +63,14 @@ const TOWER = { union: true, line: 'rgba(140,110,150,0.28)', lw: 1.1, shade: '#d
 onLayout(() => {
   for (const c of clouds) {
     c.cs = streak(c.seed, c.w, c.h);
-    c.sp_ = sprite(-c.w * 0.62, -c.h * 1.8, c.w * 1.24, c.h * 2.2, (g) => {
+    c.sp_ = sprite(-c.w * 0.62, -c.h * 2.2, c.w * 1.3, c.h * 2.3, (g) => {
       lumps(g, c.cs, c.col, 0);
       // the warm underside: the low sun lights the bellies of the clouds from the left
       g.save(); g.globalCompositeOperation = 'source-atop';
-      g.fillStyle = grad(g, -c.w * 0.6, 0, c.w * 0.6, 0, ['rgba(255,190,140,0.55)', 'rgba(255,190,150,0.15)', 'rgba(255,200,170,0)']);
-      g.fillRect(-c.w, -c.h * 0.35, c.w * 2, c.h);
+      g.fillStyle = grad(g, 0, -c.h * 0.5, 0, 0, ['rgba(255,196,150,0)', 'rgba(255,186,140,0.7)']);
+      g.fillRect(-c.w, -c.h * 0.5, c.w * 2, c.h * 0.5);
+      g.fillStyle = grad(g, -c.w * 0.6, 0, c.w * 0.6, 0, ['rgba(255,200,150,0.45)', 'rgba(255,200,160,0)']);
+      g.fillRect(-c.w, -c.h * 2, c.w * 2, c.h * 2);
       g.restore();
     });
     c.glow = 0;
@@ -114,34 +123,44 @@ layer({
       g.save(); g.globalAlpha = 0.75; lumps(g, cs, TOWER, y); g.restore();
     }
 
-    // the headland: cool violet rock, warm where its slopes turn to the low sun on the left
+    // the headland: cool violet rock in its own shadow, warm only where its bluffs turn to the sun
     const hp = curve(HEAD, true);
-    g.fillStyle = grad(g, 0, 150, 0, HZ, ['#8b86a8', '#9a92ac', '#aaa0b4']);
+    g.fillStyle = grad(g, 0, 150, 0, HZ, ['#6c6890', '#757096', '#8a83a3']);
     g.fill(hp);
     g.save(); g.clip(hp);
-    // grassy top, sun-warmed, with a darker bushy fringe
-    g.fillStyle = '#a4a08e';
-    g.fill(curve([[-140, 300], ...HEAD.slice(1, -1).map(([x, y]) => [x, y - 2]), [1420, 420], [1420, 360], ...HEAD.slice(1, -1).reverse().map(([x, y]) => [x + 8, y + 22 + Math.sin(x * 0.03) * 6])], true));
-    // cliff faces: vertical strata, lit on their left-facing sides
     const rs = rng(5);
-    for (let i = 0; i < 70; i++) {
-      const x = -120 + rs() * 1500, top = headY(x) + 22 + rs() * 14, bot = HZ - rs() * 10;
-      g.strokeStyle = rs() < 0.5 ? 'rgba(206,170,170,0.5)' : 'rgba(96,88,128,0.45)';
-      g.lineWidth = 1 + rs() * 2;
-      g.beginPath(); g.moveTo(x, top); g.quadraticCurveTo(x + 4 - rs() * 8, (top + bot) / 2, x + (rs() - 0.5) * 6, bot); g.stroke();
+    // bluffs: each a lit left face and a shaded front, between coves
+    const bluffs = [[-90, 140], [150, 60], [300, 190], [610, 90], [830, 210], [1120, 70], [1260, 40]];
+    for (const [x, w] of bluffs) {
+      const top = headY(x + w * 0.3) + 20, x1 = x + w;
+      g.fillStyle = 'rgba(176,144,160,0.32)';
+      g.fill(poly([[x, headY(x) + 22], [x + w * 0.28, top], [x + w * 0.22, HZ], [x - w * 0.05, HZ]]));
+      g.fillStyle = 'rgba(84,78,120,0.22)';
+      g.fill(poly([[x + w * 0.7, headY(x + w * 0.7) + 22], [x1, headY(x1) + 24], [x1 - w * 0.05, HZ], [x + w * 0.62, HZ]]));
+      g.strokeStyle = 'rgba(60,52,90,0.5)'; g.lineWidth = 1.2;
+      g.beginPath(); g.moveTo(x + w * 0.28, top); g.quadraticCurveTo(x + w * 0.25 + rs() * 6, (top + HZ) / 2, x + w * 0.22, HZ); g.stroke();
     }
-    // the shadowed folds between bluffs
-    for (const [x, w] of [[140, 50], [380, 70], [640, 60], [880, 80], [1100, 50], [1260, 30]]) {
-      g.fillStyle = 'rgba(100,92,136,0.45)';
-      g.fill(poly([[x, headY(x) + 18], [x + w, headY(x + w) + 22], [x + w * 0.8, HZ], [x - w * 0.1, HZ]]));
-      g.fillStyle = 'rgba(232,186,160,0.25)';
-      g.fill(poly([[x - w * 0.5, headY(x - w * 0.5) + 18], [x, headY(x) + 18], [x - w * 0.1, HZ], [x - w * 0.7, HZ]]));
+    // bedding: long, slightly tilted strata catching a little light
+    for (let i = 0; i < 26; i++) {
+      const y = 200 + rs() * 170, x = -100 + rs() * 1400, w = 60 + rs() * 220;
+      if (y < headY(x) + 26) continue;
+      g.strokeStyle = rs() < 0.5 ? 'rgba(200,170,180,0.3)' : 'rgba(70,62,100,0.3)'; g.lineWidth = 1 + rs();
+      g.beginPath(); g.moveTo(x, y); g.lineTo(x + w, y + w * 0.04); g.stroke();
     }
+    // grassy cap with a ragged lower edge that hangs down into the gullies
+    const cap = new Path2D();
+    cap.moveTo(-140, HEAD[1][1] - 2);
+    for (const [x, y] of HEAD.slice(1, -1)) cap.lineTo(x, y - 2);
+    for (let x = 1420; x >= -140; x -= 12) cap.lineTo(x, headY(x) + 10 + Math.abs(noise(x * 0.05)) * 14 + (Math.abs(noise(x * 0.013 + 4)) > 0.7 ? 18 : 0));
+    cap.closePath();
+    g.fillStyle = '#8f8f78'; g.fill(cap);
+    g.save(); g.clip(cap); g.fillStyle = grad(g, 0, 150, 0, 300, ['#b0a98a', '#8f8f78']); g.translate(-6, -6); g.fill(cap); g.restore();
+    g.strokeStyle = 'rgba(70,66,70,0.5)'; g.lineWidth = 1; g.stroke(cap);
     // a band of haze at its foot, where it meets the far flats
-    g.fillStyle = grad(g, 0, HZ - 50, 0, HZ, ['rgba(236,222,210,0)', 'rgba(240,226,212,0.75)']);
-    g.fillRect(-150, HZ - 50, 1600, 52);
+    g.fillStyle = grad(g, 0, HZ - 60, 0, HZ, ['rgba(236,222,210,0)', 'rgba(240,226,212,0.8)']);
+    g.fillRect(-150, HZ - 60, 1600, 62);
     g.restore();
-    g.lineWidth = 1; g.strokeStyle = 'rgba(96,80,118,0.4)'; g.stroke(hp);
+    g.lineWidth = 1.2; g.strokeStyle = 'rgba(80,66,104,0.55)'; g.stroke(hp);
 
     // cottages and a windbreak of pines up on the headland: where the town was before it walked
     const houses = [[260, 0.9], [300, 1], [338, 0.8], [1060, 0.9], [1095, 0.7], [200, 0.7]];
