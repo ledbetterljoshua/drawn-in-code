@@ -138,8 +138,10 @@ F.globe = (o) => {
     outline.push([cx + Math.cos(a) * R * 1.04 * k, cy + Math.sin(a) * R * 0.94 * k]);
   }
   // spiral suture: r = R · e^(-b θ), measured from the apex
-  const turns = o.turns || 3.2, b = Math.log(R * 1.0 / (R * 0.06)) / (turns * TAU);
-  const spiral = (th) => { const rr = R * 0.98 * Math.exp(-b * th); const a = -th + (o.spin || 0.4); return [ax + Math.cos(a) * rr * 1.02, ay + Math.sin(a) * rr * 0.92]; };
+  // the coil's centre slides from the middle of the shell (outer whorl, which is the outline) toward
+  // the apex as it winds in, so the outer whorl dominates and the spiral isn't a target
+  const turns = o.turns || 3.2, b = Math.log(1 / 0.07) / (turns * TAU);
+  const spiral = (th) => { const k = Math.exp(-b * th), rr = R * 0.97 * k; const a = -th + (o.spin || 0.4); const ccx = ax + (cx - ax) * k, ccy = ay + (cy - ay) * k; return [ccx + Math.cos(a) * rr * 1.02, ccy + Math.sin(a) * rr * 0.92]; };
   return { cx, cy, R, ax, ay, outline: curve(outline), spiral, turns, o };
 };
 F.paintGlobe = (g, gl, pal, seed = 1) => {

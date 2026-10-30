@@ -26,7 +26,7 @@ const LINE = F.LINE;
 F.zOf = (y) => 8 + (y - HZ) / 40;
 
 const SKIN = {
-  gran: { base: '#ab8f95', shade: '#735c78', lit: '#dcbfb2', foot: '#c9aea4', spot: '#5f4762', sheen: '#fbf1ea' },
+  gran: { base: '#b39088', shade: '#76586e', lit: '#e6c3ac', foot: '#d1b09e', spot: '#5a3f52', sheen: '#fff3e8' },
   tea: { base: '#b9967a', shade: '#856a6c', lit: '#dcbb98', foot: '#cdb093', spot: '#7c5d58', sheen: '#f8efe2' },
   book: { base: '#9aa08c', shade: '#6d7480', lit: '#c3c3a4', foot: '#b5b69d', spot: '#5f6670', sheen: '#f1efe4' },
   fish: { base: '#a89aa6', shade: '#776c86', lit: '#cbbcbc', foot: '#bdb0b4', spot: '#6a5d78', sheen: '#f2ecea' },
@@ -72,6 +72,8 @@ function drawFoot(g, sn, t) {
   g.lineTo(L * 0.6, 2); g.closePath(); g.fill();
   g.strokeStyle = F.rgba(sk.shade, 0.6); g.lineWidth = Math.max(0.5, L * 0.003);
   for (let i = 0; i < 26; i++) { const x = -L * 0.5 + (i / 26) * L + ((t * 0.02 * L) % (L / 26)); g.beginPath(); g.moveTo(x, -L * 0.003); g.lineTo(x + L * 0.006, -L * 0.022); g.stroke(); }
+  // mottling: soft darker patches the way a garden snail's skin is blotched
+  { const r = rng(sn.seed + 21); g.fillStyle = F.rgba(sk.spot, 0.22); for (let i = 0; i < 14; i++) g.fill(ell(-L * 0.48 + r() * L * 0.96, -L * 0.035 - r() * L * 0.07, L * (0.02 + r() * 0.03), L * (0.008 + r() * 0.01), undefined, (r() - 0.5) * 0.4)); }
   skinNet(g, sn, -L * 0.48, L * 0.45, -L * 0.1, -L * 0.035, 0, 34, sn.seed);
   // a wet sheen along the back, and the cool shadow the shell throws onto the body
   g.strokeStyle = F.rgba(sk.sheen, 0.9); g.lineWidth = Math.max(1, L * 0.009);
@@ -96,6 +98,12 @@ function drawHead(g, sn, t) {
   g.fillRect(L * 0.1, -L * 0.35, L * 0.55, L * 0.36);
   // the underside of the neck in shadow, the skin's net of grooves, a wet highlight
   g.fillStyle = F.rgba(sk.shade, 0.55); g.fill(curve([[L * 0.3, -L * 0.02], [hx - L * 0.02, hy + L * 0.03], [hx + L * 0.07, hy + L * 0.05], [L * 0.52, 0], [L * 0.3, 0.5]]));
+  // a core shadow where the neck turns from the sun, and warm light bounced up from the sand under it
+  g.strokeStyle = F.rgba(sk.shade, 0.6); g.lineWidth = L * 0.035; g.lineCap = 'round';
+  g.beginPath(); g.moveTo(L * 0.25 - sx * L * 0.0, -L * 0.07); g.quadraticCurveTo(L * 0.36, -L * 0.13, hx - L * 0.0, hy + L * 0.0); g.stroke();
+  g.strokeStyle = 'rgba(240,190,150,0.35)'; g.lineWidth = L * 0.018;
+  g.beginPath(); g.moveTo(L * 0.42, -L * 0.03); g.quadraticCurveTo(L * 0.48, -L * 0.05, hx + L * 0.06, hy + L * 0.05); g.stroke();
+  { const r = rng(sn.seed + 23); g.fillStyle = F.rgba(sk.spot, 0.22); for (let i = 0; i < 9; i++) g.fill(ell(L * 0.24 + r() * L * 0.22, -L * 0.05 - r() * L * 0.15, L * (0.015 + r() * 0.022), L * (0.01 + r() * 0.01), undefined, -0.6)); }
   skinNet(g, sn, L * 0.22, hx + L * 0.04, hy - L * 0.03, -L * 0.04, -0.55, 18, sn.seed + 9);
   g.strokeStyle = F.rgba(sk.sheen, 0.8); g.lineWidth = Math.max(0.8, L * 0.008);
   g.beginPath(); g.moveTo(L * 0.27, -L * 0.135); g.quadraticCurveTo(hx - L * 0.06, hy - L * 0.06, hx + L * 0.01, hy - L * 0.065); g.stroke();
@@ -123,7 +131,7 @@ function drawStalk(g, sn, s, bx, by, t, far) {
   const mx = bx + Math.cos(a - bend) * len * 0.5, my = by + Math.sin(a - bend) * len * 0.5;
   const ex = bx + Math.cos(a) * len, ey = by + Math.sin(a) * len;
   g.lineCap = 'round';
-  const w0 = L * 0.024, w1 = L * 0.013;
+  const w0 = L * 0.02, w1 = L * 0.011;
   const path = new Path2D(); path.moveTo(bx, by); path.quadraticCurveTo(mx, my, ex, ey);
   g.lineWidth = w0 + sn.lw * 2; g.strokeStyle = LINE; g.stroke(path);
   g.lineWidth = w0; g.strokeStyle = far ? sk.shade : sk.base; g.stroke(path);
@@ -297,8 +305,8 @@ function granTown(g) {
 gran.box = [-270, -730, 220, 20];
 
 // ============================================================ the tea-house
-const tea = makeSnail({ id: 'tea', x: 1470, y: 690, dir: -1, k: 1.22, L: 340, skin: 'tea', seed: 23, shellX: -0.05 });
-tea.gl = F.globe({ x: 20, y: -30, R: 118, turns: 3.3, apex: [-6, -20], spin: 0.6, lw: 2.6 });
+const tea = makeSnail({ id: 'tea', x: 1470, y: 690, dir: -1, k: 1.22, L: 300, skin: 'tea', seed: 23, shellX: -0.05 });
+tea.gl = F.globe({ x: 20, y: -30, R: 118, turns: 2.7, apex: [32, -26], spin: 0.6, lw: 2.6 });
 tea.trail = [[1640, 404], [1590, 470], [1530, 560], [1490, 630], [1480, 690]];
 tea.trailW = 100;
 const SHELL_TEA = { lit: '#fbe7c6', base: '#e9be8c', shade: '#ad7f84', bounce: '#e8a582', band: '#8a4a3d', band2: '#c76d48', growth: '#9b6a55', line: '#3b2433' };
@@ -389,7 +397,7 @@ book.box = [-200, -380, 160, 10];
 
 // ============================================================ the fishmonger
 const fish = makeSnail({ id: 'fish', x: 1905, y: 512, dir: -1, k: 1, L: 320, skin: 'fish', seed: 51, shellX: -0.05 });
-fish.gl = F.globe({ x: 10, y: -28, R: 100, turns: 3.6, apex: [0, -6], spin: 1.0, lw: 2.8 });
+fish.gl = F.globe({ x: 10, y: -28, R: 100, turns: 3.4, apex: [14, -10], spin: 1.0, lw: 2.8 });
 fish.trail = [[2120, 400], [2060, 440], [1980, 480], [1920, 512]];
 fish.trailW = 90;
 const SHELL_FISH = { lit: '#f3e6d6', base: '#d8c0b6', shade: '#9c8aa6', bounce: '#d9ab98', rib: '#a07c88', growth: '#8a7080', line: '#3b2433' };
@@ -420,7 +428,7 @@ fish.box = [-140, -260, 140, 10];
 
 // ============================================================ the youngster
 const young = makeSnail({ id: 'young', x: 1720, y: 985, dir: -1, k: 1.05, L: 140, skin: 'young', seed: 67, shellX: -0.05 });
-young.gl = F.globe({ x: 6, y: -12, R: 44, turns: 2.6, apex: [-3, -6], spin: 0.3, lw: 1.6 });
+young.gl = F.globe({ x: 6, y: -12, R: 44, turns: 2.4, apex: [12, -10], spin: 0.3, lw: 1.6 });
 young.trail = [[1500, 470], [1540, 560], [1620, 700], [1690, 850], [1720, 985]];
 young.trailW = 40;
 const SHELL_YOUNG = { lit: '#fff0dc', base: '#f2c9a2', shade: '#c08f96', bounce: '#f0b18f', band: '#d9785a', band2: '#a75c6a', growth: '#b27e70', line: '#3b2433' };
@@ -443,7 +451,7 @@ young.box = [-70, -130, 80, 10];
 
 // ============================================================ the sleeper
 const sleep = makeSnail({ id: 'sleep', x: 120, y: 520, dir: 1, k: 0.9, L: 200, skin: 'gran', seed: 71 });
-sleep.gl = F.globe({ x: 0, y: -4, R: 82, turns: 3.4, apex: [-4, -8], spin: 0.2, lw: 2.8 });
+sleep.gl = F.globe({ x: 0, y: -4, R: 82, turns: 2.8, apex: [-18, -14], spin: 0.2, lw: 2.8 });
 sleep.trail = [[60, 404], [90, 470], [118, 520]];
 sleep.trailW = 70;
 const SHELL_SLEEP = { lit: '#efe2cf', base: '#d3c0ad', shade: '#988aa0', bounce: '#d2a892', band: '#7b6a8a', band2: '#a3705a', growth: '#8a7a7a', line: '#3b2433' };
@@ -464,9 +472,42 @@ function sleepTown(g) {
 sleep.box = [-100, -180, 100, 10];
 sleep.peek = 0; sleep.zT = 0;
 
+// ============================================================ latecomers, still coming in down their trails
+const late = [
+  makeSnail({ id: 'late0', x: 1190, y: 472, dir: -1, k: 1, L: 300, skin: 'book', seed: 81 }),
+  makeSnail({ id: 'late1', x: 560, y: 458, dir: 1, k: 1, L: 280, skin: 'tea', seed: 83 }),
+];
+late[0].gl = F.globe({ x: 10, y: -30, R: 92, turns: 2.6, apex: [24, -20], spin: 0.9, lw: 3 });
+late[1].sp = F.spire({ x: -20, y: -36, w: 190, h: 70, n: 6, rw: 0.76, rh: 0.84, lean: -4, body: 1.3, slope: 0.1, lw: 3, eyeY: (HZ - 458) / pxu(458) });
+late[0].trail = [[1330, 400], [1260, 430], [1210, 460], [1190, 472]]; late[0].trailW = 80;
+late[1].trail = [[420, 398], [480, 425], [540, 450], [560, 458]]; late[1].trailW = 80;
+const latePal = [F.hazed({ lit: '#f4ead8', base: '#d9c4b0', shade: '#a596a8', bounce: '#d8b29a', band: '#7a5a6a', band2: '#a3704a', growth: '#8a7a7a', line: '#5a4458' }, 0.35),
+  F.hazed({ lit: '#f6eede', base: '#e2cfb0', shade: '#a99aa8', bounce: '#dab49a', band: '#9a5a44', band2: '#6a6a8a', growth: '#8a7a70', line: '#5a4458' }, 0.35)];
+for (const sn of late) sn.skin = F.hazed(sn.skin, 0.35);
+late[0].box = [-120, -230, 120, 10]; late[1].box = [-140, -330, 120, 10];
+const lateRiders = [F.blinker(85), F.blinker(86)];
+let lateWave = 0;
+layer({
+  id: 'latecomers', z: F.zOf(472),
+  hit: (x, y) => late.some((sn) => Math.abs(x - sn.x) < 70 && y > sn.y - 90 && y < sn.y + 6),
+  update(dt, t, L) { for (const sn of late) stepStalks(sn, dt, t); lateWave = ease(lateWave, L.hovered ? 1 : 0, 3, dt); for (const b of lateRiders) b.step(dt); for (const sn of late) sn.lower = -lateWave * 0.4; },
+  draw(g, t) {
+    late.forEach((sn, i) => {
+      const S = sn.S;
+      g.save(); g.translate(sn.x, sn.y); g.scale(S * sn.dir, S); drawFoot(g, sn, t); g.restore();
+      blit(g, sn.shell);
+      g.save(); g.translate(sn.x, sn.y); g.scale(S * sn.dir, S); drawHead(g, sn, t); g.restore();
+      // a rider up top waving in
+      const top = i === 0 ? [sn.gl.cx, sn.gl.cy - sn.gl.R * 0.92] : sn.sp.apex;
+      F.folk(g, sn.x + top[0] * S, sn.y + (top[1] + 4) * S, { sp: i ? 'hare' : 'otter', sc: S * 0.95, dir: -sn.dir, coat: i ? '#d65a4a' : '#f2c95c', t, haze: 0.3, blink: lateRiders[i].v, armR: -2.4 - lateWave * 0.4 + Math.sin(t * (2 + lateWave * 7) + i) * 0.4, happy: lateWave > 0.4 });
+    });
+  },
+});
+F.late = late;
+
 const SNAILS = [gran, tea, book, fish, young];
 F.makeSnail = makeSnail; F.drawFoot = drawFoot; F.drawHead = drawHead; F.stepStalks = stepStalks;
-F.SNAILS = [gran, tea, book, fish, young, sleep];
+F.SNAILS = [gran, tea, book, fish, young, sleep, ...late];
 F.gran = gran; F.tea = tea; F.young = young; F.fishSnail = fish; F.book = book;
 
 onLayout(() => {
@@ -476,6 +517,8 @@ onLayout(() => {
   bakeShell(fish, fish.box, (g) => { F.paintRam(g, fish.gl, SHELL_FISH, 51); fishTown(g); });
   bakeShell(young, young.box, (g) => { F.paintGlobe(g, young.gl, SHELL_YOUNG, 67); youngTown(g); });
   bakeShell(sleep, sleep.box, (g) => { F.paintGlobe(g, sleep.gl, SHELL_SLEEP, 71); sleepTown(g); });
+  bakeShell(late[0], late[0].box, (g) => { F.paintGlobe(g, late[0].gl, latePal[0], 81); F.garden(g, late[0].gl.cx + 30, late[0].gl.cy - 80, 40, 88); });
+  bakeShell(late[1], late[1].box, (g) => { F.paintSpire(g, late[1].sp, latePal[1], 83); const w = late[1].sp.ws[1]; for (const a of [-0.6, 0.5]) { const [x, y, k] = F.bandAt(w, a, 0.5); F.window(g, x, y, 14, 18, k, { glow: a > 0 }); } });
 });
 
 // ------------------------------------------------------------ shadows and reflections (one layer each, under everything that stands)

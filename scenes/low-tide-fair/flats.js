@@ -12,7 +12,7 @@ const PAL = F.PAL;
 
 // ------------------------------------------------------------ water: the creek and the pools
 // the creek's centreline, its width in world units, and the outline built from them in perspective
-const CREEK = [[-120, 1070], [80, 1020], [260, 975], [440, 918], [620, 862], [820, 828], [1040, 808], [1200, 780], [1300, 742], [1290, 716], [1380, 700], [1560, 690], [1640, 640], [1600, 600], [1700, 560], [1880, 520], [1960, 480], [1930, 450], [2060, 425], [2200, 404], [2320, 390]];
+const CREEK = [[-120, 1070], [80, 1020], [260, 975], [440, 918], [620, 862], [820, 828], [1040, 808], [1220, 776], [1330, 736], [1420, 712], [1580, 694], [1690, 650], [1720, 610], [1800, 566], [1920, 520], [2000, 476], [2080, 440], [2200, 406], [2320, 390]];
 const creekW = 74;
 function creekOutline() {
   const L = [], R = [];
@@ -153,7 +153,7 @@ layer({
     for (const p of pools) { g.fillStyle = radial(g, p.x, p.y, p.rx * 0.2, p.rx, [[0, 'rgba(255,255,255,0)'], [1, 'rgba(214,190,170,0.55)']]); g.save(); g.translate(p.x, p.y); g.scale(1, flat(p.y) * 1.15); g.translate(-p.x, -p.y); g.fill(circ(p.x, p.y, p.rx * 1.1)); g.restore(); }
     g.restore();
     // the bright near rim of each pool and the creek, where the water meets the lit sand
-    g.save(); g.lineWidth = 1.6; g.strokeStyle = 'rgba(255,248,232,0.7)';
+    g.save(); g.lineWidth = 1.2; g.strokeStyle = 'rgba(255,248,232,0.35)';
     g.beginPath(); creek.R.forEach(([x, y], i) => (i ? g.lineTo(x, y + 0.5) : g.moveTo(x, y + 0.5))); g.stroke();
     for (const p of pools) { g.save(); g.clip(new Path2D(`M${p.x - 400} ${p.y}h800v300h-800z`)); g.stroke(p.path); g.restore(); }
     g.restore();

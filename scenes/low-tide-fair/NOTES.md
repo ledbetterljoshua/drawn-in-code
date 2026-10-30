@@ -110,3 +110,26 @@ My own five worst, agreeing with most of it:
    faint growth lines, a nacre sheen.
 5. **Figures are the weakest-drawn thing.** *Fix:* heavier lines on near folk, stronger cast and
    contact shadows, a rest pose per folk (hands behind, on hips, holding something), body widths.
+
+## Round 3
+
+Did round 2's five: the veil is gone (dune shadow deleted, cool corner out of the grade); the
+ledges bend with the eye line; the tower has spiral cords, faint growth lines and a nacre sheen;
+near folk have heavier lines, stronger cast and contact shadows, a resting pose each (hanging, hips,
+behind, folded) and their own build; new vignettes: a snail race on the right with jockeys, punters
+and a judge, clam diggers and puddle-jumpers on the left, eelgrass tufts cropped by the bottom
+edge; the hermits' shells are now a moon snail, whelks, a turban, a cone, a teacup and a thimble.
+
+The five worst now:
+
+1. **The tea shell was a target.** Concentric rings round a centred apex. *Fixed:* the coil's centre
+   slides toward an offset apex as it winds in, so the outer whorl dominates like a real helix.
+2. **The snails' necks are the dullest big masses in the frame.** Flat tan or grey wedges. *Fix:*
+   mottled patches, a core shadow down the back of the neck, warm bounce under the chin; a smaller
+   tea-house neck; thinner eyestalks.
+3. **The far flats said nothing about the migration.** *Fixed:* two latecomer snails still crawling
+   in down their trails, hazed, with riders who wave when you look.
+4. **The creek's bright near rim reads as a white road, and its new meander zig-zagged.** *Fix:*
+   rim at half strength, a smoother meander.
+5. **The phone frame is half empty sky.** *Fix:* the phone draws the panorama larger (≈700 artboard
+   units across) and biases less toward sky.
