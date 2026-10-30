@@ -167,3 +167,33 @@ Close-ups of every room at the new scale.
    draw cleanly at 2×; the warm pools now carry the hero rooms.
 4. (kept) the telescope on the roof reads as a stick at full frame.
 5. (kept) the eel colony is small at desktop size.
+
+## Round 9 — after the third critic
+The third critic: a grey elliptical "lid" between the rooms and the body chamber (the cut seemed to
+change view partway round); the head reading as a human face in a beanie (lip-like collars); no rim
+light or core shadow on the shell; materials (chrome septa, a rail through the chambers); a crackle-
+glaze caustic everywhere, shell included; mirrored corners; tangents (kelp through the cirri, jelly and
+turtle kissing the silhouette); copied lanterns; no story beat linking inside to out; flat values,
+peach cirri lost against a peach face; an empty top on the phone.
+
+Did:
+- The "lid" was the room light adding over the dark pocket under the wheelhouse floor, plus a grey
+  keel stop in the shell gradient: room light now clips to above its deck (under-floor stays dark),
+  the sawn-edge quad is gone (the cut is flush on one plane), the keel stop is warm.
+- Story beat: left alone, the observatory goby keeps the telescope trained on the old turtle as it
+  cruises past (and the turtle comes round again behind the ark).
+- The scope through the roof is a three-draw brass spyglass with a dew hood, not a stick.
+- Sun rim on the shell's upper left much stronger, a deeper teal core along the lower right.
+- Caustics: the net is faint everywhere and bright only in drifting patches; none on the shell.
+- The right corner is a great brain coral with two sea fans instead of the twin of the left rock.
+- Cirri cooler and darker (mauve) so they separate from the face; the collars are small and soft.
+- Jelly and turtle moved off the silhouette; the front kelp moved clear of the face.
+- A manta glides far up near the surface (only a tall screen sees it), filling the phone's top.
+
+## Still wrong (for whoever picks this up)
+- The head still has a faintly human profile (brow, nose-tip hood, chin); a real nautilus head is
+  stranger. It wants a redraw from reference, not more tweaks.
+- The small inner rooms all hang the same jar lamp; the coil would be better with a few rooms dark,
+  used as storage, so the lit ones count.
+- The septum at the back of the body chamber is the thickest band in the drawing and, with the
+  crescent's coil edge, still reads a little like a rim where the cut meets the whole whorl.

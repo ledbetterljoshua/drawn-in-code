@@ -13,9 +13,10 @@ const FOG = '#4c9fa9';
 const fog = (c, f) => mix(c, FOG, f);
 
 // ------------------------------------------------------------------ the turtle
-const T = { x: 520, y: 360, vx: -9, head: 0, row: 0, rowSp: 1, look: [0, 0], blink: Drawn.blinker(3, 5), slow: 0 };
+const T = { x: 440, y: 250, vx: -9, head: 0, row: 0, rowSp: 1, look: [0, 0], blink: Drawn.blinker(3, 5), slow: 0 };
 const TC = (f) => ({ shell: fog('#7d6a3a', f), scute: fog('#a8904e', f), scuteDk: fog('#5a4a2a', f), skin: fog('#b8a47a', f), skinSh: fog('#8a7a5a', f), spot: fog('#6a5a3a', f), belly: fog('#e6d8a8', f), line: fog('#3a2a30', f * 0.8) });
 const tc = TC(0.38);
+A.turtle = T;
 function flipper(g, x, y, len, a, w, c) {
   g.save(); g.translate(x, y); g.rotate(a);
   const F = curve([[0, -w * 0.4], [len * 0.4, -w * 0.6], [len, -w * 0.15], [len * 0.95, w * 0.2], [len * 0.4, w * 0.5], [0, w * 0.4]]);
@@ -29,8 +30,8 @@ layer({
   update(dt, t, L) {
     T.slow = Drawn.ease(T.slow, L.hovered ? 1 : 0, 2, dt);
     T.x += T.vx * (1 - T.slow * 0.85) * dt;
-    T.y = 360 + Math.sin(t * 0.21) * 30;
-    if (T.x < st.view.x0 - 200) T.x = st.view.x1 + 200;
+    T.y = 250 + Math.sin(t * 0.21) * 24;
+    if (T.x < st.view.x0 - 200) T.x = st.view.x1 + 200; // round again, passing behind the ark
     T.rowSp = lerp(1, 0.15, T.slow);
     T.row += dt * 1.3 * T.rowSp;
     const dx = P.x - (T.x - 70), dy = P.y - T.y, d = Math.hypot(dx, dy) || 1;
@@ -109,8 +110,28 @@ layer({
   },
 });
 
+// ------------------------------------------------------------------ a manta, far up near the surface
+// (only a tall screen sees this high): a slow fogged silhouette gliding across, wings rowing
+const MANTA = { x: 1300, y: -250 };
+layer({
+  id: 'manta', z: 3,
+  update(dt, t) { MANTA.x -= 14 * dt; MANTA.y = -250 + Math.sin(t * 0.13) * 30; if (MANTA.x < st.view.x0 - 300) MANTA.x = st.view.x1 + 300; },
+  draw(g, t) {
+    if (st.view.y0 > -60) return;
+    const fl = Math.sin(t * 0.9) * 0.35, { x, y } = MANTA;
+    g.save(); g.translate(x, y); g.fillStyle = fog('#2f5a6a', 0.7); g.scale(0.75, 0.75);
+    const wing = (sd) => { g.beginPath(); g.moveTo(-20, 0); g.quadraticCurveTo(-10, sd * 40, 30, sd * (110 + fl * 30 * sd)); g.quadraticCurveTo(40, sd * 30, 50, 0); g.closePath(); g.fill(); };
+    wing(-1); wing(1);
+    g.fill(ell(10, 0, 50, 22));
+    g.beginPath(); g.moveTo(-40, -6); g.lineTo(-58, -14); g.lineTo(-56, -4); g.closePath(); g.fill();
+    g.beginPath(); g.moveTo(-40, 6); g.lineTo(-58, 14); g.lineTo(-56, 4); g.closePath(); g.fill();
+    g.lineWidth = 2; g.strokeStyle = fog('#2f5a6a', 0.7); g.beginPath(); g.moveTo(58, 0); g.quadraticCurveTo(110, 4 + Math.sin(t) * 6, 150, 0); g.stroke();
+    g.restore();
+  },
+});
+
 // ------------------------------------------------------------------ moon jellies
-const jellies = [{ x: 1340, y: 640, ph: 0, s: 1, v: 0 }, { x: 160, y: 180, ph: 2, s: 0.8, v: 0 }];
+const jellies = [{ x: 1470, y: 600, ph: 0, s: 1, v: 0 }, { x: 160, y: 180, ph: 2, s: 0.8, v: 0 }];
 for (const [i, J] of jellies.entries()) {
   layer({
     id: 'jelly-' + i, z: 24,
@@ -121,7 +142,7 @@ for (const [i, J] of jellies.entries()) {
       J.v += (-8 - J.v) * dt * 0.8 + (L.hovered ? -40 * dt : 0);
       J.y += J.v * dt * 0.4 + Math.sin(J.ph) * 4 * dt;
       J.x += (wind(t, J.x) * 6) * dt;
-      if (J.y < A.SURF - 60) { J.y = 1000; J.x = J === jellies[0] ? 1300 + Math.random() * 120 : 100 + Math.random() * 160; }
+      if (J.y < A.SURF - 60) { J.y = 1000; J.x = J === jellies[0] ? 1440 + Math.random() * 80 : 100 + Math.random() * 160; }
       if (J.x > st.view.x1 + 60) J.x = st.view.x0 - 40;
     },
     draw(g, t) {

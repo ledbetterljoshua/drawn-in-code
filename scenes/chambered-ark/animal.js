@@ -20,7 +20,7 @@ const Minv = M.inverse();
 const toLocal = (x, y) => { const [sx, sy] = A.toShell(x, y); const p = Minv.transformPoint({ x: sx, y: sy }); return [p.x, p.y]; };
 
 const HOOD = { base: '#b4693f', lit: '#d9915c', shade: '#7a3c2e', spot: '#f6e4cc', ridge: '#8a4630' };
-const CIRRI = { base: '#f0d0bc', shade: '#c69488', lit: '#fff0e2' };
+const CIRRI = { base: '#d9b3b0', shade: '#9a7480', lit: '#f2dcd6' };
 const EYE = { ring: '#cbb8ae', dark: '#24182a' };
 
 // the cirri: rooted in a fan under the eye
@@ -72,7 +72,7 @@ function drawCirri(g, t, L, back) {
   for (const c of cirri) {
     if (c.back !== back) continue;
     const pts = cirrusPts(c, t, L.hover * (c.back ? 0.6 : 1), tx, ty);
-    const col = c.layer === 0 ? '#b98a84' : c.layer === 1 ? '#dcb0a0' : CIRRI.base;
+    const col = c.layer === 0 ? '#8f6f7c' : c.layer === 1 ? '#b8949a' : CIRRI.base;
     C.limb(g, pts, c.w, 1.1, col, c.layer === 2 ? 1.3 : 1, CIRRI.shade);
     if (!back) {
       // the ridged grip along each cirrus
@@ -196,10 +196,10 @@ layer({
       // where each cluster leaves the face, a soft fleshy collar, not a tube
       for (const sh of sheaths) {
         const cx = sh.u + Math.cos(sh.a) * sh.len * 0.6, cy = sh.v + Math.sin(sh.a) * sh.len * 0.6;
-        g.fillStyle = sh.layer === 2 ? '#dba792' : '#c99482'; g.fill(ell(cx, cy, sh.len * 0.75, 11, undefined, sh.a));
+        g.fillStyle = sh.layer === 2 ? '#c99a90' : '#b48a88'; g.fill(ell(cx, cy, sh.len * 0.6, 8, undefined, sh.a));
         g.fillStyle = 'rgba(255, 226, 206, 0.45)'; g.fill(ell(cx - 2, cy - 4, sh.len * 0.45, 3.5, undefined, sh.a));
         g.lineWidth = 1; g.strokeStyle = 'rgba(110, 56, 60, 0.45)';
-        g.beginPath(); g.ellipse(cx, cy, sh.len * 0.75, 11, sh.a, -0.3, Math.PI + 0.3); g.stroke();
+        
       }
       drawCirri(g, t, L, false);
       g.restore();

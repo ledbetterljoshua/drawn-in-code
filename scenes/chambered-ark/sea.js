@@ -263,11 +263,17 @@ layer({
     g.save();
     g.beginPath(); g.rect(v.x0, A.BED - 10, v.x1 - v.x0, Math.min(380, v.y1 - A.BED + 10)); g.clip();
     g.globalCompositeOperation = 'lighter';
-    for (const [k, sp, al] of [[0, 7, 0.42], [1, -5, 0.26]]) {
+    // patches: the net is only bright where the surface focuses the light
+    const patches = new Path2D();
+    for (let i = 0; i < 9; i++) { const px = v.x0 + ((i * 263 + t * 6) % (v.x1 - v.x0 + 400)) - 200, py = A.BED + 30 + ((i * 97) % 220); patches.ellipse(px, py, 160 + (i % 3) * 70, 40 + (i % 4) * 22, 0, 0, TAU); patches.closePath(); }
+    for (const [k, sp, al] of [[0, 7, 0.2], [1, -5, 0.14]]) {
       g.globalAlpha = al * (0.8 + 0.2 * Math.sin(t * 0.9 + k));
       const sc = 1 + k * 0.25, off = ((t * sp) % (700 * sc) + 700 * sc) % (700 * sc);
       for (let x = v.x0 - 700 * sc + off; x < v.x1; x += 700 * sc) g.drawImage(cau.c, x, A.BED - 4 + Math.sin(t * 0.5 + k) * 3, 700 * sc, 300 * sc);
     }
+    g.clip(patches);
+    g.globalAlpha = 0.4;
+    for (let x = v.x0 - 700 + ((t * 7) % 700); x < v.x1; x += 700) g.drawImage(cau.c, x, A.BED - 4 + Math.sin(t * 0.5) * 3, 700, 300);
     g.restore();
   },
 });
@@ -323,7 +329,7 @@ layer({
     const v = st.view, r = rng(91);
     // seagrass meadow tufts, painted (the swaying ones are in 'grass')
     // big rocks at both corners, with their coral
-    const groups = [[60, 1135, 190, 90, 1], [1530, 1140, 200, 95, 2], [1280, 1330, 150, 70, 4], [300, 1930, 640, 300, 5]];
+    const groups = [[60, 1135, 190, 90, 1], [1280, 1330, 150, 70, 4], [300, 1930, 640, 300, 5]];
     for (const [x, y, w, h, sd] of groups) {
       if (y - h > v.y1 + 20) continue;
       const cs = rock(g, x, y, w, h, sd);
@@ -335,6 +341,10 @@ layer({
         [brain, staghorn, sponge, staghorn][(i + sd) % 4](g, cx + (r() - 0.5) * cr, cy - cr * 0.8, Math.min(70, cr * (0.7 + r() * 0.5)), c, r);
       }
     }
+    // the right corner: a great brain coral with a sea fan behind it
+    { const rr = rng(17); fan(g, 1560, 1110, 260, '#b5607a', 2.4, rr); fan(g, 1500, 1120, 180, '#c98a5e', 2, rr);
+      brain(g, 1500, 1135, 120, { line: LINE, shade: '#8a6a4a', base: '#c9a46a', lit: '#ead090' }, rr);
+      brain(g, 1385, 1130, 46, { line: LINE, shade: '#6a7a5a', base: '#9ab07a', lit: '#c8dca0' }, rr); }
     // shells and a starfish strewn on the sand
     const star = (x, y, s, rot) => { const pts = []; for (let i = 0; i < 10; i++) { const a = rot + (i / 10) * TAU, rr = i % 2 ? s * 0.42 : s; pts.push([x + Math.cos(a) * rr, y + Math.sin(a) * rr * 0.55]); } const S = curve(pts); g.fillStyle = '#e8774a'; g.fill(S); g.lineWidth = 1.4; g.strokeStyle = LINE; g.stroke(S); g.fillStyle = '#ffd0a0'; for (let i = 0; i < 5; i++) { const a = rot + (i / 5) * TAU; g.fill(circ(x + Math.cos(a) * s * 0.5, y + Math.sin(a) * s * 0.27, s * 0.06)); } };
     star(560, 1110, 16, 0.3); star(1210, 1300, 22, 1.1); star(300, 1420, 26, 2);
@@ -477,7 +487,7 @@ function drawKelp(g, k, t) {
   }
 }
 const kelpBack = [kelpStrand(1, 90, 990, 1450, 0.6, 0), kelpStrand(2, 250, 1060, 760, 0.35, 1), kelpStrand(3, 1490, 1000, 1150, 0.55, 0), kelpStrand(4, 1390, 1040, 620, 0.38, 1)];
-const kelpFront = [kelpStrand(6, -70, 1200, 1800, 0, 1.4), kelpStrand(7, 300, 1240, 600, 0, 1.4, -30), kelpStrand(8, 1690, 1220, 900, 0, 1.4)];
+const kelpFront = [kelpStrand(6, -70, 1200, 1800, 0, 1.4), kelpStrand(7, 190, 1240, 620, 0, 1.4, -10), kelpStrand(8, 1690, 1220, 900, 0, 1.4)];
 A.kelp = [...kelpBack, ...kelpFront];
 function kelpUpdate(list, dt, t) {
   for (const k of list) {

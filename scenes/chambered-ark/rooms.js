@@ -36,7 +36,7 @@ K.deck = (g, ch, y, o = {}) => {
   const r = rng(Math.round(y * 13 + x0));
   g.save(); g.clip(ch.path);
   // the dark below the floor
-  g.fillStyle = 'rgba(40, 30, 58, 0.35)'; g.fillRect(x0 - 10, y + th, x1 - x0 + 20, 400);
+  g.fillStyle = 'rgba(34, 24, 50, 0.62)'; g.fillRect(x0 - 10, y + th, x1 - x0 + 20, 400);
   if (d > 0) {
     // seen from above: the top surface, planks running back
     g.fillStyle = W.top; g.fillRect(x0 - 10, y - d, x1 - x0 + 20, d);
@@ -166,13 +166,16 @@ A.room = (def) => {
         if (def.glow && ch.size > 110) {
           const hero = clamp(ch.size / 200, 0.35, 1.15);
           const f = 0.85 + 0.1 * Math.sin(t * 2.3 + def.k) + 0.05 * Math.sin(t * 5.1 + def.k * 3) + L.hover * 0.2 + (A.flare ? A.flare(def.k) * 0.8 : 0);
+          g.save();
+          // the light stays above the deck: the space under the floor stays dark
+          if (R.fy != null) { g.beginPath(); g.rect(-1e4, -1e4, 3e4, R.fy + 1e4 + 7); g.clip(); }
           g.globalCompositeOperation = 'lighter';
           for (const [x, y, rad, a] of def.glow) {
             const al = a * 0.55 * f * hero, rr = rad * 1.25;
             g.fillStyle = radial(g, x, y, 0, rr, [[0, `rgba(255, 190, 110, ${al})`], [0.4, `rgba(240, 140, 70, ${al * 0.45})`], [1, 'rgba(200, 100, 60, 0)']]);
             g.fillRect(x - rr, y - rr, rr * 2, rr * 2);
           }
-          g.globalCompositeOperation = 'source-over';
+          g.restore();
         }
         g.restore();
         if (def.over) def.over(g, t, L, R);
@@ -191,7 +194,7 @@ A.look = look;
 // ================================================================== 0 · the wheelhouse
 A.room({
   k: 0, id: 'wheelhouse', floor: 512,
-  glow: [[1172, 410, 190, 0.95], [1130, 500, 90, 0.5]],
+  glow: [[1172, 410, 190, 0.95]],
   state: () => ({ act: A.actor(11, [['look', 2.4], ['hat', 1.6], ['peer', 3]], [3, 7]), wheel: 0, wv: 0, blink: Drawn.blinker(), tube: A.beat(2.6), lean: 0 }),
   furnish(g, R) {
     // a chart of the reef pinned to the wall
@@ -445,6 +448,8 @@ A.room({
     R.act.step(dt); R.jump.step(dt);
     // the telescope swings to follow the pointer while hovered, otherwise sweeps the sky slowly
     let want = -2.05 + Math.sin(t * 0.17) * 0.25;
+    // left alone, the goby keeps the scope on the old turtle cruising past
+    if (A.turtle) { const [tx, ty] = A.toShell(A.turtle.x, A.turtle.y); want = clamp(Math.atan2(ty - SCOPE.pivot[1], tx - SCOPE.pivot[0]), -2.9, -0.6); }
     if (L.hovered || (P.inside && Math.hypot(...ptr().map((v, i) => v - SCOPE.pivot[i])) < 260 && ptr()[1] < SCOPE.pivot[1])) {
       const [px, py] = ptr(); want = clamp(Math.atan2(py - SCOPE.pivot[1], px - SCOPE.pivot[0]), -2.7, -0.6);
     }
@@ -466,14 +471,18 @@ A.room({
     if (j > 0.5) { g.fillStyle = A.LINE; g.font = 'bold 14px Georgia'; g.fillText('!', 908, 268 - j * 16); }
   },
   over(g, t, L, R) {
-    // outside: the objective end pokes out through the shell's roof and moves with the aim
+    // outside: the objective end pokes out through the shell's roof and moves with the aim — a brass
+    // spyglass in three draws, a dew-hood at the end
     const a = R.aim, [px, py] = SCOPE.pivot;
-    const ox = px + Math.cos(a) * 58, oy = py + Math.sin(a) * 58;
-    const tube = [[px, py], [ox, oy]];
-    A.stroke(g, tube, 13, A.LINE); A.stroke(g, tube, 10.5, '#c9a258'); A.stroke(g, tube.map(([x, y]) => [x - 2, y - 1]), 2, '#f5dc98');
-    g.save(); g.translate(ox, oy); g.rotate(a);
-    ink(g, A.rr(-4, -8, 10, 16, 2), '#d2a456', 1.3);
-    g.fillStyle = 'rgba(200,240,255,0.8)'; g.fill(ell(6, 0, 1.8, 6));
+    g.save(); g.translate(px, py); g.rotate(a);
+    for (const [x0, x1, w] of [[0, 26, 15], [24, 46, 13], [44, 62, 11]]) {
+      ink(g, A.rr(x0, -w / 2, x1 - x0, w, 2), '#c9a258', 1.4);
+      g.fillStyle = '#f5dc98'; g.fillRect(x0 + 2, -w / 2 + 2, x1 - x0 - 4, 2);
+      g.fillStyle = '#8a6a2a'; g.fillRect(x1 - 3, -w / 2 + 1, 2, w - 2);
+    }
+    ink(g, poly([[60, -6], [74, -9], [74, 9], [60, 6]]), '#d2a456', 1.3);
+    g.fillStyle = 'rgba(210,245,255,0.9)'; g.fill(ell(74, 0, 2, 8));
+    g.fillStyle = '#fff'; g.fill(ell(74, -4, 1, 2));
     g.restore();
     // a brass collar where it passes through the wall
     ink(g, ell(px, py, 9, 6, undefined, -0.1), '#b8862e', 1.3);

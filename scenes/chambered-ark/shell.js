@@ -137,10 +137,10 @@ function paintFace(g) {
   for (const f of faceItems) { g.save(); f(g); g.restore(); }
   // the silhouette: a heavy ink line, a warm rim where the sun catches it, cool below
   g.save(); g.clip(A.outlinePath);
-  g.lineWidth = 7; g.strokeStyle = 'rgba(255, 240, 210, 0.5)';
-  g.save(); g.translate(5, 6); g.stroke(A.outlinePath); g.restore();
-  g.lineWidth = 9; g.strokeStyle = 'rgba(40, 90, 120, 0.25)';
-  g.save(); g.translate(-6, -7); g.stroke(A.outlinePath); g.restore();
+  g.lineWidth = 9; g.strokeStyle = 'rgba(255, 244, 214, 0.75)';
+  g.save(); g.translate(6, 7); g.stroke(A.outlinePath); g.restore();
+  g.lineWidth = 16; g.strokeStyle = 'rgba(40, 96, 128, 0.32)';
+  g.save(); g.translate(-9, -10); g.stroke(A.outlinePath); g.restore();
   g.restore();
   g.lineWidth = 3.4; g.strokeStyle = LINE; g.stroke(A.outlinePath);
 }
@@ -158,7 +158,7 @@ function paintBody(g, r) {
   // a rounded tube seen from the side: lit up toward the coil, falling into shade at the keel
   g.fillStyle = SH.base; g.fill(W);
   const rm = A.R((th0 + A.thE) / 2), rim = A.ri((th0 + A.thE) / 2);
-  g.fillStyle = radial(g, A.C[0], A.C[1], rim, rm, [[0, '#cbbca8'], [0.22, '#f6ead6'], [0.5, '#fff6e6'], [0.78, '#ead9bf'], [1, '#bfb2a4']]);
+  g.fillStyle = radial(g, A.C[0], A.C[1], rim, rm, [[0, '#e6d8c4'], [0.18, '#f6ead6'], [0.5, '#fff6e6'], [0.8, '#f0e2cc'], [1, '#dcc9b0']]);
   g.fill(W);
   // flame stripes: broad wavy bands from the coil outward, swept back, strongest on the older
   // part of the whorl and fading out toward the aperture
@@ -197,13 +197,10 @@ function paintBody(g, r) {
   g.fillStyle = grad(g, A.C[0], A.C[1] + 250, A.C[0] + 150, A.C[1] + 560, [[0, 'rgba(60, 110, 150, 0)'], [1, 'rgba(60, 110, 150, 0.35)']]);
   g.fill(belly);
   g.restore();
-  // the near wall's sawn edge along the cut, a band showing its two layers
+  // where the whole whorl meets the cut: the shell's thickness shown flush on the same plane, a thin
+  // porcelain-and-nacre strip along the last septum
   const e0 = A.pt(th0, A.ri(th0)), e1 = A.pt(th0, A.R(th0));
-  const nx = Math.cos(th0 + Math.PI / 2), ny = Math.sin(th0 + Math.PI / 2);
-  const T = A.R(th0) * 0.045;
-  const edge = poly([e0, e1, [e1[0] - nx * T, e1[1] - ny * T], [e0[0] - nx * T * 0.6, e0[1] - ny * T * 0.6]]);
-  crewInk(g, edge, '#f6eee9', 1.6);
-  g.save(); g.clip(edge); g.fillStyle = SH.base; g.fill(poly([e0, e1, [e1[0] - nx * T * 0.4, e1[1] - ny * T * 0.4], [e0[0] - nx * T * 0.25, e0[1] - ny * T * 0.25]])); g.restore();
+  A.stroke(g, [e0, e1], 7, LINE); A.stroke(g, [e0, e1], 4.5, '#f6eee9'); A.stroke(g, [e0, e1].map(([x, y]) => [x + 1.2, y - 1]), 1.4, SH.base);
   g.lineWidth = 2.4; g.strokeStyle = LINE; g.stroke(W);
 }
 
@@ -237,22 +234,6 @@ layer({
 });
 layer({ id: 'shell-back', z: 30, draw(g) { if (back) A.inShell(g, () => blit(g, back)); } });
 layer({ id: 'shell-face', z: 55, draw(g) { if (face) A.inShell(g, () => blit(g, face)); } });
-
-// the sea's caustic net playing over the outside of the shell, so the ark sits in the same water
-layer({
-  id: 'shell-light', z: 55.5,
-  draw(g, t) {
-    if (!A.cau) return;
-    A.inShell(g, () => {
-      g.save(); g.clip(A.wedgePath); g.globalCompositeOperation = 'lighter';
-      const b = A.shellBox, off = (t * 9) % 700;
-      g.globalAlpha = 0.05 + 0.02 * Math.sin(t * 0.7);
-      const S = 1.9, off2 = (t * 9) % (700 * S);
-      for (let x = b.x0 - 700 * S + off2; x < b.x0 + b.w; x += 700 * S) g.drawImage(A.cau.c, x, b.y0 + 300 + Math.sin(t * 0.4) * 6, 700 * S, b.h);
-      g.restore();
-    });
-  },
-});
 
 // barnacles crusted on the keel, where nobody can scrub
 A.faceItem((g) => {
