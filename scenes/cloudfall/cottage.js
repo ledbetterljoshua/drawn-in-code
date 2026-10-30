@@ -549,6 +549,12 @@ layer({
         g.restore();
         const [sx, sy] = CF.at(Mx, d.x + d.w / 2, d.y + d.h + 4);
         CF.glow(g, sx + 14, sy + 6, 60, '#ffc070', 0.4 * o);
+        // the lamplight falls out of the door in a wedge across the step and the path
+        const sp = CF.P3([P3d(20, 0, 60), P3d(54, 0, 60), P3d(80, 0, 128), P3d(-2, 0, 128)]);
+        const [w0x, w0y] = pr(...P3d(37, 0, 60)), [w1x, w1y] = pr(...P3d(39, 0, 128));
+        g.save(); g.globalCompositeOperation = 'lighter';
+        g.fillStyle = grad(g, w0x, w0y, w1x, w1y, [[0, `rgba(255,190,100,${0.5 * o})`], [1, 'rgba(255,190,100,0)']]); g.fill(sp);
+        g.restore();
       }
       // the door leaf, hinged on its left, swinging into the house
       const dw = Math.cos(o * 1.25);

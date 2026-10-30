@@ -202,3 +202,9 @@ Fixed:
 - The waterfall runs on down and ends in a warm plume of mist where it reaches the floor.
 - (Also: the fisher's and gardener's hats sat on their eyes; the stargazer was hidden behind
   her rail, so she stands on a crate.)
+
+## Round 11
+Looked only at full-frame size. One thing would visibly help: the door, which is the focal point,
+didn't announce itself. Its lamplight now falls out of the open door in a warm wedge across the
+step and the path, the warmest accent in the picture. Waterfall mist puffs halved (they read as
+a glint). Nothing else I could name changes the full frame.
