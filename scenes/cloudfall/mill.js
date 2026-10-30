@@ -13,17 +13,17 @@
 const D = Drawn, { TAU, clamp, lerp, ease, rng, hash, wind, breeze, circ, ell, rect, seg, poly, ink, grad, tube, P, layer } = D;
 const { pr, mix, rgba, tone, lit, M, on, plane, frog, spawn, P3, face3, nrm3 } = CF;
 
-const MX = 236, MZ = -122, R0 = 54, R1 = 33, Y0 = 34, Y1 = 300, ROT = 0.2;
+const MX = 236, MZ = -122, R0 = 56, R1 = 33, Y0 = 34, Y1 = 338, ROT = 0.2;
 const rAt = (y) => lerp(R0, R1, (y - Y0) / (Y1 - Y0));
 const corner = (i, y, r = rAt(y)) => { const a = ROT + (i / 8) * TAU; return [MX + Math.cos(a) * r, y, MZ + Math.sin(a) * r]; };
 CF.millHook = (() => { const d = CF.norm([45 - MX, 0, -33 - MZ]), r = rAt(128) + 1; return [MX + d[0] * r, 128, MZ + d[2] * r]; })();
 const NS = CF.norm([-0.52, 0, 0.86]); // the sails face this way: up-wind and toward us
-const HUB = [MX + NS[0] * 44, 316, MZ + NS[2] * 44];
+const HUB = [MX + NS[0] * 44, 354, MZ + NS[2] * 44];
 const E1 = [NS[2], 0, -NS[0]];
 const sailM = plane(HUB, E1, [0, -1, 0]);
 CF.mill = { HUB, MX, MZ };
 
-CF.casters.push(() => { const pts = []; for (let i = 0; i < 8; i++) pts.push(corner(i, 0, 60), corner(i, Y1)); pts.push([MX, 344, MZ]); return pts; });
+CF.casters.push(() => { const pts = []; for (let i = 0; i < 8; i++) pts.push(corner(i, 0, 60), corner(i, Y1)); pts.push([MX, 382, MZ]); return pts; });
 
 // ------------------------------------------------------------------ the tower
 function octFaces(y0, y1, r0, r1) {
@@ -116,7 +116,7 @@ layer({
 
 // ------------------------------------------------------------------ the stage, the cap, the sails
 const mill = { a: 0.4, w: 0.5, fan: 0, oil: 0, wipe: 0, blink: D.blinker(), drip: 0 };
-const STAGE = 132;
+const STAGE = 150;
 function stage(g, front) {
   // the stage platform round the tower, railing on the outside; front: the half nearer us
   const pts = [], inner = [];

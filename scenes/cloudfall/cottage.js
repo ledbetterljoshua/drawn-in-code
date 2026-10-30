@@ -22,7 +22,7 @@ const P3d = (a, y, b) => { const [x, z] = at(a, b); return [x, y, z]; };
 const H1 = 80, H2 = 74, YT = H1 + H2;
 const RIDGE = 246, RB = 4, EB = 81, YE = 131, SLOPE = (RIDGE - YE) / (EB - RB);
 const roofY = (b) => RIDGE - Math.abs(b - RB) * SLOPE;
-const T0 = at(-86, -64), TR = 33, TY = 300, CONE = 418;
+const T0 = at(-86, -64), TR = 33, TY = 300, CONE = 440;
 const U3 = [U[0], 0, U[1]], V3 = [V[0], 0, V[1]];
 CF.cottage = { at, P3d, U, V, T0 };
 
@@ -497,7 +497,7 @@ layer({
     // lamplight breathing in the windows
     glows().forEach(([[x, y], r], i) => {
       const f = 0.22 + 0.05 * Math.sin(t * 2.3 + i * 1.7) + 0.04 * noise(t * 4 + i * 9) + L.hover * 0.1;
-      CF.glow(g, x, y, r * 1.5, '#ffbe64', f);
+      CF.glow(g, x, y, r * 1.25, '#ffbe64', f * 0.75);
     });
     // grandma at the upstairs window: the curtain draws aside and she peeks out over her knitting
     const uw = CF.cottage.upWin;

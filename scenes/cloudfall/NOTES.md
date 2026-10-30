@@ -75,3 +75,33 @@ Worst five after the first shot, fixed in the same round:
 Also: the turret's lower window was a black slab (now an arrow slit); NOWHERE was clipped; the
 canopy had rice-grain highlights; the sunflowers stood in front of the door lamp (moved past the
 corner); stepping stones were too big for frogs.
+
+## Round 5 (fresh-eyes critic, screenshots only)
+The critic's ten, worst first, condensed: (1) the rock underside is the laziest passage: strata
+ignore the cone, sticker crystals evenly spaced, identical roots, a skewer at the tip; (2) no
+focal point, a picket-fence skyline, the island dead centre, the balloon touching the tree;
+(3) "a different camera per object" (not so: the mill tapers and the pond shares the island's
+tilt, but the roof's right edge has no barge and the dormer floats); (4) the light is announced
+but not applied: no raking shadows across the grass, daylight halos on every lamp, generated-
+looking motes; (5) clone repetition: cabbages, pumpkins, stepping stones, five confetti
+islands; (6) one line weight at every distance; (7) the cloud floor is wallpaper with no big
+masses; (8) the waterfall is a pale rectangle; (9) the grass lip and vines are combed; (10) five
+frog clones with nothing happening between them, and a literal signpost.
+
+Fixed this round:
+- Rock: strata are now level courses carried round the cone, so they bow with the form and dip
+  left; per-facet strata gone; each slab drifts a little ochre, plum or pale; a pink bounce from
+  the cloud floor comes up into the shaded underside; crystals are three clusters of 5, 3 and 2
+  prisms; roots taper to hair, bend, and split into rootlets; the lantern hangs from a root on
+  the sunny side and the tip trails a short tangle; the five confetti islands are three chunks
+  of different sizes near the tip, one still trailing a root.
+- Composition: island moved right of centre; skyline stepped (tree lowest, turret higher, mill
+  tallest); balloon pulled up and left, clear of the crown.
+- Light: the sun swung more side-on so shadows run left across visible grass; lamp halos cut by
+  a third, bridge lanterns by half; motes cut from 50 to 22 and dimmed.
+- Cloud floor: three big cumulus banks heaped up out of it, left, right and near left: the
+  large shapes the floor needed.
+- The signpost reads HOME and NOWHERE and isn't hidden by the mailbox any more; the sky-fish
+  nibble round the bobber instead of floating beside the line.
+Left for round 6: waterfall, grass lip and vine curtains, the frogs' shared moment, line weight
+by distance, small-object shadows.

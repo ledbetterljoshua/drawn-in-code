@@ -24,7 +24,7 @@ const { rgba } = CF;
 
 // ------------------------------------------------------------------ motes
 const motes = [];
-{ const r = rng(99); for (let i = 0; i < 50; i++) motes.push({ x: 300 + r() * 1000, y: 140 + r() * 600, ph: r() * 10, s: 0.5 + r() * 0.8, ox: 0, oy: 0, glow: 0 }); }
+{ const r = rng(99); for (let i = 0; i < 22; i++) motes.push({ x: 300 + r() * 1000, y: 140 + r() * 600, ph: r() * 10, s: 0.5 + r() * 0.8, ox: 0, oy: 0, glow: 0 }); }
 layer({
   id: 'motes', z: 40,
   update(dt, t) {
@@ -41,7 +41,7 @@ layer({
   draw(g, t) {
     g.save(); g.globalCompositeOperation = 'lighter';
     for (const m of motes) {
-      const a = (0.2 + 0.3 * Math.max(0, Math.sin(t * 1.3 + m.ph))) * m.s + m.glow * 0.45, r = 4.5 * m.s + m.glow * 2.5;
+      const a = (0.08 + 0.22 * Math.max(0, Math.sin(t * 1.3 + m.ph))) * m.s + m.glow * 0.45, r = 4.5 * m.s + m.glow * 2.5;
       g.fillStyle = radial(g, m.x + m.ox, m.y + m.oy, 0, r, [[0, `rgba(255,236,170,${a})`], [1, 'rgba(255,236,170,0)']]);
       g.fill(circ(m.x + m.ox, m.y + m.oy, r));
     }

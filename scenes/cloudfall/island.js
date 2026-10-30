@@ -85,6 +85,8 @@ function drawRock(g, rock, o = {}) {
     col = mix(col, mat.bounce || mat.base, clamp(down * 0.9 - b * 0.4, 0, 0.45));
     // deeper bands sit further from the sky: a touch cooler and darker
     col = mix(col, mat.shade, clamp(c.b * 0.035, 0, 0.2));
+    // no two slabs quite alike: some ochre, some plum, some paler
+    const hv = hash(c.seed * 1.7); col = mix(col, hv < 0.33 ? '#c9875a' : hv < 0.66 ? '#6a3a62' : '#d8b0a8', 0.08 + hash(c.seed * 3.1) * 0.12);
     g.fillStyle = col; g.fill(c.path);
     g.save(); g.clip(c.path);
     const [p0, p1, p2, p3] = c.s, r = rng(c.seed);
@@ -94,17 +96,6 @@ function drawRock(g, rock, o = {}) {
     g.fillStyle = grad(g, 0, topY - 4, 0, topY + sh, [[0, 'rgba(60,40,110,0.75)'], [0.5, 'rgba(90,70,140,0.3)'], [1, 'rgba(120,100,160,0)']]);
     g.fillRect(Math.min(p0[0], p3[0]) - 40, topY - 10, Math.abs(p1[0] - p0[0]) + 80, sh + 14);
     g.restore();
-    // strata: courses running across the facet, roughly parallel to its top
-    const nStrata = 1 + ((r() * 3) | 0);
-    for (let k = 1; k <= nStrata; k++) {
-      const f = k / (nStrata + 1) + (r() - 0.5) * 0.15, u0 = r() * 0.5, u1 = u0 + 0.2 + r() * 0.4;
-      const A = [lerp(p0[0], p3[0], f), lerp(p0[1], p3[1], f)], B = [lerp(p1[0], p2[0], f), lerp(p1[1], p2[1], f)];
-      const a = [lerp(A[0], B[0], u0), lerp(A[1], B[1], u0)], bq = [lerp(A[0], B[0], Math.min(1, u1)), lerp(A[1], B[1], Math.min(1, u1))];
-      const wob = (r() - 0.5) * 6 * rock.scale;
-      const pth = new Path2D(); pth.moveTo(a[0], a[1]); pth.quadraticCurveTo((a[0] + bq[0]) / 2, (a[1] + bq[1]) / 2 + wob, bq[0], bq[1]);
-      g.lineWidth = 1.3 * Math.max(0.6, rock.scale); g.strokeStyle = rgba(mat.line, 0.32); g.stroke(pth);
-      if (b > 0.45) { g.save(); g.translate(0, 1.8); g.lineWidth = 1; g.strokeStyle = rgba(mat.lit, 0.35); g.stroke(pth); g.restore(); }
-    }
     // a crack running down from the top edge on some facets
     if (r() < 0.4) {
       const u = 0.25 + r() * 0.5;
@@ -182,15 +173,42 @@ layer({
   id: 'rock', z: 15, still: true,
   draw(g) {
     drawRock(g, ISLE, { lw: 2.8 });
+    // strata: courses of rock at (nearly) level heights, carried round the cone so they bow with
+    // its curve; they dip a little to the left, and break off where the stone is weathered
+    g.save();
+    const silS = new Path2D(); for (const c of ISLE.cells) if (c.facing > -0.05) silS.addPath(c.path);
+    g.clip(silS);
+    const kAt = (Y) => { for (let b = 0; b < BANDS.length - 1; b++) if (Y <= BANDS[b].y && Y >= BANDS[b + 1].y) { const f = (BANDS[b].y - Y) / (BANDS[b].y - BANDS[b + 1].y); return lerp(BANDS[b].k * (b ? 0.95 : 1), BANDS[b + 1].k, f); } return 0; };
+    const rs = rng(23);
+    for (let Y0 = -34; Y0 > -420; Y0 -= 14 + rs() * 20) {
+      const pts = [];
+      for (let a = 0.02; a < Math.PI - 0.02; a += 0.035) {
+        const Y = Y0 + 12 * Math.cos(a) + noise(a * 4 + Y0) * 4, k = kAt(Y) * 1.004, [rx, rz] = rim(a);
+        pts.push([pr(rx * k + 40 * (1 - k), Y, rz * k + 30 * (1 - k)), Math.cos(a), noise(a * 5 + Y0 * 0.3)]);
+      }
+      for (let i = 0; i < pts.length - 1; i++) {
+        if (pts[i][2] < -0.4) continue;
+        const [[x0, y0], lt] = pts[i], [[x1, y1]] = pts[i + 1];
+        g.lineWidth = 1.8; g.strokeStyle = rgba(M.rock.line, 0.5); g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke();
+        if (lt > 0.1) { g.lineWidth = 1.4; g.strokeStyle = rgba(M.rock.lit, 0.6 * lt); g.beginPath(); g.moveTo(x0, y0 + 2); g.lineTo(x1, y1 + 2); g.stroke(); }
+      }
+    }
+    // the cloud floor bounces a pink light up into the underside, strongest at the shaded left
+    g.save(); g.globalCompositeOperation = 'screen';
+    const [tipx, tipy] = pr(40, -450, 30);
+    g.fillStyle = radial(g, tipx - 160, tipy + 40, 0, 330, [[0, 'rgba(214,130,150,0.38)'], [1, 'rgba(214,130,150,0)']]);
+    g.fillRect(tipx - 520, tipy - 420, 900, 520);
+    g.restore();
+    g.restore();
     // the warm rim of sun down the right edge of the whole rock, and the big form over the facets
     g.save();
     const sil = new Path2D(); for (const c of ISLE.cells) if (c.facing > -0.05) sil.addPath(c.path);
     g.clip(sil);
     g.save(); g.globalCompositeOperation = 'multiply';
-    g.fillStyle = grad(g, 340, 0, 1180, 0, ['rgba(90,80,160,0.55)', 'rgba(160,140,200,0.2)', 'rgba(255,255,255,0)']); g.fillRect(330, 630, 870, 460);
-    g.fillStyle = grad(g, 0, 660, 0, 1090, ['rgba(255,255,255,0)', 'rgba(120,90,150,0.3)']); g.fillRect(330, 630, 870, 460);
+    g.fillStyle = grad(g, CF.CAM.cx - 420, 0, CF.CAM.cx + 420, 0, ['rgba(90,80,160,0.55)', 'rgba(160,140,200,0.2)', 'rgba(255,255,255,0)']); g.fillRect(CF.CAM.cx - 430, 630, 870, 460);
+    g.fillStyle = grad(g, 0, 660, 0, 1090, ['rgba(255,255,255,0)', 'rgba(120,90,150,0.3)']); g.fillRect(CF.CAM.cx - 430, 630, 870, 460);
     g.restore();
-    g.lineWidth = 10; g.strokeStyle = grad(g, 900, 0, 1200, 0, ['rgba(255,214,150,0)', 'rgba(255,214,150,0.6)']);
+    g.lineWidth = 10; g.strokeStyle = grad(g, CF.CAM.cx + 140, 0, CF.CAM.cx + 440, 0, ['rgba(255,214,150,0)', 'rgba(255,214,150,0.6)']);
     for (const c of ISLE.cells) if (c.facing > -0.05 && c.nrm[0] > 0.6) g.stroke(c.path);
     g.restore();
     // the turf lip: a band of dark soil and roots under the grass, all along the front edge
@@ -201,7 +219,7 @@ layer({
     }
     const lip = poly(T.concat(B.slice().reverse()));
     g.lineWidth = 5; g.strokeStyle = M.soil.line; g.stroke(lip);
-    g.fillStyle = grad(g, 340, 0, 1180, 0, [M.soil.shade, M.soil.base, M.soil.lit]); g.fill(lip);
+    g.fillStyle = grad(g, CF.CAM.cx - 420, 0, CF.CAM.cx + 420, 0, [M.soil.shade, M.soil.base, M.soil.lit]); g.fill(lip);
     g.save(); g.clip(lip);
     const r = rng(12);
     for (let i = 0; i < 90; i++) {
@@ -223,7 +241,7 @@ layer({
     CF.topPath = top;
     g.lineWidth = 4.4; g.strokeStyle = M.grass.line; g.stroke(top);
     // the sun reaches the right side first and pools there; the far left is cooler
-    g.fillStyle = grad(g, 340, 0, 1180, 0, [tone(M.grass, 0.36), tone(M.grass, 0.52), tone(M.grass, 0.7)]); g.fill(top);
+    g.fillStyle = grad(g, CF.CAM.cx - 420, 0, CF.CAM.cx + 420, 0, [tone(M.grass, 0.36), tone(M.grass, 0.52), tone(M.grass, 0.7)]); g.fill(top);
     g.save(); g.clip(top);
     const r = rng(5);
     // meadow patches: some lusher, some sun-bleached
@@ -271,7 +289,7 @@ D.onLayout(() => {
   for (const c of ISLE.cells) {
     if (c.facing < 0.15 || c.b < 1 || c.b > 4 || r() > 0.32) continue;
     const u = 0.2 + r() * 0.6, q = c.p, X = lerp(q[3][0], q[2][0], u), Y = lerp(q[3][1], q[2][1], u), Z = lerp(q[3][2], q[2][2], u);
-    roots.push({ X, Y: Y + 4, Z, len: 20 + r() * 50, ph: r() * 6, curl: r() < 0.5 ? 1 : -1, leaf: r() < 0.5 });
+    roots.push({ X, Y: Y + 4, Z, len: 14 + r() ** 2 * 70, ph: r() * 6, curl: r() < 0.5 ? 1 : -1, leaf: r() < 0.35, kids: r() < 0.6 ? 1 + ((r() * 2) | 0) : 0, bend: (r() - 0.5) * 30 });
   }
   roots.sort((a, b) => a.Z - b.Z);
   for (let i = 0; i < 16; i++) {
@@ -280,28 +298,39 @@ D.onLayout(() => {
     vines.push({ X: X * 0.99, Z: Z * 0.99, len: 30 + r() * 90, ph: r() * 6, n: 0 });
   }
   // the lowest root carries a lantern
-  roots.push({ X: 40, Y: -446, Z: 30, len: 70, ph: 0, curl: 1, lantern: true });
+  // the lantern hangs from a root on the sunny side, low down; the tip itself trails a short tangle
+  const lc = ISLE.cells.filter((c) => c.b === 4 && c.facing > 0.3 && c.nrm[0] > 0.2)[0];
+  if (lc) { const q = lc.p; roots.push({ X: (q[2][0] + q[3][0]) / 2, Y: (q[2][1] + q[3][1]) / 2 + 3, Z: (q[2][2] + q[3][2]) / 2, len: 44, ph: 1, curl: 1, lantern: true, kids: 0 }); }
+  for (const dx of [-8, 4, 12]) roots.push({ X: 40 + dx, Y: -444, Z: 30, len: 16 + Math.abs(dx) * 1.5, ph: dx, curl: dx > 0 ? 1 : -1, kids: 1 });
 });
 layer({
   id: 'roots', z: 15.5,
-  hit: (x, y) => y > 640 && y < 1120 && Math.abs(x - 790) < 380 - (y - 640) * 0.6,
+  hit: (x, y) => y > 640 && y < 1120 && Math.abs(x - CF.CAM.cx - 30) < 380 - (y - 640) * 0.6,
   update(dt, t, L) { this.stir = ease(this.stir || 0, L.hovered ? clamp(P.sp / 300, 0.3, 1) : 0, 3, dt); },
   draw(g, t) {
     const stir = this.stir || 0;
     for (const R of roots) {
       const [x, y] = pr(R.X, R.Y, R.Z), len = R.len;
       const sw = (wind(t, x) - 0.7) * len * 0.22 + Math.sin(t * 1.3 + R.ph) * (2 + stir * 12) + (P.inside && stir ? clamp((P.x - x) / 200, -1, 1) * stir * 10 : 0);
-      const ex = x + sw, ey = y + len;
+      const ex = x + sw + (R.bend || 0) * 0.4, ey = y + len;
       const pts = [];
       for (let k = 0; k <= 12; k++) {
         const u = k / 12, m = 1 - u;
-        pts.push([m ** 3 * x + 3 * m * m * u * (x - 4) + 3 * m * u * u * (ex - sw * 0.4) + u ** 3 * ex, y + len * (3 * m * m * u * 0.3 + 3 * m * u * u * 0.7 + u ** 3)]);
+        pts.push([m ** 3 * x + 3 * m * m * u * (x - 4 + (R.bend || 0) * 0.3) + 3 * m * u * u * (ex - sw * 0.4 - (R.bend || 0) * 0.5) + u ** 3 * ex, y + len * (3 * m * m * u * 0.3 + 3 * m * u * u * 0.7 + u ** 3)]);
       }
-      pts.push([ex + R.curl * 5, ey + 4], [ex + R.curl * 8, ey - 1]);
+      pts.push([ex + R.curl * 4, ey + 3], [ex + R.curl * 6, ey - 1]);
+      const W0 = Math.min(4.2, 1.6 + len * 0.04);
       for (const pass of [0, 1]) for (let k = 0; k < pts.length - 1; k++) {
-        const w = lerp(4.6, 1, k / (pts.length - 1));
-        g.lineWidth = pass ? w : w + 2.6; g.strokeStyle = pass ? (k < 4 ? '#6f4d4a' : '#8e6a58') : '#2c1a28';
+        const w = lerp(W0, 0.5, (k / (pts.length - 1)) ** 0.8);
+        g.lineWidth = pass ? w : w + 2.2; g.strokeStyle = pass ? (k < 4 ? '#6f4d4a' : '#8e6a58') : '#2c1a28';
         g.beginPath(); g.moveTo(...pts[k]); g.lineTo(...pts[k + 1]); g.stroke();
+      }
+      // rootlets splitting off and curling
+      for (let q = 0; q < (R.kids || 0); q++) {
+        const k0 = 3 + q * 3, [sx, sy] = pts[Math.min(k0, pts.length - 1)], dir = (q % 2 ? 1 : -1) * R.curl, l2 = len * 0.35;
+        const rp = D.quad(sx, sy, sx + dir * l2 * 0.5 + sw * 0.2, sy + l2 * 0.4, sx + dir * l2 * 0.3 + sw * 0.4, sy + l2);
+        g.lineWidth = 2.6; g.strokeStyle = '#2c1a28'; g.stroke(rp);
+        g.lineWidth = 1; g.strokeStyle = '#8e6a58'; g.stroke(rp);
       }
       // a lit edge on the sun side
       g.lineWidth = 1; g.strokeStyle = 'rgba(255,196,140,0.5)';
@@ -336,13 +365,13 @@ layer({
 const crystals = [];
 D.onLayout(() => {
   if (crystals.length) return;
-  const pick = [[2, 0.62], [3, 0.4], [1, 0.75], [4, 0.55], [2, 0.3]];
-  for (const [b, u] of pick) {
+  const pick = [[2, 0.66, 1.25, 5], [2, 0.58, 0.6, 2], [4, 0.45, 0.8, 3]];
+  for (const [b, u, sz, n] of pick) {
     const cs = ISLE.cells.filter((c) => c.b === b && c.facing > 0.3);
     if (!cs.length) continue;
     const c = cs[Math.floor(u * cs.length) % cs.length], q = c.p;
     const X = (q[0][0] + q[1][0] + q[2][0] + q[3][0]) / 4, Y = (q[0][1] + q[1][1] + q[2][1] + q[3][1]) / 4, Z = (q[0][2] + q[1][2] + q[2][2] + q[3][2]) / 4;
-    crystals.push({ X, Y, Z, s: 0.7 + hash(b * 9 + u) * 0.6, ph: u * 20, tw: 0 });
+    crystals.push({ X, Y, Z, s: sz, n, ph: u * 20, tw: 0 });
   }
 });
 layer({
@@ -355,7 +384,8 @@ layer({
       const [x, y] = pr(c.X, c.Y, c.Z), s = c.s;
       const glint = Math.max(0, Math.sin(t * 0.7 + c.ph)) ** 12 + c.tw;
       CF.glow(g, x, y - 10 * s, 28 * s, '#a8e8ff', 0.16 + glint * 0.4);
-      for (const [dx, h, w, a] of [[-6, 16, 5, -0.35], [3, 24, 6, 0.08], [10, 13, 4.5, 0.45]]) {
+      const prisms = [[-6, 16, 5, -0.35], [3, 24, 6, 0.08], [10, 13, 4.5, 0.45], [-13, 10, 4, -0.7], [15, 8, 3.5, 0.8]].slice(0, c.n);
+      for (const [dx, h, w, a] of prisms) {
         g.save(); g.translate(x + dx * s, y); g.rotate(a);
         const L = poly([[-w * s, 0], [-w * s, -h * s], [0, -(h + 6) * s], [0, 0]]), R = poly([[0, 0], [0, -(h + 6) * s], [w * s, -h * s], [w * s, 0]]);
         ink(g, L, '#5d86c4', 1.4, '#22305a'); ink(g, R, '#aee6f0', 1.4, '#22305a');
@@ -374,10 +404,11 @@ let doorM = null;
 D.onLayout(() => {
   const cs = ISLE.cells.filter((c) => c.b === 1 && c.facing > 0.5 && c.nrm[0] > -0.1 && c.nrm[0] < 0.55);
   const c = cs[Math.floor(cs.length / 2)] || ISLE.cells[0], q = c.p;
-  const u = [q[1][0] - q[0][0], q[1][1] - q[0][1], q[1][2] - q[0][2]], ul = Math.hypot(...u);
-  const v = [q[3][0] - q[0][0], q[3][1] - q[0][1], q[3][2] - q[0][2]], vl = Math.hypot(...v);
-  doorM = plane(q[0], u.map((x) => x / ul), v.map((x) => x / vl));
-  doorM.w = ul; doorM.h = vl; doorM.cell = c;
+  // a door stands upright: carve it into the facet along its top edge, straight down
+  const u = [q[0][0] - q[1][0], 0, q[0][2] - q[1][2]], ul = Math.hypot(...u);
+  const top = [lerp(q[1][0], q[2][0], 0.15), lerp(q[1][1], q[2][1], 0.15), lerp(q[1][2], q[2][2], 0.15)];
+  doorM = plane(top, u.map((x) => x / ul), [0, -1, 0]);
+  doorM.w = ul; doorM.h = (q[1][1] - q[2][1]) * 0.85; doorM.cell = c;
 });
 layer({
   id: 'rock-door', z: 15.7,
@@ -433,10 +464,11 @@ layer({
 });
 
 // ------------------------------------------------------------------ stones floating under the island
-const stones = [[-300, -360, 40, 20, 1], [260, -330, 120, 15, 2], [-120, -520, 80, 12, 3], [470, -250, 60, 13, 4], [-470, -230, 90, 17, 5], [140, -560, 120, 9, 6]]
+// three chunks that broke off the tip and never fell, the biggest still trailing a root
+const stones = [[170, -392, 70, 22, 1], [-96, -428, 72, 13, 2], [236, -330, 100, 8, 3]]
   .map(([X, Y, Z, r, s]) => ({ X, Y, Z, r, s, ox: 0, oy: 0, vx: 0, vy: 0 }));
 layer({
-  id: 'stones', z: 13,
+  id: 'stones', z: 15.8,
   hit: (x, y) => stones.some((s) => Math.hypot(x - s.x, y - s.y) < s.r + 24),
   update(dt, t) {
     for (const s of stones) {
@@ -457,6 +489,7 @@ layer({
       ink(g, poly([[r * 0.05, -r * 0.2], [r * 0.55, -r * 0.42], [r, -r * 0.05], [r * 0.45, r * 0.6], [r * 0.05, r * 0.95]]), tone(M.rock, 0.8), 1.2, M.rock.line);
       ink(g, poly([[-r * 0.45, r * 0.55], [r * 0.05, r * 0.95], [r * 0.05, -r * 0.2], [-r, -r * 0.15]]), mix(tone(M.rock, 0.15), M.rock.bounce, 0.3), 1.2, M.rock.line);
       ink(g, ell(0, -r * 0.34, r * 0.86, r * 0.2), tone(M.grass, 0.6), 1.3, M.grass.line);
+      if (s.s === 1) { const sw = Math.sin(t * 1.2) * 3; tube(g, D.quad(r * 0.1, r * 0.9, r * 0.3 + sw, r * 1.6, -r * 0.1 + sw * 1.5, r * 2.3), '#7d5a4e', 1.6, 1); }
       g.restore();
     }
   },
@@ -475,7 +508,7 @@ layer({
     ink(g, poly(T.concat(B.reverse())), M.soil.base, 1.8, M.soil.line);
     const pts = []; for (let i = 0; i < 60; i++) { const a = (i / 60) * TAU, [x, z] = satRim(a); pts.push(pr(SAT.X + x, SAT.Y, SAT.Z + z)); }
     const top = poly(pts);
-    ink(g, top, grad(g, SAT.X + 760 - 70, 0, SAT.X + 760 + 70, 0, [tone(M.grass, 0.38), tone(M.grass, 0.68)]), 2.6, M.grass.line);
+    ink(g, top, grad(g, SAT.X + CF.CAM.cx - 70, 0, SAT.X + CF.CAM.cx + 70, 0, [tone(M.grass, 0.38), tone(M.grass, 0.68)]), 2.6, M.grass.line);
     const r = rng(3);
     for (let i = 0; i < 46; i++) {
       const a = 0.04 + (i / 46) * (Math.PI - 0.08), [X, Z] = satRim(a), [x, y] = pr(SAT.X + X, SAT.Y, SAT.Z + Z), len = 4 + r() * 8;
@@ -487,10 +520,10 @@ layer({
       g.lineWidth = 1; g.strokeStyle = rgba(M.grass.line, 0.4); g.beginPath(); g.moveTo(x - 2.5, y - 3.5); g.lineTo(x, y); g.lineTo(x + 2.5, y - 4); g.stroke();
     }
     // the signpost: CLOUDFALL one way, the cottage the other
-    const [px, py] = pr(SAT.X + 18, SAT.Y, SAT.Z - 22);
+    const [px, py] = pr(SAT.X - 8, SAT.Y, SAT.Z - 26);
     CF.contact(g, px, py, 9, 3, 0.45);
     tube(g, D.seg(px, py, px, py - 58), tone(M.timber, 0.55), 3.4, 1.4);
-    for (const [dy, dir, txt, w] of [[-52, 1, 'COTTAGE', 52], [-38, -1, 'NOWHERE', 58]]) {
+    for (const [dy, dir, txt, w] of [[-52, 1, 'HOME', 40], [-38, -1, 'NOWHERE', 58]]) {
       const x0 = px, x1 = px + dir * w, yy = py + dy;
       ink(g, poly([[x0, yy - 6], [x1 - dir * 8, yy - 6], [x1, yy], [x1 - dir * 8, yy + 6], [x0, yy + 6]]), dir > 0 ? '#f1dcb4' : '#d9c39c', 1.4, M.timber.line);
       g.font = 'italic 700 8px Georgia, serif'; g.fillStyle = '#5a3a3e'; g.textAlign = 'center'; g.fillText(txt, (x0 + x1 - dir * 6) / 2, yy + 3);
@@ -503,14 +536,14 @@ layer({
 const mail = { flag: 0, fv: 0, letter: 0 };
 layer({
   id: 'mailbox', z: 10.5,
-  hit: (x, y) => { const [mx, my] = pr(SAT.X - 22, SAT.Y, SAT.Z - 10); return Math.abs(x - mx) < 20 && y > my - 60 && y < my + 4; },
+  hit: (x, y) => { const [mx, my] = pr(SAT.X + 40, SAT.Y, SAT.Z - 4); return Math.abs(x - mx) < 20 && y > my - 60 && y < my + 4; },
   onEnter() { mail.fv -= 9; },
   update(dt, t, L) {
     mail.fv += (-40 * (mail.flag - (L.hovered ? -1.4 : 0)) - 4 * mail.fv) * dt; mail.flag += mail.fv * dt;
     mail.letter = ease(mail.letter, L.hovered && L.since > 0.6 ? 1 : 0, 3, dt);
   },
   draw(g) {
-    const [x, y] = pr(SAT.X - 22, SAT.Y, SAT.Z - 10);
+    const [x, y] = pr(SAT.X + 40, SAT.Y, SAT.Z - 4);
     CF.contact(g, x, y, 10, 3, 0.45);
     tube(g, D.seg(x, y, x, y - 34), tone(M.timber, 0.55), 3.4, 1.4);
     const bx = x - 13, by = y - 34;
@@ -570,7 +603,7 @@ layer({
       const [x, y] = bridgeAt(u, 1, 26 - bridge.b * 0.3 * Math.sin(Math.PI * u));
       g.save(); g.translate(x, y); g.rotate(bridge.lan[i]);
       g.lineWidth = 1; g.strokeStyle = '#4a3030'; g.beginPath(); g.moveTo(0, 0); g.lineTo(0, 8); g.stroke();
-      CF.glow(g, 0, 15, 24, '#ffbe6e', 0.45 + 0.05 * Math.sin(t * 4 + i * 2));
+      CF.glow(g, 0, 15, 20, '#ffbe6e', 0.25 + 0.04 * Math.sin(t * 4 + i * 2));
       ink(g, ell(0, 15, 6.5, 8), grad(g, -6, 0, 6, 0, ['#e88a4f', '#f8c47a', '#ffe8b0']), 1.5);
       g.lineWidth = 0.8; g.strokeStyle = 'rgba(120,50,30,0.5)'; g.beginPath(); g.ellipse(0, 15, 3, 8, 0, 0, TAU); g.stroke();
       ink(g, D.rect(-3.5, 6, 7, 2.5), '#6e3c32', 1);
@@ -601,7 +634,7 @@ layer({
     g.lineWidth = 1.3; g.strokeStyle = CF.LINE; g.stroke(circ(bx, fall + bob, 4.5));
     fisher.fish.forEach((f, i) => {
       const caught = i === 0 ? c : 0, a = t * (0.9 + i * 0.2) + f.ph;
-      let x = bx + Math.cos(a) * f.r * 1.6, y = fall + 34 + Math.sin(a) * f.r * 0.6 + i * 10;
+      let x = bx + Math.cos(a) * (f.r * 0.9 + 4), y = fall + bob + 12 + Math.sin(a) * f.r * 0.45 + i * 6;
       let dir = -Math.sin(a) > 0 ? 1 : -1;
       if (caught > 0.02) { x = lerp(x, bx, caught); y = lerp(y, fall + bob + 13, caught); dir = 1; }
       g.save(); g.translate(x, y); g.scale(dir, 1);
@@ -621,7 +654,7 @@ layer({
       arms: [[-17, -12 - c * 6, -12, -11]],
       hat: (g, lw) => { ink(g, D.ell(0, -32, 17, 4.5), '#e8c56a', lw); ink(g, D.ell(0, -36, 9, 6), '#e8c56a', lw); g.lineWidth = 2.4; g.strokeStyle = '#c9503f'; g.beginPath(); g.ellipse(0, -33.5, 8.6, 2.2, 0, 0, Math.PI); g.stroke(); } });
     // a bucket beside the fisher, with one already in it
-    const [kx, ky] = pr(SAT.X + 34, SAT.Y, SAT.Z + 24);
+    const [kx, ky] = pr(SAT.X - 34, SAT.Y, SAT.Z + 22);
     CF.contact(g, kx, ky, 11, 3.5);
     ink(g, poly([[kx - 9, ky - 16], [kx + 9, ky - 16], [kx + 7, ky], [kx - 7, ky]]), grad(g, kx - 9, 0, kx + 9, 0, ['#5a6a8a', '#8aa0b8', '#c7d6e0']), 1.5);
     ink(g, ell(kx, ky - 16, 9, 2.6), '#4a6fa0', 1.3);

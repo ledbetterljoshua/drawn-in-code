@@ -85,6 +85,20 @@ function cloudRow(g, d, seed, v) {
     x += len + gap;
   }
 }
+// a big bank of cumulus heaped up out of the floor: the large shapes the floor is built around
+function bank(g, x, y, w, h, seed, warm) {
+  const cs = cumulusCircles(seed, w, h).map(([cx, cy, r]) => [x + cx, y + cy, r]);
+  for (let xx = x - w / 2; xx < x + w / 2; xx += h * 0.3) cs.push([xx, y + h * 0.12, h * 0.3]);
+  lumps(g, cs, { union: true, lw: 1.4, line: rgba('#9a6a8c', 0.28),
+    shade: mix('#ad92c6', '#d29cb0', warm), base: mix('#f0d6dc', '#fcd6bc', warm), lit: mix('#fff4ec', '#fff0c8', warm) }, y + h * 0.3);
+  // its shaded flank away from the sun, and the dark where it sinks into the floor
+  g.save(); g.globalCompositeOperation = 'multiply';
+  const U = new Path2D(); for (const [cx, cy, r] of cs) D.circ(cx, cy, r, U);
+  g.clip(U);
+  g.fillStyle = grad(g, x - w / 2, 0, x + w / 2, 0, ['rgba(140,120,190,0.45)', 'rgba(200,180,220,0.1)', 'rgba(255,255,255,0)']); g.fillRect(x - w, y - h * 1.6, w * 2, h * 2);
+  g.fillStyle = grad(g, 0, y - h * 0.2, 0, y + h * 0.3, ['rgba(255,255,255,0)', 'rgba(150,120,180,0.5)']); g.fillRect(x - w, y - h * 0.2, w * 2, h * 0.5);
+  g.restore();
+}
 function mountain(g, pts, haze) {
   const p = poly(pts);
   g.fillStyle = mix('#8d86b4', '#d4bcc8', haze); g.fill(p);
@@ -155,6 +169,9 @@ layer({
       at(7, () => farIsle(g, 1450, 410, 120, 0.45, 3)),
       at(12, () => farIsle(g, 470, 240, 70, 0.6, 5)),
       at(5, () => farIsle(g, -60, 190, 130, 0.35, 7)),
+      at(3.2, () => bank(g, 100, rowY(3.2) + 10, 760, 210, 31, 0.1)),
+      at(2.4, () => bank(g, 1640, rowY(2.4) + 10, 820, 260, 33, 1)),
+      at(1.3, () => bank(g, -200, rowY(1.3) + 30, 900, 300, 35, 0.2)),
     ];
     for (const d of ds) {
       for (const th of things) if (!th.done && th.d >= d) { th.fn(); th.done = true; }
@@ -266,7 +283,7 @@ layer({
 });
 
 // ------------------------------------------------------------------ the balloon, tied to the tree
-const balloon = (CF.balloon = { x: 290, y: 150, rise: 0, flame: 0, tie: [395, 372], blink: D.blinker(), sway: 0, sv: 0 });
+const balloon = (CF.balloon = { x: 250, y: 112, rise: 0, flame: 0, tie: CF.pr(-392, 190, -70), blink: D.blinker(), sway: 0, sv: 0 });
 layer({
   id: 'balloon', z: 8,
   hit: (x, y) => Math.hypot(x - balloon.cx, y - balloon.cy) < 84 || (Math.abs(x - balloon.cx) < 30 && y > balloon.cy + 72 && y < balloon.cy + 140),

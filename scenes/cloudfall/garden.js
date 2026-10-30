@@ -64,7 +64,7 @@ layer({
 });
 
 // ------------------------------------------------------------------ the peach tree
-const TREE = { X: -318, Z: -64, cy: 236 };
+const TREE = { X: -318, Z: -64, cy: 206 };
 let treeSprite = null;
 const peaches = [];
 function drawTree(g) {

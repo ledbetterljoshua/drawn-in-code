@@ -13,7 +13,7 @@ const { clamp, lerp } = D;
 const CF = (window.CF = { D });
 
 // ------------------------------------------------------------------ camera
-const CAM = (CF.CAM = { cx: 760, cy: 630, S: 0.31, C: 0.951, HZ: 312 });
+const CAM = (CF.CAM = { cx: 840, cy: 630, S: 0.31, C: 0.951, HZ: 312 });
 CF.pr = (X, Y = 0, Z = 0) => [CAM.cx + X, CAM.cy + Z * CAM.S - Y * CAM.C];
 const vec = (v) => [v[0], v[2] * CAM.S - v[1] * CAM.C];
 CF.plane = (o, u, v) => {
@@ -37,14 +37,14 @@ CF.pgrad = (g, M, s0, t0, s1, t1, list) => D.grad(g, ...CF.at(M, s0, t0), ...CF.
 // low on the right and a little in front of us, so the right-facing walls catch it and the
 // shadows run back and to the left
 const norm = (v) => { const l = Math.hypot(...v); return v.map((x) => x / l); };
-const LIGHT = (CF.LIGHT = norm([0.84, 0.4, 0.36]));
+const LIGHT = (CF.LIGHT = norm([0.88, 0.4, 0.22]));
 CF.norm = norm;
 CF.dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 CF.cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
 // brightness 0..1 of a surface with normal n: direct sun plus a little sky from above
 CF.lit = (n) => { n = norm(n); return clamp(0.1 + 0.9 * Math.max(0, CF.dot(n, LIGHT)) + 0.12 * Math.max(0, n[1]), 0, 1); };
 // where a point at height Y casts its shadow on the ground (plan): back and to the left
-CF.SH = [-1.05, -0.42];
+CF.SH = [-1.2, -0.26];
 CF.shadowOf = (X, Y, Z) => [X + CF.SH[0] * Y, Z + CF.SH[1] * Y];
 CF.SHADOW = '#8d86c9'; // multiplied over whatever it falls on: a cool violet shade, never grey
 CF.casters = []; // functions returning 3D points whose shadows the ground layer draws
