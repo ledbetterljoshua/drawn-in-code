@@ -184,8 +184,8 @@ layer({
       }
       for (const sh of sheaths) {
         const [x0, y0] = [sh.u, sh.v], x1 = x0 + Math.cos(sh.a) * sh.len, y1 = y0 + Math.sin(sh.a) * sh.len;
-        C.limb(g, [[x0, y0], [lerp(x0, x1, 0.5), lerp(y0, y1, 0.5) + 2], [x1, y1]], 20, 13, sh.layer === 2 ? '#e8bca6' : sh.layer === 1 ? '#d6a490' : '#c08e84', 1.3, '#a87470');
-        g.lineWidth = 0.9; g.strokeStyle = 'rgba(120,60,60,0.5)';
+        C.limb(g, [[x0, y0], [lerp(x0, x1, 0.5), lerp(y0, y1, 0.5) + 2], [x1, y1]], 20, 13, sh.layer === 2 ? '#dfae98' : sh.layer === 1 ? '#d09c88' : '#bf8c80', 0.9, '#a87470');
+        g.lineWidth = 0.7; g.strokeStyle = 'rgba(120,60,60,0.3)';
         for (const f of [0.35, 0.65]) { const cx = lerp(x0, x1, f), cy = lerp(y0, y1, f); g.beginPath(); g.ellipse(cx, cy, 2.5, 6.5, sh.a, 0, TAU); g.stroke(); }
       }
       drawCirri(g, t, L, false);

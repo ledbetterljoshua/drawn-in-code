@@ -367,14 +367,18 @@ const C_limb = (...a) => A.crew.limb(...a);
 
 // sea grass: tufts along the sand, every blade leaning into the current
 const tufts = [];
-{ const r = rng(71); for (let i = 0; i < 26; i++) tufts.push({ x: -100 + r() * 1800, y: 1080 + r() * 60 + (i % 5 === 0 ? r() * 700 : 0), n: 5 + Math.floor(r() * 5), h: 26 + r() * 30, ph: r() * 6 }); }
+{ const r = rng(71);
+  // meadows gather around the rocks and thin out across the open sand; nearer tufts are bigger
+  const seeds = [[120, 1110, 150], [1500, 1112, 160], [620, 1085, 60], [1280, 1300, 140], [350, 1500, 200], [1150, 1090, 50]];
+  for (const [cx, cy, sp] of seeds) { const n = 3 + Math.floor(r() * 4); for (let i = 0; i < n; i++) tufts.push({ x: cx + (r() - 0.5) * sp * 2, y: cy + (r() - 0.5) * 24, n: 3 + Math.floor(r() * 6), h: 18 + r() * 34, ph: r() * 6 }); }
+  tufts.sort((a, b) => a.y - b.y); }
 layer({
   id: 'grass', z: 15,
   draw(g, t) {
     const v = st.view;
     for (const tf of tufts) {
       if (tf.y > v.y1 + 10) continue;
-      const w = wind(t, tf.x), s = 1 + (tf.y - 1080) * 0.0015;
+      const w = wind(t, tf.x), s = 0.75 + (tf.y - 1070) * 0.006;
       for (let i = 0; i < tf.n; i++) {
         const bx = tf.x + (i - tf.n / 2) * 3 * s, h = tf.h * s * (0.7 + ((i * 7) % 5) / 8);
         const bend = (w * 0.5 + Math.sin(t * 1.4 + tf.ph + i) * 0.18) * h;
@@ -388,13 +392,16 @@ layer({
 // ------------------------------------------------------------------ kelp
 // a strand: a stem rooted at (x, y) rising h, gas floats and long blades along it, swaying with the
 // current — stronger near the top. Colours fogged by depth.
-const KELP = { stem: '#6b5326', blade: '#a08a34', bladeLt: '#d3bb5a', bladeSh: '#6d5a22', float: '#c1a243' };
+const KELP = { stem: '#6b5326', blade: '#a8873a', bladeLt: '#e8cf6a', bladeSh: '#6d5a22', under: '#c9b25a', float: '#c9a548' };
 function kelpStrand(seed, x, y, h, fog, lw) {
   const r = rng(seed), c = {};
   for (const k in KELP) c[k] = mix(KELP[k], FOG, fog);
   const blades = [];
-  for (let u = 0.1 + r() * 0.05; u < 1; u += 0.03 + r() * 0.07) blades.push({ u, side: r() < 0.72 ? 1 : -1, len: (70 + r() * 90) * (0.6 + u * 0.5), w: 16 + r() * 12, ph: r() * 6 });
-  c.line = mix(LINE, FOG, fog * 0.8);
+  for (let u = 0.08 + r() * 0.05; u < 1.02; u += 0.05 + r() * 0.08) {
+    const len = (45 + Math.pow(r(), 0.7) * 150) * (0.7 + u * 0.4);
+    blades.push({ u, side: r() < 0.7 ? 1 : -1, len, w: len * (0.13 + r() * 0.08) + 5, ph: r() * 6, tw: 0.6 + r() * 1.4, tph: r() * 3 });
+  }
+  c.line = mix('#3e2a1a', FOG, fog * 0.85);
   return { x, y, h, c, blades, lw, ph: r() * 10, push: 0, pv: 0 };
 }
 function stemPts(k, t) {
@@ -409,43 +416,53 @@ function stemPts(k, t) {
 }
 function drawKelp(g, k, t) {
   const pts = stemPts(k, t);
-  A.stroke(g, pts, 5 + k.lw * 2, k.c.line);
-  A.stroke(g, pts, 5, k.c.stem);
+  if (k.lw) A.stroke(g, pts, 4 + k.lw * 2, k.c.line);
+  A.stroke(g, pts, 4, k.c.stem);
   for (const b of k.blades) {
     const i = Math.min(pts.length - 2, Math.floor(b.u * (pts.length - 1)));
     const f = b.u * (pts.length - 1) - i;
     const x = lerp(pts[i][0], pts[i + 1][0], f), y = lerp(pts[i][1], pts[i + 1][1], f);
     // a long ruffled blade streaming downstream from a little float, bending along its length
     const w = wind(t, k.x);
-    const a0 = -Math.PI / 2 + (b.side > 0 ? 0.95 : 0.35) + w * 0.4;
-    const L = b.len, W = b.w, seg = 9;
+    const a0 = -Math.PI / 2 + (b.side > 0 ? 0.75 : 0.12) + w * 0.35;
+    const L = b.len, W = b.w, seg = 10;
     const spine = [[x, y]];
     let a = a0, px = x, py = y;
     for (let j = 1; j <= seg; j++) {
       const u = j / seg;
-      a += (Math.sin(t * 1.3 + b.ph + u * 3) * 0.07 + 0.07 + w * 0.04) * (0.5 + u);
+      // each blade droops downstream toward its tip, and ripples
+      a += (Math.sin(t * 1.3 + b.ph + u * 3) * 0.06 + 0.05 + w * 0.04) * (0.4 + u * 1.2);
       px += Math.cos(a) * L / seg; py += Math.sin(a) * L / seg;
       spine.push([px, py]);
     }
+    // a ribbon that twists: where it turns edge-on it narrows, and past the twist we see its paler underside
     const Ls = [], Rs = [];
+    let twistAt = -1;
     for (let j = 0; j <= seg; j++) {
       const u = j / seg, q = spine[Math.max(0, j - 1)], n = spine[Math.min(seg, j + 1)];
       const dx = n[0] - q[0], dy = n[1] - q[1], d = Math.hypot(dx, dy) || 1;
-      const hw = W * Math.sin(Math.min(1, u * 1.6 + 0.12) * Math.PI * 0.5) * (1 - u * 0.55) * 0.5;
-      const ruf = 1 + 0.22 * Math.sin(u * 22 + b.ph + t * 2);
+      const tw = Math.cos(u * Math.PI * b.tw + b.tph + Math.sin(t * 0.8 + b.ph) * 0.3);
+      if (twistAt < 0 && j > 0 && Math.sign(tw) !== Math.sign(Math.cos(((j - 1) / seg) * Math.PI * b.tw + b.tph))) twistAt = j;
+      const hw = W * Math.sin(Math.min(1, u * 2 + 0.1) * Math.PI * 0.5) * (1 - u * 0.7) * 0.5 * (0.3 + 0.7 * Math.abs(tw));
+      const ruf = 1 + 0.15 * Math.sin(u * 26 + b.ph + t * 2);
       Ls.push([spine[j][0] - (dy / d) * hw * ruf, spine[j][1] + (dx / d) * hw * ruf]);
-      Rs.push([spine[j][0] + (dy / d) * hw / ruf, spine[j][1] - (dx / d) * hw / ruf]);
+      Rs.push([spine[j][0] + (dy / d) * hw, spine[j][1] - (dx / d) * hw]);
     }
-    const p = curve([...Ls, ...Rs.reverse()]);
-    g.fillStyle = k.c.blade; g.fill(p);
-    g.lineWidth = k.lw; g.strokeStyle = k.c.line; g.stroke(p);
-    // the midrib, lit where the sun comes through the blade
-    A.stroke(g, spine.slice(1, -2), Math.max(1.5, W * 0.16), k.c.bladeLt);
-    g.fillStyle = k.c.float; g.fill(ell(x, y, 4.5, 5.5)); g.lineWidth = k.lw * 0.8; g.stroke(ell(x, y, 4.5, 5.5));
+    const p = curve([...Ls, ...Rs.slice().reverse()]);
+    const [tx, ty] = spine[seg];
+    g.fillStyle = grad(g, x, y, tx, ty, [k.c.bladeSh, k.c.blade, k.c.bladeLt]);
+    g.fill(p);
+    if (twistAt > 0 && twistAt < seg - 1) {
+      const q = curve([...Ls.slice(twistAt), ...Rs.slice(twistAt).reverse()]);
+      g.fillStyle = k.c.under; g.globalAlpha = 0.8; g.fill(q); g.globalAlpha = 1;
+    }
+    if (k.lw) { g.lineWidth = k.lw; g.strokeStyle = k.c.line; g.stroke(p); }
+    A.stroke(g, spine.slice(1, -3), Math.max(1, W * 0.08), k.c.bladeLt);
+    g.fillStyle = k.c.float; g.fill(ell(x, y, 3.8, 4.8)); if (k.lw) { g.lineWidth = k.lw * 0.8; g.strokeStyle = k.c.line; g.stroke(ell(x, y, 3.8, 4.8)); }
   }
 }
-const kelpBack = [kelpStrand(1, 90, 990, 1450, 0.55, 1), kelpStrand(2, 250, 1060, 760, 0.3, 1.3), kelpStrand(3, 1490, 1000, 1150, 0.5, 1), kelpStrand(4, 1390, 1040, 620, 0.35, 1.2)];
-const kelpFront = [kelpStrand(6, -70, 1200, 1800, 0, 1.9), kelpStrand(7, 390, 1240, 560, 0, 1.8), kelpStrand(8, 1690, 1220, 900, 0, 1.9)];
+const kelpBack = [kelpStrand(1, 90, 990, 1450, 0.6, 0), kelpStrand(2, 250, 1060, 760, 0.35, 1), kelpStrand(3, 1490, 1000, 1150, 0.55, 0), kelpStrand(4, 1390, 1040, 620, 0.38, 1)];
+const kelpFront = [kelpStrand(6, -70, 1200, 1800, 0, 1.4), kelpStrand(7, 390, 1240, 560, 0, 1.4), kelpStrand(8, 1690, 1220, 900, 0, 1.4)];
 A.kelp = [...kelpBack, ...kelpFront];
 function kelpUpdate(list, dt, t) {
   for (const k of list) {

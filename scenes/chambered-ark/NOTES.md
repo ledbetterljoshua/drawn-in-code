@@ -107,3 +107,14 @@ Worst five, and what I did:
    glowing sea-pen, a jelly on a tether drifting in the observatory and the garden.
 4. Caustics on the shell first read as crackle glaze → bigger cells, much fainter, one tall tile (no seam).
 5. Barnacles first came out as upside-down cups mid-shell → plate volcanoes seen from the side, on the keel.
+
+## Round 5
+Worst five:
+1. Kelp, still a fern on a pole → rebuilt the blades as twisting ribbons: narrow where they turn
+   edge-on, the paler underside showing past the twist, a gradient from dark base to a backlit tip,
+   lengths from 45 to 200, fewer and irregular; brown line instead of plum; far strands unlined.
+2. Grass tufts sprinkled evenly at one size → meadows gathered round the rocks and the eels, thinning
+   over open sand, scaled with distance.
+3. Sheaths on the face read as popcorn cups → lower contrast, lighter line, closer to the face colour.
+4. (kept) values are mid-everywhere; the cut face's whites carry the read. Watching.
+5. (kept) the eel colony is a picket line at full frame. Watching.
