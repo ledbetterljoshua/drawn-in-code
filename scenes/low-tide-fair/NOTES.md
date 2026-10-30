@@ -240,3 +240,22 @@ Plus a light canvas grade (saturate 1.12, contrast 1.07) to lift the values out 
 
 Not taken, and why: a full re-pose of the folk (three-quarter views, seen-from-behind) needs a
 second rig; that's the biggest thing left (see "still wrong").
+
+## Round 9
+
+1. **The band's audience merged into one dark knot** with a flowering tuft growing through it: the
+   strolling couple's path ran straight through the crowd. Couple rerouted between the stalls,
+   audience and dancers spaced so every silhouette reads alone, tuft moved off the crowd.
+2. Final hover, phone and frame-rate check (headless Chromium: p90 16.8 ms at 1440×900 and at
+   390×844 @2x).
+
+## Still wrong (for whoever picks this up)
+
+- **One body, one view.** Every folk is the same upright profile rig, recoloured and rescaled. A
+  three-quarter / back view and a few dedicated poses (carrying, reaching, sitting properly) would do
+  more for the crowd than anything else left.
+- **The near wet sand is still the weakest material.** It should be a broken mirror holding dark
+  vertical reflections of the figures standing on it; right now only the snails reflect.
+- **Snail heads.** The grandmother's neck reads as a big soft wedge; she needs a clearer head with a
+  face, and a mantle collar where the body meets the shell's aperture.
+- Under 4× CPU throttling (headless, software raster) it drops to ~15 fps; unverified on a real phone.

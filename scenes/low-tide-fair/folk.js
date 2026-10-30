@@ -75,12 +75,12 @@ function grounded(g, x, y, h, w, fn) {
 const band = {
   x: 1120, y: 990, tempo: 1, toot: 0, beat: 0,
   crabs: [{ dx: -26, col: '#d9644a', inst: 'fiddle' }, { dx: 0, col: '#e88a4a', inst: 'drum' }, { dx: 26, col: '#c45a5a', inst: 'conch' }],
-  dancers: [folk({ sp: 'hare', x: 1030, y: 1018, coat: '#a8689b', acc: '#f2c95c', cloth: 'smock', dir: 1 }), folk({ sp: 'vole', x: 1215, y: 1024, coat: '#4f8fa3', acc: '#e07f62', dir: -1 }), folk({ sp: 'otter', x: 1160, y: 1050, coat: '#e7a43c', dir: -1, k: 0.95 })],
+  dancers: [folk({ sp: 'hare', x: 1015, y: 1022, coat: '#a8689b', acc: '#f2c95c', cloth: 'smock', dir: 1 }), folk({ sp: 'vole', x: 1240, y: 1032, coat: '#4f8fa3', acc: '#e07f62', dir: -1 }), folk({ sp: 'otter', x: 1150, y: 1060, coat: '#e7a43c', dir: -1, k: 0.95 })],
   spin: [0, 0, 0],
   crowd: [
-    folk({ sp: 'mole', x: 985, y: 1000, coat: '#d65a4a', dir: 1, hat: F.HATS.straw() }), folk({ sp: 'otter', x: 1255, y: 1000, coat: '#6f9d58', acc: '#f4efe6', dir: -1 }),
-    folk({ sp: 'shrew', x: 1270, y: 1040, coat: '#f2c95c', dir: -1, k: 0.8 }), folk({ sp: 'hare', x: 1080, y: 1064, coat: '#5a7b8c', acc: '#e07f62', dir: 1, k: 1.05 }),
-    folk({ sp: 'vole', x: 960, y: 1052, coat: '#efe2c8', cloth: 'smock', acc: '#a8689b', dir: 1, k: 0.75 }),
+    folk({ sp: 'mole', x: 960, y: 998, coat: '#d65a4a', dir: 1, hat: F.HATS.straw() }), folk({ sp: 'otter', x: 1300, y: 996, coat: '#6f9d58', acc: '#f4efe6', dir: -1 }),
+    folk({ sp: 'shrew', x: 1335, y: 1046, coat: '#f2c95c', dir: -1, k: 0.8 }), folk({ sp: 'hare', x: 1060, y: 1074, coat: '#5a7b8c', acc: '#e07f62', dir: 1, k: 1.05 }),
+    folk({ sp: 'vole', x: 915, y: 1050, coat: '#efe2c8', cloth: 'smock', acc: '#a8689b', dir: 1, k: 0.75 }),
   ],
 };
 layer({
@@ -435,12 +435,12 @@ layer({
 // ============================================================ the strolling couple
 const couple = { a: folk({ sp: 'mole', coat: '#5a7b8c', acc: '#efe2c8', dir: 1, hat: null }), b: folk({ sp: 'mole', coat: '#a8689b', cloth: 'smock', acc: '#f2c95c', dir: 1, hat: F.HATS.kerchief('#e07f62') }), stop: 0, u: 0 };
 layer({
-  id: 'wander', z: F.zOf(1062),
+  id: 'wander', z: F.zOf(988),
   hit(x, y) { return Math.abs(x - couple.x) < 50 && y > couple.y - 60 && y < couple.y + 8; },
   update(dt, t, L) { couple.stop = ease(couple.stop, L.hovered ? 1 : 0, 3, dt); couple.u += dt * 0.012 * (1 - couple.stop); stepFolk(couple.a, dt); stepFolk(couple.b, dt); },
   draw(g, t) {
     const u = couple.u % 2, k = u < 1 ? u : 2 - u, dir = u < 1 ? 1 : -1;
-    const x = lerp(1250, 1520, k), y = 1062 + Math.sin(k * 7) * 4;
+    const x = lerp(620, 830, k), y = 988 + Math.sin(k * 7) * 4;
     couple.x = x; couple.y = y;
     const s = pxu(y), step = (t * 0.7) % 1;
     const hatUp = couple.stop;

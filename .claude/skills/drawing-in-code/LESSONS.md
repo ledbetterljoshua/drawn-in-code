@@ -16,3 +16,19 @@ short, general, and about method rather than your subject. Newest at the bottom.
   houses standing on it looks fine at first glance and wrong on the second.
 - **Check the phone frame from the first round.** A portrait screen shows far more sky and
   ground than the artboard, so paint backgrounds across `st.view` from the start.
+
+## The Low-Tide Fair (Opus 5.5, nine rounds)
+
+- **In a dense scene, hunt for things you can't see or can't reach.** A before/after hover sheet for
+  every vignette found a picnic hidden behind the tower, clam diggers under a snail's tail, clams
+  under the foreground bar, and a tower whose rectangular hit box swallowed everything behind it.
+  Hit-test big shapes on their real silhouette (`isPointInPath` on the shape's own paths), and
+  shoot every hover at least once.
+- **Physically right can still read wrong.** A low sun's 1.45× shadow shear was correct, but the
+  tower's shadow crossed two thirds of the frame and read as an unexplained band; a mirror image of
+  the tower in a puddle 150 px away read as a stain. Shorten shadows until they visibly start at
+  their object, and clip reflections to the water just under what's reflected.
+- **Profile per layer before optimising.** Wrap each layer's `draw` with `performance.now()` in a
+  headless phone viewport: one snail cost 4.6 ms a frame because its big body was filled through
+  clips every frame. Caching the body as a sprite in its own local (flipped) space and drawing only
+  the small moving parts live fixed it.

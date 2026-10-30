@@ -244,7 +244,7 @@ layer({
 const tufts = [];
 {
   const r = rng(909);
-  for (const [x, y, k, n, spread, cols, flowers] of [[440, 1124, 1.4, 14, 0.9, ['#6f7f45', '#879055', '#5d6b3e'], false], [1215, 1136, 2.2, 26, 1.4, ['#7c8a4c', '#a3a05a', '#6a7a44'], true], [1810, 1132, 1.7, 18, 0.7, ['#5d6b3e', '#4f5f3a', '#879055'], false]]) {
+  for (const [x, y, k, n, spread, cols, flowers] of [[440, 1124, 1.4, 14, 0.9, ['#6f7f45', '#879055', '#5d6b3e'], false], [1450, 1136, 2.2, 26, 1.4, ['#7c8a4c', '#a3a05a', '#6a7a44'], true], [1810, 1132, 1.7, 18, 0.7, ['#5d6b3e', '#4f5f3a', '#879055'], false]]) {
     const blades = [];
     for (let i = 0; i < n; i++) blades.push({ a: -Math.PI / 2 + (r() - 0.5) * spread, L: (24 + r() * 52) * k * (1 - Math.abs(i / n - 0.5) * 0.6), w: (1.8 + r() * 2.6) * k, c: cols[Math.floor(r() * cols.length)], ph: r() * TAU });
     tufts.push({ x, y, k, blades, flowers });
