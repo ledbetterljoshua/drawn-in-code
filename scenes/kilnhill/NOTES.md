@@ -189,3 +189,25 @@ the clip-art flames and depth. What changed:
 Rejected again: moon, stars, horizon glow (the lane is light from within only).
 Not fixed: a portrait-specific composition (needs per-aspect framing the shared engine doesn't
 have); bricks staying one size up the taper is correct for a real bottle kiln.
+
+## Round 9
+1. **The clay face still read as planks.** Small slumped clods break the bed lines, each with a
+   shadow under it, so the face reads as dug earth.
+2. **The watchers looked at nothing in particular** (critic 3, point 10). The parent now tips its
+   head back and looks up at the kiln with the pup, which points at it.
+3. Checked the hero interaction end to end: hovering the stoker throws the salt and all three
+   firemouths flash green, the lip flame greens, the far towns answer.
+Stopping here: the last two rounds' changes are visible at full frame but small; what's left
+needs bigger moves (below) rather than another polish pass.
+
+## Still wrong (for whoever picks this up)
+- **The phone frame is a centre crop, not a composition.** The kiln sits left, the bowl house is
+  cut at the right edge and the top third is empty sky. It needs per-aspect framing (shift and
+  scale the artboard for portrait), which the shared engine doesn't offer; a copy of the engine in
+  this folder could add it.
+- **The mole rig is one side-view puppet.** At the near figures' scale you can see it: the arms
+  are simple tapers and nobody can turn toward or away from you. A three-quarter head and a
+  sitting pose would let the watchers sit on the bank and actually face the kiln.
+- **The story is spread evenly.** Eight vignettes each get about the same weight. An illustrator
+  would quiet half of them (fewer lit windows on the left terrace, a darker workshop) so the
+  stoker's moment at the firemouth reads first.

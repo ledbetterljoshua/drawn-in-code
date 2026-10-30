@@ -197,6 +197,16 @@
       g.restore();
       scoops(g, f, [[20, 760, 0.9], [210, 690, 1.1], [-240, 700, 0.8], [330, 790, 0.7]], 5);
       stones(g, f, [-700, 620, 1150, 240], 26, 7, M.stone, 5);
+      // where beds have slumped: rounded clods breaking the horizontal lines, shadow under each
+      { const r = rng(29); g.save(); g.clip(f);
+        for (let i = 0; i < 16; i++) {
+          const x = -700 + r() * 1100, y = 630 + r() * 230, w = 7 + r() * 13, h = 4 + r() * 5;
+          const cl = curve([[x - w, y + h * 0.4], [x - w * 0.6, y - h * 0.6], [x + w * 0.1, y - h], [x + w * 0.8, y - h * 0.5], [x + w, y + h * 0.3], [x, y + h * 0.7]]);
+          g.fillStyle = 'rgba(20,10,16,0.35)'; g.fill(ell(x + 2, y + h * 0.8, w * 0.9, h * 0.35));
+          g.fillStyle = r() < 0.5 ? '#9a6a54' : '#a89078'; g.fill(cl);
+          g.lineWidth = 1; g.strokeStyle = 'rgba(30,16,22,0.5)'; g.stroke(cl);
+        }
+        g.restore(); }
       burrowMouth(g, 96, 646, 26, 20, 3);
       // roots hanging off the lip
       const r = rng(17);

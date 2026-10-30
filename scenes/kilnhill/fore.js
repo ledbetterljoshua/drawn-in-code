@@ -258,9 +258,9 @@
       const br = Math.sin(t * 1.6) * 0.5 + 0.5;
       // the parent, mug in hand
       const ph = K.mole(g, 910, 1172, 2.1, {
-        flip: true, apron: '#5a4a3a', scarf: '#5a6a8a', open: blinkA(t), look: [0.6, -0.6], breathe: br, smile: 1,
+        flip: true, apron: '#5a4a3a', scarf: '#5a6a8a', open: blinkA(t), look: [0.8, -1], breathe: br, smile: 1,
         hands: hug > 0 ? { f: [26 - hug * 4, -30 + hug * 4], b: [6, -18] } : { f: [14, -22 - sip * 10], b: [-8, -16] },
-        lean: -0.04 * hug, lx: 890, ly: 1120,
+        lean: -0.07 - 0.04 * hug, lx: 890, ly: 1120,
       });
       if (!hug) {
         const [mx, my] = ph.f;
