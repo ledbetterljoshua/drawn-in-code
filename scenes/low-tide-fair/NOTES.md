@@ -75,3 +75,38 @@ The five worst things:
 
 Also: the hermit-crab shells were drawn at the artboard origin (path built without the offset), and
 the tea tables on round stones read as carts.
+
+## Round 2
+
+Fixed round 1: fair moved forward (band, bakery, kite, porters, couple, castle to y 950–1070),
+audience round the band, kids chasing a crab, barrel whorls with notched sutures, longer feet and a
+real neck on every snail, warmer sand, darker headland, flat-bottomed cloud decks, bunting strung
+from the tower's ledges to masts, the tea-house and the band, hermit shells drawn in place, ripple
+marks as fields instead of stamps.
+
+**Critic (fresh eyes, screenshots only), top ten:** (1) density far below wimmelbild: empty flats
+left-middle and right-middle, empty bottom band, empty sky; (2) aerial perspective backwards, a
+milky lilac veil thickest on the *nearest* plane, no real darks, no hot accent; (3) folk are clones
+in one pose, arms out like sleepwalkers; (4) light has no consequences: faint figure shadows, flat
+puddles reflecting nothing; (5) ledges high above the horizon still sag as if seen from above, and
+the grandmother's foot can't carry her tower; (6) ground texture procedural; (7) straight hairlines
+(creek, kite string, bunting drops) read as UI guides, nothing balances the tower on the right,
+corner blobs are blunt; (8) the tower's vertical growth lines read as wooden staves, no nacre, no
+wet shine; (9) line weight is heavier on scenery than on the figures, which are the subject;
+(10) the hermit queue is one shell stamped at stepped sizes, the far folk are brown stubs, the
+clouds repeat, no narrative spine.
+
+My own five worst, agreeing with most of it:
+
+1. **The lilac veil.** The dune-shadow band and the grade's cool corner put a grey film over the
+   nearest figures. *Fix:* delete the dune shadow, keep cool only in shadows, let the foreground be
+   the richest, darkest, most saturated plane.
+2. **Empty middle distance.** *Fix:* a snail race on the right (the narrative's second beat), clam
+   diggers on the left, kids jumping puddles, a gull thief; a cropped beached boat in the near
+   foreground.
+3. **Ledge perspective.** *Fix:* every whorl's ellipse bends with its height against the eye line,
+   smiling below the horizon, flat at it, frowning above.
+4. **Shell reads as staves.** *Fix:* spiral cords (fine paired light/dark lines along each whorl),
+   faint growth lines, a nacre sheen.
+5. **Figures are the weakest-drawn thing.** *Fix:* heavier lines on near folk, stronger cast and
+   contact shadows, a rest pose per folk (hands behind, on hips, holding something), body widths.

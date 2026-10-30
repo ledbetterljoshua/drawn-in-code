@@ -24,6 +24,8 @@ const LINE = F.LINE;
 F.zOf = (y) => 8 + (y - HZ) / 40;
 
 let seaLook = 0;
+// resting arm angles [front, back]: hanging, hands on hips, hands behind, arms folded
+const REST = { hang: [-0.08, 0.12], hips: [0.55, -0.5], behind: [-0.55, 0.6], fold: [-1.15, -0.9] };
 D.on('tide-bell', () => { seaLook = 3.2; });
 
 // a folk: position, species, clothes, and its own clocks
@@ -31,6 +33,10 @@ let nSeed = 1;
 function folk(o) {
   const f = Object.assign({ dir: 1, coat: F.CLOTH[nSeed % F.CLOTH.length], cloth: 'tunic', ph: nSeed * 1.7 }, o);
   f.blinkC = F.blinker(nSeed * 3 + 1);
+  // each has its own way of standing about, and its own build
+  const rr = rng(nSeed * 97 + 5);
+  f.rest = o.rest || ['hang', 'hips', 'behind', 'hang', 'fold', 'behind'][Math.floor(rr() * 6)];
+  f.wide = o.wide || 0.88 + rr() * 0.3; f.tall = o.tall || 0.92 + rr() * 0.16;
   f.act = F.actor(nSeed * 5 + 2, o.acts || [['look', 1.8], ['shift', 1.4], ['look', 2.4], ['scratch', 1.2]], [2, 7]);
   nSeed++;
   return f;
@@ -46,14 +52,15 @@ function drawFolk(g, f, t, pose = {}) {
   const dir = pose.dir ?? f.dir;
   // shadow on the sand first, then the contact pool
   if (!pose.noShadow) {
-    F.castShadow(g, x, y, (g) => { g.fill(ell(0, -15 * s, 6 * s, 15 * s)); g.fill(circ(0, -25 * s, 6 * s)); }, 0.38);
-    F.contact(g, x, y, 8 * s, 0.5);
+    F.castShadow(g, x, y, (g) => { g.fill(ell(0, -15 * s, 6.5 * s, 15 * s)); g.fill(circ(0, -25 * s, 6 * s)); }, 0.55);
+    F.contact(g, x, y, 8.5 * s, 0.7);
   }
   F.folk(g, x, y, Object.assign({
     sp: f.sp, sc: s, dir, coat: f.coat, acc: f.acc, cloth: f.cloth, hat: f.hat, t, haze: hz,
     blink: f.blinkC.v, bob: breath + sh * 0.6, lean: sh * 0.06 * f.act.side,
     head: lk * 0.8 + sea * (dir > 0 ? 0.8 : -0.8), look: [lk + sea * dir, 0],
-    armR: f.armR ?? (sc_ > 0 ? -2.2 + Math.sin(t * 14) * 0.2 * sc_ : -0.1), armL: f.armL ?? 0.15,
+    armR: f.armR ?? (sc_ > 0 ? -2.2 + Math.sin(t * 14) * 0.2 * sc_ : REST[f.rest][0]), armL: f.armL ?? REST[f.rest][1],
+    wide: f.wide, tall: f.tall,
   }, pose));
 }
 
@@ -115,7 +122,7 @@ layer({
     const audience = (front) => band.crowd.forEach((d, i) => {
       if ((d.y > band.y + 30) !== front) return;
       const c = Math.sin(b * Math.PI * 2 + i) * clap;
-      drawFolk(g, d, t, { armR: -1.3 + c * 0.5 - clap * 0.2, armL: -1.1 - c * 0.5 - clap * 0.2, happy: clap > 0.5, bob: -Math.max(0, Math.sin(b * Math.PI + i)) * clap * 1.5, look: [d.dir * 0.5, 0] });
+      drawFolk(g, d, t, clap > 0.05 ? { armR: lerp(REST[d.rest][0], -1.3 + c * 0.5, clap), armL: lerp(REST[d.rest][1], -1.1 - c * 0.5, clap), happy: clap > 0.5, bob: -Math.max(0, Math.sin(b * Math.PI + i)) * clap * 1.5, look: [d.dir * 0.5, 0] } : { look: [d.dir * 0.5, 0] });
     });
     audience(false);
     // dancers: a hop on the beat, swinging arms, spinning when you arrive
@@ -130,29 +137,29 @@ layer({
 
 // ============================================================ the tea tables in front of the tea-house
 const tables = [
-  { x: 1290, y: 716, sitters: [folk({ sp: 'otter', dx: -22, coat: '#3f6aa1', acc: '#f4efe6', dir: 1 }), folk({ sp: 'hare', dx: 22, coat: '#efe2c8', dir: -1, hat: F.HATS.straw('#f2c95c') }), folk({ sp: 'mole', dx: 2, dy: -6, coat: '#a8689b', dir: 1, k: 0.95 })] },
-  { x: 1385, y: 742, sitters: [folk({ sp: 'vole', dx: -20, coat: '#6f9d58', acc: '#d65a4a', dir: 1 }), folk({ sp: 'shrew', dx: 20, coat: '#e7a43c', dir: -1 })] },
+  { x: 1385, y: 748, sitters: [folk({ sp: 'otter', dx: -22, coat: '#3f6aa1', acc: '#f4efe6', dir: 1 }), folk({ sp: 'hare', dx: 22, coat: '#efe2c8', dir: -1, hat: F.HATS.straw('#f2c95c') }), folk({ sp: 'mole', dx: 2, dy: -6, coat: '#a8689b', dir: 1, k: 0.95 })] },
+  { x: 1505, y: 768, sitters: [folk({ sp: 'vole', dx: -20, coat: '#6f9d58', acc: '#d65a4a', dir: 1 }), folk({ sp: 'shrew', dx: 20, coat: '#e7a43c', dir: -1 })] },
 ];
 const teaT = { lift: 0, clink: 0 };
-const waiter = folk({ sp: 'otter', x: 1340, y: 728, coat: '#f4efe6', cloth: 'apron', acc: '#3b2433', dir: 1 });
+const waiter = folk({ sp: 'otter', x: 1440, y: 758, coat: '#f4efe6', cloth: 'apron', acc: '#3b2433', dir: 1 });
 layer({
-  id: 'teatable', z: F.zOf(735),
-  hit: (x, y) => x > 1230 && x < 1440 && y > 670 && y < 765,
+  id: 'teatable', z: F.zOf(768),
+  hit: (x, y) => x > 1330 && x < 1560 && y > 700 && y < 790,
   onEnter() { teaT.clink = 1; },
   update(dt, t, L) {
     teaT.lift = ease(teaT.lift, L.hovered ? 1 : 0, L.hovered ? 4 : 1.6, dt);
-    if (teaT.clink > 0 && teaT.lift > 0.8) { teaT.clink = 0; F.spawn({ kind: 'word', text: 'clink!', x: 1300, y: 660, vy: -14, life: 1.2, size: 0.8 }); F.spawn({ kind: 'spark', x: 1296, y: 680, life: 0.5, size: 0.8 }); }
+    if (teaT.clink > 0 && teaT.lift > 0.8) { teaT.clink = 0; F.spawn({ kind: 'word', text: 'clink!', x: 1390, y: 690, vy: -14, life: 1.2, size: 0.8 }); F.spawn({ kind: 'spark', x: 1386, y: 712, life: 0.5, size: 0.8 }); }
     for (const tb of tables) for (const f of tb.sitters) stepFolk(f, dt);
     stepFolk(waiter, dt);
     if (Math.random() < dt * (0.8 + teaT.lift * 3)) { const tb = tables[Math.floor(Math.random() * 2)], s = pxu(tb.y); F.spawn({ kind: 'steam', x: tb.x + 6 * s, y: tb.y - 18 * s, vx: 3, vy: -10, life: 1.8, size: 0.35, grow: 0.6 }); }
   },
   draw(g, t) {
     // the waiter walks a slow loop between the tables with a tray
-    const u = (t * 0.05) % 1, wx = 1250 + Math.sin(u * TAU) * 110, wy = 728 + Math.cos(u * TAU) * 6;
+    const u = (t * 0.05) % 1, wx = 1445 + Math.sin(u * TAU) * 110, wy = 760 + Math.cos(u * TAU) * 6;
     const wdir = Math.cos(u * TAU) > 0 ? 1 : -1;
     const tray = (g, hand, back, line, lw) => { ink(g, ell(hand[0] + 2, hand[1] - 2, 7, 1.6), '#c9a46a', lw * 0.7, line); ink(g, poly([[hand[0], hand[1] - 3], [hand[0] + 3, hand[1] - 3], [hand[0] + 2.6, hand[1] - 6], [hand[0] + 0.4, hand[1] - 6]]), '#f4efe6', lw * 0.6, line); };
     const drawWaiter = () => drawFolk(g, waiter, t, { x: wx, y: wy, dir: wdir, step: (t * 0.9) % 1, armR: -1.5, hold: tray });
-    if (wy < 726) drawWaiter();
+    if (wy < 758) drawWaiter();
     for (const tb of tables) {
       const s = pxu(tb.y);
       // sitters behind the table
@@ -175,7 +182,7 @@ layer({
         g.fillStyle = '#c98a4a'; for (let k = 0; k < 3; k++) g.fill(circ(tb.x - 16 * s + k * 2.4 * s, tb.y - 7.5 * s, 1.3 * s));
       });
     }
-    if (wy >= 726) drawWaiter();
+    if (wy >= 758) drawWaiter();
   },
 });
 
@@ -269,8 +276,8 @@ layer({
     const k = kite.kid, s = pxu(k.y), tip = kite.climb;
     const hand = [k.x + 6 * s, k.y - 24 * s - tip * 4 * s];
     // the line, bowing in the wind
-    g.strokeStyle = 'rgba(70,50,70,0.7)'; g.lineWidth = 0.8;
-    g.beginPath(); g.moveTo(hand[0], hand[1]); g.quadraticCurveTo(hand[0] + 160 + D.wind(t, 1600) * 40, (hand[1] + kite.y) / 2 + 80, kite.x - 6, kite.y + 12); g.stroke();
+    g.strokeStyle = 'rgba(70,50,70,0.4)'; g.lineWidth = 0.7;
+    g.beginPath(); g.moveTo(hand[0], hand[1]); g.bezierCurveTo(hand[0] + 40, hand[1] - 200, hand[0] + 260 + D.wind(t, 1600) * 40, (hand[1] + kite.y) / 2 + 60, kite.x - 6, kite.y + 12); g.stroke();
     // the kite: a fish, with a ribbon tail that streams
     const ang = Math.atan2(kite.vy, 40) * 0.5 + Math.sin(t * 1.7) * 0.15;
     g.save(); g.translate(kite.x, kite.y); g.rotate(ang);

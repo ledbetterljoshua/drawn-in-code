@@ -35,8 +35,8 @@ const SKIN = {
 
 // ------------------------------------------------------------ the snail rig
 // sn: { x, y (middle of the foot on the sand), dir, k (size), L (foot length, local units), skin }
-function snailBodyPath(L, br = 1) {
-  const h = L * 0.12 * br;
+function snailBodyPath(L, br = 1, fat = 1) {
+  const h = L * 0.12 * br * fat;
   return curve([
     [-L * 0.53, -0.5], [-L * 0.5, -h * 0.3], [-L * 0.4, -h * 0.72], [-L * 0.24, -h * 0.98], [0, -h * 1.05], [L * 0.16, -h * 0.95],
     [L * 0.26, -h * 0.62], [L * 0.4, -h * 0.34], [L * 0.52, -L * 0.012], [L * 0.5, 1.2], [0, 1.6], [-L * 0.4, 1],
@@ -56,7 +56,7 @@ function skinNet(g, sn, x0, x1, y0, y1, ang, n, seed) {
 function drawFoot(g, sn, t) {
   const L = sn.L, sk = sn.skin;
   const br = 1 + Math.sin(t * 0.9 + sn.ph) * 0.025;
-  const body = snailBodyPath(L, br);
+  const body = snailBodyPath(L, br, sn.fat || 1);
   ink(g, body, sk.base, sn.lw * 1.15);
   g.save(); g.clip(body);
   // lit from the low sun (in snail space the sun is on -x when the snail faces right)
@@ -74,7 +74,7 @@ function drawFoot(g, sn, t) {
   for (let i = 0; i < 26; i++) { const x = -L * 0.5 + (i / 26) * L + ((t * 0.02 * L) % (L / 26)); g.beginPath(); g.moveTo(x, -L * 0.003); g.lineTo(x + L * 0.006, -L * 0.022); g.stroke(); }
   skinNet(g, sn, -L * 0.48, L * 0.45, -L * 0.1, -L * 0.035, 0, 34, sn.seed);
   // a wet sheen along the back, and the cool shadow the shell throws onto the body
-  g.strokeStyle = F.rgba(sk.sheen, 0.75); g.lineWidth = Math.max(0.8, L * 0.007);
+  g.strokeStyle = F.rgba(sk.sheen, 0.9); g.lineWidth = Math.max(1, L * 0.009);
   g.beginPath(); g.moveTo(-sx * L * 0.45, -L * 0.03); g.quadraticCurveTo(-sx * L * 0.3, -L * 0.075, -sx * L * 0.12, -L * 0.095); g.stroke();
   g.fillStyle = 'rgba(70,50,90,0.38)'; g.fill(ell(sn.shellX * L * sn.dir, -L * 0.12, L * 0.34, L * 0.05));
   g.restore();
@@ -195,8 +195,8 @@ function drawShadow(g, sn, a = 0.4) {
 }
 
 // ============================================================ the grandmother
-const gran = makeSnail({ id: 'gran', x: 800, y: 790, dir: 1, k: 1, L: 450, skin: 'gran', seed: 11, shellX: -0.08 });
-gran.sp = F.spire({ x: -36, y: -62, w: 290, h: 112, n: 9, rw: 0.8, rh: 0.84, lean: -5, body: 1.4, slope: 0.1, lw: 2.6 });
+const gran = makeSnail({ id: 'gran', x: 800, y: 790, dir: 1, k: 1, L: 470, skin: 'gran', seed: 11, shellX: -0.08, fat: 1.35 });
+gran.sp = F.spire({ x: -36, y: -66, w: 290, h: 112, n: 9, rw: 0.8, rh: 0.84, lean: -5, body: 1.4, slope: 0.1, lw: 2.6, eyeY: (HZ - 790) / pxu(790) });
 gran.trail = [[700, 430], [640, 520], [600, 610], [640, 700], [700, 770], [760, 793]];
 gran.trailW = 110;
 const SHELL_GRAN = { lit: '#fff3dd', base: '#f0d9bd', shade: '#c49ea6', bounce: '#e4b395', band: '#c0623f', band2: '#8a4752', growth: '#a98272', line: '#3b2433' };
@@ -297,9 +297,9 @@ function granTown(g) {
 gran.box = [-270, -730, 220, 20];
 
 // ============================================================ the tea-house
-const tea = makeSnail({ id: 'tea', x: 1440, y: 672, dir: -1, k: 0.95, L: 340, skin: 'tea', seed: 23, shellX: -0.05 });
+const tea = makeSnail({ id: 'tea', x: 1470, y: 690, dir: -1, k: 1.22, L: 340, skin: 'tea', seed: 23, shellX: -0.05 });
 tea.gl = F.globe({ x: 20, y: -30, R: 118, turns: 3.3, apex: [-6, -20], spin: 0.6, lw: 2.6 });
-tea.trail = [[1640, 404], [1580, 470], [1500, 540], [1470, 610], [1460, 672]];
+tea.trail = [[1640, 404], [1590, 470], [1530, 560], [1490, 630], [1480, 690]];
 tea.trailW = 100;
 const SHELL_TEA = { lit: '#fbe7c6', base: '#e9be8c', shade: '#ad7f84', bounce: '#e8a582', band: '#8a4a3d', band2: '#c76d48', growth: '#9b6a55', line: '#3b2433' };
 function teaTown(g) {
@@ -355,7 +355,7 @@ tea.box = [-170, -270, 160, 10];
 
 // ============================================================ the bookbinder
 const book = makeSnail({ id: 'book', x: 345, y: 585, dir: 1, k: 0.95, L: 310, skin: 'book', seed: 37, shellX: -0.1 });
-book.sp = F.spire({ x: -30, y: -38, w: 230, h: 86, n: 5, rw: 0.7, rh: 0.8, lean: -4, body: 1.25, slope: 0.12, lw: 2.8 });
+book.sp = F.spire({ eyeY: (HZ - 585) / (pxu(585) * 0.95), x: -30, y: -38, w: 230, h: 86, n: 5, rw: 0.7, rh: 0.8, lean: -4, body: 1.25, slope: 0.12, lw: 2.8 });
 book.trail = [[180, 404], [230, 470], [300, 540], [330, 585]];
 book.trailW = 90;
 const SHELL_BOOK = { lit: '#f4ead2', base: '#d9cba7', shade: '#9e92a2', bounce: '#d8b292', band: '#6b7a5c', band2: '#a3603f', growth: '#8a7d70', line: '#3b2433' };
@@ -465,6 +465,7 @@ sleep.box = [-100, -180, 100, 10];
 sleep.peek = 0; sleep.zT = 0;
 
 const SNAILS = [gran, tea, book, fish, young];
+F.makeSnail = makeSnail; F.drawFoot = drawFoot; F.drawHead = drawHead; F.stepStalks = stepStalks;
 F.SNAILS = [gran, tea, book, fish, young, sleep];
 F.gran = gran; F.tea = tea; F.young = young; F.fishSnail = fish; F.book = book;
 

@@ -21,7 +21,9 @@ F.spire = (o) => {
   for (let i = 0; i < o.n; i++) {
     const rt = rb * (o.rw || 0.82) * (i === 0 ? 0.96 : 1);
     const yt = yb - h;
-    ws.push({ i, cx, yb, yt, rb, rt, h, s: rb * (o.slope || 0.11) });
+    // bend: +1 well below the eye line (we see the tops of the rings), 0 at it, -1 above it
+    const bend = o.eyeY == null ? 1 : clamp((yb - o.eyeY) / 260, -1, 1);
+    ws.push({ i, cx, yb, yt, rb, rt, h, s: rb * (o.slope || 0.11), bend, bendT: o.eyeY == null ? 1 : clamp((yt - o.eyeY) / 260, -1, 1) });
     yb = yt + h * 0.16;
     cx += o.lean || -6;
     rb = rt;
@@ -38,14 +40,14 @@ F.bandPath = (w) => {
   const p = new Path2D();
   p.moveTo(cx - rt * 0.88, yt + s * 0.5);
   p.bezierCurveTo(cx - rt * 1.02 - (rb - rt) * 0.3, yt + h * 0.08, cx - rb * 1.17, yb - h * 0.48, cx - rb, yb + s);
-  p.quadraticCurveTo(cx, yb + h * 0.32, cx + rb, yb - s);
+  p.quadraticCurveTo(cx, yb + h * 0.32 * w.bend, cx + rb, yb - s);
   p.bezierCurveTo(cx + rb * 1.17, yb - h * 0.48 - s, cx + rt * 1.02 + (rb - rt) * 0.3, yt + h * 0.08 - s, cx + rt * 0.88, yt - s * 0.5);
-  p.quadraticCurveTo(cx, yt - h * 0.06, cx - rt * 0.88, yt + s * 0.5);
+  p.quadraticCurveTo(cx, yt - h * 0.06 * w.bendT, cx - rt * 0.88, yt + s * 0.5);
   return p;
 };
 // the y of a band's bottom edge (a quadratic bulge) at x, and its top (suture) at x
-F.bandBottom = (w, x) => { const u = clamp((x - (w.cx - w.rb)) / (2 * w.rb), 0, 1); return lerp(lerp(w.yb + w.s, w.yb + w.h * 0.3, u), lerp(w.yb + w.h * 0.3, w.yb - w.s, u), u); };
-F.bandTop = (w, x) => { const u = clamp((x - (w.cx - w.rt)) / (2 * w.rt), 0, 1); return lerp(lerp(w.yt + w.s * 0.5, w.yt - w.h * 0.06, u), lerp(w.yt - w.h * 0.06, w.yt - w.s * 0.5, u), u); };
+F.bandBottom = (w, x) => { const u = clamp((x - (w.cx - w.rb)) / (2 * w.rb), 0, 1), m = w.yb + w.h * 0.3 * w.bend; return lerp(lerp(w.yb + w.s, m, u), lerp(m, w.yb - w.s, u), u); };
+F.bandTop = (w, x) => { const u = clamp((x - (w.cx - w.rt)) / (2 * w.rt), 0, 1), m = w.yt - w.h * 0.06 * w.bendT; return lerp(lerp(w.yt + w.s * 0.5, m, u), lerp(m, w.yt - w.s * 0.5, u), u); };
 // a point on the face of a band at angle a (0 = facing us, -π/2 = the left edge) and height v
 // (0 = bottom, 1 = top); returns [x, y, foreshortening]
 F.bandAt = (w, a, v) => {
@@ -89,14 +91,26 @@ F.paintSpire = (g, sp, pal, seed = 1) => {
       }
       a += 0.16 + r() * 0.34;
     }
-    // growth lines: fine, slightly bowed, bunched toward the edges as the surface turns away
-    const ng = Math.round(10 + rb / 6);
+    // spiral cords: fine raised ridges running round the whorl, each a lit edge over a dark one
+    for (let c = 0; c < 5; c++) {
+      const v = 0.12 + c * 0.19 + (r() - 0.5) * 0.04;
+      for (const [dy, col, al] of [[0, pal.growth, 0.35], [-Math.max(0.6, h * 0.012), pal.lit, 0.7]]) {
+        g.beginPath();
+        for (let k = 0; k <= 20; k++) { const aa = -1.55 + (3.1 * k) / 20; const [x, y] = F.bandAt(w, aa, v); k ? g.lineTo(x, y + dy) : g.moveTo(x, y + dy); }
+        g.lineWidth = Math.max(0.5, h * 0.012); g.strokeStyle = col; g.globalAlpha = al; g.stroke(); g.globalAlpha = 1;
+      }
+    }
+    // growth lines: very faint, bunched toward the edges as the surface turns away
+    const ng = Math.round(6 + rb / 14);
     for (let k = 0; k < ng; k++) {
       const a = -1.45 + (2.9 * (k + r() * 0.6)) / ng;
-      const [x0, y0] = F.bandAt(w, a, 0.02), [x1, y1] = F.bandAt(w, a + 0.06, 0.98);
+      const [x0, y0] = F.bandAt(w, a, 0.04), [x1, y1] = F.bandAt(w, a + 0.06, 0.96);
       g.beginPath(); g.moveTo(x0, y0); g.quadraticCurveTo((x0 + x1) / 2 + rb * 0.05, (y0 + y1) / 2, x1, y1);
-      g.lineWidth = 0.5 + r() * 0.8; g.strokeStyle = r() < 0.6 ? pal.growth : F.rgba(pal.lit, 0.6); g.globalAlpha = 0.35 + r() * 0.4; g.stroke(); g.globalAlpha = 1;
+      g.lineWidth = 0.5 + r() * 0.5; g.strokeStyle = pal.growth; g.globalAlpha = 0.12 + r() * 0.14; g.stroke(); g.globalAlpha = 1;
     }
+    // nacre: a cool iridescent sheen on the turned-away side, warm pearl on the lit side
+    g.fillStyle = grad(g, cx - rb, 0, cx + rb, 0, ['rgba(255,236,214,0)', 'rgba(255,226,236,0.18)', 'rgba(200,226,236,0.22)', 'rgba(210,200,240,0)']);
+    g.fillRect(cx - rb * 1.2, yt, rb * 2.4, h * 1.3);
     // nacre glint on the sun's side and a rim of sky light right at the edge
     g.fillStyle = grad(g, cx - rb * 0.75, 0, cx - rb * 0.35, 0, ['rgba(255,252,240,0)', 'rgba(255,250,236,0.55)', 'rgba(255,252,240,0)']);
     g.fillRect(cx - rb, yt, rb, h * 1.3);

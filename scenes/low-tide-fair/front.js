@@ -102,7 +102,7 @@ layer({
 });
 
 // ============================================================ the seal
-const seal = { x: 1985, y: 712, eye: 0, roll: 0, wave: 0, blink: F.blinker(401), zT: 0 };
+const seal = { x: 2010, y: 690, eye: 0, roll: 0, wave: 0, blink: F.blinker(401), zT: 0 };
 layer({
   id: 'seal', z: F.zOf(seal.y),
   hit: (x, y) => Math.abs(x - seal.x) < 70 && y > seal.y - 40 && y < seal.y + 10,
@@ -160,26 +160,49 @@ const hermits = [];
   const n = 8;
   for (let i = 0; i < n; i++) {
     const u = i / (n - 1);
-    hermits.push({ x: lerp(1940, 1560, u) + Math.sin(i * 1.3) * 10, y: lerp(1018, 1066, u) + Math.cos(i * 2) * 4, size: lerp(1.3, 0.55, u), shell: i, col: SHELLS[i], blink: F.blinker(500 + i), ph: i * 1.7, hop: 0, peek: 0 });
+    hermits.push({ x: lerp(1940, 1560, u) + Math.sin(i * 1.3) * 10, y: lerp(1018, 1066, u) + Math.cos(i * 2) * 4, size: lerp(1.3, 0.55, u), shell: i, col: SHELLS[i], kind: ['moon', 'whelk', 'turban', 'cup', 'cone', 'whelk', 'thimble', 'moon'][i], blink: F.blinker(500 + i), ph: i * 1.7, hop: 0, peek: 0 });
   }
 }
 const whelk = { x: 2070, y: 1006, size: 1.75, empty: true };
 const queue = { swap: 0, done: false, back: 0 };
-function hermitShell(g, x, y, sz, col) {
-  // a whelk-ish shell lying on its side, aperture toward +x, sitting on the sand at (x, y)
+// each hermit has made do with something different: whelks, a moon snail, a cone, a turban, and
+// for two of them, a teacup and a thimble. Aperture toward +x, sitting on the sand at (x, y)
+function hermitShell(g, x, y, sz, col, kind = 'whelk') {
   const S = sz;
   g.save(); g.translate(x, y);
-  const p = curve([[-14 * S, 0], [-15 * S, -8 * S], [-8 * S, -15 * S], [2 * S, -16 * S], [10 * S, -11 * S], [12 * S, -3 * S], [6 * S, 1 * S]]);
+  if (kind === 'cup') {
+    const p = curve([[-12 * S, -14 * S], [12 * S, -14 * S], [10 * S, -4 * S], [5 * S, 0], [-6 * S, 0], [-11 * S, -5 * S]]);
+    ink(g, p, '#f4efe6', 1.3);
+    g.save(); g.clip(p); g.fillStyle = 'rgba(80,60,110,0.25)'; g.fillRect(2 * S, -16 * S, 14 * S, 18 * S); g.fillStyle = '#4f8fa3'; g.fillRect(-14 * S, -11 * S, 28 * S, 1.6 * S); for (let k = 0; k < 4; k++) g.fill(circ(-7 * S + k * 4.5 * S, -7 * S, 1.2 * S)); g.restore();
+    g.lineWidth = 2.2 * S; g.strokeStyle = LINE; g.beginPath(); g.arc(-13 * S, -8 * S, 3.4 * S, Math.PI * 0.5, Math.PI * 1.5); g.stroke(); g.lineWidth = 1.2 * S; g.strokeStyle = '#f4efe6'; g.stroke();
+    ink(g, ell(0, -14 * S, 12 * S, 2.6 * S), '#5a4058', 1);
+    g.restore(); return;
+  }
+  if (kind === 'thimble') {
+    const p = poly([[-11 * S, -12 * S], [7 * S, -12 * S], [11 * S, 0], [-13 * S, 0]]);
+    ink(g, p, '#c7c3cf', 1.3);
+    g.save(); g.clip(p); g.fillStyle = 'rgba(70,60,100,0.35)'; g.fillRect(2 * S, -14 * S, 12 * S, 16 * S); g.fillStyle = 'rgba(255,255,255,0.6)'; g.fillRect(-8 * S, -12 * S, 2 * S, 12 * S);
+    g.fillStyle = 'rgba(70,60,100,0.4)'; for (let i = 0; i < 6; i++) for (let j = 0; j < 3; j++) g.fill(circ(-9 * S + i * 3.4 * S + j, -9 * S + j * 3.4 * S, 0.6 * S)); g.restore();
+    g.restore(); return;
+  }
+  const shapes = {
+    whelk: [[-14, 0], [-15, -8], [-8, -15], [2, -16], [10, -11], [12, -3], [6, 1]],
+    moon: [[-13, 0], [-14, -9], [-6, -16], [5, -15], [12, -8], [11, -1], [4, 1]],
+    cone: [[-16, -1], [-8, -8], [4, -13], [12, -9], [12, -2], [4, 1]],
+    turban: [[-12, 0], [-13, -7], [-9, -13], [-2, -18], [6, -14], [11, -7], [10, 0]],
+  };
+  const p = curve(shapes[kind].map(([a, b]) => [a * S, b * S]));
   ink(g, p, col, 1.3);
   g.save(); g.clip(p);
   g.fillStyle = grad(g, -15 * S, -14 * S, 12 * S, 0, ['#fff6e8', col, F.mix(col, '#5a4078', 0.4)]);
-  g.fillRect(-16 * S, -18 * S, 30 * S, 20 * S);
+  g.fillRect(-16 * S, -20 * S, 30 * S, 22 * S);
   g.strokeStyle = F.mix(col, '#5a3a50', 0.45); g.lineWidth = Math.max(0.6, 0.9 * S);
-  for (let k = 0; k < 3; k++) { g.beginPath(); g.arc(-4 * S, -7 * S, (3.5 + k * 3.8) * S, Math.PI * 0.85, Math.PI * 2.05); g.stroke(); }
+  if (kind === 'cone') { for (let k = 0; k < 5; k++) { g.beginPath(); g.moveTo(-12 * S + k * 5 * S, -12 * S); g.lineTo(-14 * S + k * 5 * S, 0); g.stroke(); } }
+  else if (kind === 'turban') { for (let k = 0; k < 4; k++) { g.beginPath(); g.moveTo(-14 * S, -3 * S - k * 4 * S); g.quadraticCurveTo(0, -1 * S - k * 4.5 * S, 12 * S, -4 * S - k * 3 * S); g.stroke(); } }
+  else for (let k = 0; k < 3; k++) { g.beginPath(); g.arc(-4 * S, -7 * S, (3.5 + k * 3.8) * S, Math.PI * 0.85, Math.PI * 2.05); g.stroke(); }
   g.fillStyle = F.rgba(F.mix(col, '#a0503a', 0.5), 0.5); for (let k = 0; k < 5; k++) g.fill(ell(-10 * S + k * 4 * S, -9 * S + Math.sin(k) * 3 * S, 1.2 * S, 2.2 * S, undefined, 0.4));
   g.fillStyle = 'rgba(80,50,90,0.32)'; g.fill(ell(4 * S, -1 * S, 10 * S, 3 * S));
   g.restore();
-  // the dark mouth of the aperture
   ink(g, ell(9 * S, -4 * S, 3.6 * S, 4.4 * S, undefined, 0.3), '#4a3346', 0.9);
   g.restore();
 }
@@ -207,14 +230,14 @@ layer({
   draw(g, t) {
     const n = hermits.length, sw = queue.swap, done = queue.done;
     const ph = hermits.map((h, i) => (done ? 1 : sw > 0 ? clamp(sw * 1.7 - i * 0.09, 0, 1) : 0));
-    const slot = (j) => (j < 0 ? { x: whelk.x, y: whelk.y, size: whelk.size, col: '#f6e3c8' } : hermits[j]);
+    const slot = (j) => (j < 0 ? { x: whelk.x, y: whelk.y, size: whelk.size, col: '#f6e3c8', kind: 'whelk' } : hermits[j]);
     // the shells stay where they lie; the crabs move. Slot j holds crab j until it leaves, then
     // crab j+1 once it arrives
     for (let j = -1; j < n; j++) {
       const p = slot(j), s = pxu(p.y) * p.size;
       F.castShadow(g, p.x, p.y, (g) => g.fill(ell(0, -8 * s, 14 * s, 8 * s)), 0.38);
       F.contact(g, p.x, p.y, 15 * s, 0.5);
-      hermitShell(g, p.x, p.y, s, p.col);
+      hermitShell(g, p.x, p.y, s, p.col, p.kind);
       const occ = j + 1 < n && ph[j + 1] >= 1 ? j + 1 : j >= 0 && ph[j] === 0 ? j : -1;
       if (occ >= 0) hermitPeek(g, p.x, p.y, s, hermits[occ], t, queue.back);
     }
@@ -359,33 +382,3 @@ layer({
 });
 })();
 
-// the dune behind us throws a long cool shadow across the very front of the flats
-(() => {
-const D = Drawn, F = Fair;
-const { grad, curve, st, layer } = D;
-layer({
-  id: 'near-shadow', z: 38, still: true,
-  draw(g) {
-    const v = st.view;
-    const edge = [[v.x0 - 20, 1010]];
-    for (let x = v.x0; x <= v.x1 + 40; x += 80) edge.push([x, 1050 + Math.sin(x * 0.004) * 22 + Math.sin(x * 0.011 + 2) * 10 + (x - v.x0) * 0.03]);
-    const p = new Path2D(); p.moveTo(v.x0 - 20, v.y1 + 20);
-    edge.forEach(([x, y]) => p.lineTo(x, y));
-    p.lineTo(v.x1 + 40, v.y1 + 20); p.closePath();
-    g.save(); g.globalCompositeOperation = 'multiply';
-    g.fillStyle = grad(g, 0, 1020, 0, v.y1, ['rgba(196,170,200,0.6)', 'rgba(170,140,186,0.8)']);
-    g.fill(p);
-    // the shadows of the marram grass on the dune's crest, laid along the edge
-    const r = D.rng(31);
-    g.fillStyle = 'rgba(170,140,190,0.7)';
-    for (const [x, y] of edge) for (let k = 0; k < 6; k++) {
-      const bx = x + r() * 80, by = y - 4 + r() * 6, L = 18 + r() * 40, a = -0.25 - r() * 0.35;
-      g.beginPath(); g.moveTo(bx - 3, by + 2); g.quadraticCurveTo(bx + Math.cos(a) * L * 0.5, by + Math.sin(a) * L * 0.5 - 4, bx + Math.cos(a) * L, by + Math.sin(a) * L * 0.4); g.lineTo(bx + 3, by + 2); g.fill();
-    }
-    g.restore();
-    // its soft edge
-    g.save(); g.globalCompositeOperation = 'multiply'; g.lineWidth = 18; g.strokeStyle = 'rgba(170,150,200,0.25)';
-    g.beginPath(); edge.forEach(([x, y], i) => (i ? g.lineTo(x, y - 6) : g.moveTo(x, y - 6))); g.stroke(); g.restore();
-  },
-});
-})();

@@ -44,7 +44,8 @@ layer({
       const [x, y, h] = m, s = pxu(y), [tx, ty] = top(m);
       F.castShadow(g, x, y, (g) => g.fillRect(-1.6 * s, -h * s, 3.2 * s, h * s), 0.32);
       F.contact(g, x, y, 5 * s, 0.5);
-      F.post(g, x, ty, y, 3.4 * s, F.PAL.drift, 1.1);
+      F.post(g, x, ty, y, 3.8 * s, { lit: '#e6cfae', base: '#b49478', shade: '#7c6470' }, 1.1);
+      g.strokeStyle = 'rgba(90,60,60,0.45)'; g.lineWidth = 0.6; for (let k = 0; k < 4; k++) { const yy = lerp(ty, y, 0.15 + k * 0.22); g.beginPath(); g.moveTo(x - 1.5 * s, yy); g.lineTo(x + 1.2 * s, yy + 8 * s); g.stroke(); }
       g.strokeStyle = 'rgba(80,60,70,0.6)'; g.lineWidth = 0.8;
       g.beginPath(); g.moveTo(tx, ty + 6); g.lineTo(x - 40 * s, y + 4 * s); g.stroke();
       D.ink(g, D.circ(tx, ty - 1, 2.6 * s), '#d65a4a', 1);

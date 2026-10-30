@@ -12,7 +12,7 @@ const PAL = F.PAL;
 
 // ------------------------------------------------------------ water: the creek and the pools
 // the creek's centreline, its width in world units, and the outline built from them in perspective
-const CREEK = [[-120, 1070], [80, 1020], [260, 975], [440, 918], [620, 862], [820, 828], [1040, 808], [1240, 760], [1420, 690], [1580, 612], [1740, 546], [1900, 484], [2050, 436], [2200, 404], [2320, 390]];
+const CREEK = [[-120, 1070], [80, 1020], [260, 975], [440, 918], [620, 862], [820, 828], [1040, 808], [1200, 780], [1300, 742], [1290, 716], [1380, 700], [1560, 690], [1640, 640], [1600, 600], [1700, 560], [1880, 520], [1960, 480], [1930, 450], [2060, 425], [2200, 404], [2320, 390]];
 const creekW = 74;
 function creekOutline() {
   const L = [], R = [];
@@ -44,7 +44,7 @@ const creek = creekOutline();
 F.creek = creek;
 const creekPath = poly([...creek.L, ...creek.R.slice().reverse()]);
 // tide pools: [x, y, rx, seed]; ry follows the perspective
-const POOLS = [[440, 942, 150, 1], [1000, 1078, 66, 2], [1665, 772, 92, 3], [290, 652, 76, 4], [1950, 612, 70, 5], [800, 1090, 52, 6], [1560, 900, 60, 7], [2120, 760, 80, 8], [1300, 860, 46, 9]];
+const POOLS = [[440, 942, 150, 1], [1000, 1078, 66, 2], [1600, 840, 80, 3], [290, 652, 76, 4], [1950, 612, 70, 5], [800, 1090, 52, 6], [2150, 890, 80, 8], [1300, 860, 46, 9]];
 function poolPath(x, y, rx, seed) {
   const r = rng(seed * 13), pts = [], n = 14, ry = rx * flat(y) * 1.15;
   for (let i = 0; i < n; i++) { const a = (i / n) * TAU, k = 0.82 + r() * 0.3; pts.push([x + Math.cos(a) * rx * k, y + Math.sin(a) * ry * k]); }
@@ -69,7 +69,7 @@ layer({
     const v = st.view;
     const y0 = HZ + 60;
     // the sand: hazy and pale far off, warmer and deeper close to
-    g.fillStyle = grad(g, 0, HZ + 40, 0, v.y1, [[0, '#e4cfbc'], [0.12, '#e1c3a0'], [0.4, '#d9b083'], [0.75, '#cd9f70'], [1, '#c29264']]);
+    g.fillStyle = grad(g, 0, HZ + 40, 0, v.y1, [[0, '#e4cfbc'], [0.12, '#e1c3a0'], [0.4, '#d9b083'], [0.75, '#c8966a'], [1, '#b4825a']]);
     g.fillRect(v.x0 - 10, HZ + 40, v.x1 - v.x0 + 20, v.y1 - HZ);
     // a soft blend up into the far flats
     g.fillStyle = grad(g, 0, HZ + 30, 0, HZ + 95, ['rgba(232,218,206,1)', 'rgba(232,218,206,0)']);
@@ -81,37 +81,40 @@ layer({
     for (let i = 0; i < 90; i++) {
       const y = y0 + r() ** 0.9 * (v.y1 - y0 + 40), s = pxu(y), x = v.x0 - 200 + r() * (v.x1 - v.x0 + 400);
       const w = (160 + r() * 420) * s, h = Math.max(2, w * flat(y) * (0.18 + r() * 0.22));
-      g.fillStyle = r() < 0.62 ? 'rgba(128,102,126,0.2)' : 'rgba(240,222,200,0.25)';
+      const near = clamp((y - 700) / 400, 0, 1);
+      g.fillStyle = r() < 0.62 + near * 0.3 ? `rgba(${lerp(118, 104, near) | 0},${lerp(88, 74, near) | 0},${lerp(110, 80, near) | 0},${0.2 + near * 0.08})` : 'rgba(240,222,200,0.22)';
       g.fill(ell(x, y, w, h, undefined, (r() - 0.5) * 0.04));
     }
     // standing water films: thin sheets that mirror the sky in long horizontal strokes
     for (let i = 0; i < 46; i++) {
       const y = y0 + r() ** 1.3 * (v.y1 - y0), s = pxu(y), x = v.x0 + r() * (v.x1 - v.x0);
       const w = (60 + r() * 200) * s, h = Math.max(0.8, w * flat(y) * 0.16);
-      g.fillStyle = F.rgba(F.mix('#f6eadb', '#b7cad6', (y - HZ) / (H - HZ)), 0.5 + r() * 0.3);
-      g.fill(ell(x, y, w, h));
+      g.fillStyle = F.rgba(F.mix('#f6eadb', '#b7cad6', (y - HZ) / (H - HZ)), (0.5 + r() * 0.3) * (1 - clamp((y - 650) / 450, 0, 0.75)));
+      g.fill(ell(x, y, w * (1 - clamp((y - 700) / 600, 0, 0.5)), h));
     }
 
-    // ripple marks: rows of little wave-ridges, their spacing and size shrinking toward the horizon.
-    // Each ridge is a lit crest (warm, facing the sun on the left) over a cool shadowed trough.
-    for (let y = y0; y < v.y1 + 10;) {
-      const s = pxu(y), sp = Math.max(1.6, 5.2 * s);
-      const rowR = rng(Math.round(y * 10));
-      let x = v.x0 - 40 + rowR() * 30;
-      while (x < v.x1 + 40) {
-        const len = (14 + rowR() * 30) * s, gap = (3 + rowR() * 22) * s;
-        if (!F.inWater(x + len / 2, y) && rowR() < 0.82) {
-          const wob = sp * 0.35, ph = rowR() * TAU;
-          g.beginPath();
-          for (let k = 0; k <= 6; k++) { const u = k / 6, px = x + len * u, py = y + Math.sin(u * TAU * 0.8 + ph) * wob - Math.sin(u * Math.PI) * sp * 0.15; k ? g.lineTo(px, py) : g.moveTo(px, py); }
-          g.lineWidth = Math.max(0.5, 1.1 * s); g.strokeStyle = 'rgba(150,120,128,0.32)'; g.stroke();
-          g.translate(0, -Math.max(0.6, 1.1 * s)); g.lineWidth = Math.max(0.4, 0.8 * s); g.strokeStyle = 'rgba(250,228,196,0.5)'; g.stroke(); g.translate(0, Math.max(0.6, 1.1 * s));
-        }
-        x += len + gap;
+    // ripple marks come in fields: long sinuous parallel ridges, all running across the flow of the
+    // ebb, fading out at the field's edges. Each ridge is a cool shadowed trough under a warm lit crest.
+    const rf = rng(71);
+    const fields = [];
+    for (let i = 0; i < 20; i++) { const y = y0 + 30 + rf() ** 0.75 * (v.y1 - y0 - 10); fields.push([v.x0 + rf() * (v.x1 - v.x0), y, (110 + rf() * 220) * pxu(y), rf()]); }
+    for (const [fx, fy, fw, seed] of fields) {
+      const s = pxu(fy), fh = fw * flat(fy) * 0.9, sp = Math.max(3, 13 * s);
+      const rr = rng(Math.round(seed * 1e6));
+      const tilt = (rr() - 0.5) * 0.06, ph0 = rr() * 10;
+      for (let yy = fy - fh; yy < fy + fh; yy += sp * (0.85 + rr() * 0.3)) {
+        const vy = (yy - fy) / fh, half = fw * Math.sqrt(Math.max(0, 1 - vy * vy));
+        if (half < 8) continue;
+        const ss = pxu(yy);
+        const pts = [];
+        for (let x = fx - half; x <= fx + half; x += Math.max(4, 10 * ss)) pts.push([x, yy + (x - fx) * tilt + Math.sin(x * 0.03 / Math.max(0.3, ss) + ph0 + yy * 0.05) * sp * 0.35]);
+        if (pts.length < 3) continue;
+        const fade = (1 - vy * vy) * 0.8;
+        const drawRidge = (dy, w, col) => { g.beginPath(); pts.forEach(([x, y], k) => (k ? g.lineTo(x, y + dy) : g.moveTo(x, y + dy))); g.lineWidth = w; g.strokeStyle = col; g.stroke(); };
+        drawRidge(0, Math.max(0.6, 1.4 * ss), `rgba(140,108,118,${0.26 * fade})`);
+        drawRidge(-Math.max(0.7, 1.3 * ss), Math.max(0.5, 0.9 * ss), `rgba(252,230,196,${0.42 * fade})`);
       }
-      y += sp * (0.9 + rowR() * 0.5);
     }
-
     // trails: every snail came in from the horizon, and left a silver ribbon behind it
     for (const sn of F.SNAILS || []) {
       if (!sn.trail) continue;
@@ -157,12 +160,14 @@ layer({
 
     // worm casts, pebbles, cockles, razor shells, sand dollars, bits of wrack
     const rp = rng(17);
-    for (let i = 0; i < 520; i++) {
-      const y = y0 + 20 + rp() ** 0.7 * (v.y1 - y0), x = v.x0 + rp() * (v.x1 - v.x0), s = pxu(y);
+    const clumps = []; for (let i = 0; i < 40; i++) clumps.push([v.x0 + rp() * (v.x1 - v.x0), y0 + 40 + rp() ** 0.7 * (v.y1 - y0 - 40)]);
+    for (let i = 0; i < 340; i++) {
+      const [cx_, cy_] = clumps[i % clumps.length], sc_ = pxu(cy_);
+      const y = cy_ + (rp() - 0.5) * 60 * sc_ * flat(cy_) * 3, x = cx_ + (rp() - 0.5) * 160 * sc_, s = pxu(y);
       if (F.inWater(x, y) || s < 0.25) continue;
       const kind = rp();
       const fl = flat(y);
-      if (kind < 0.3) { // worm cast: a little coil of sand
+      if (kind < 0.18) { // worm cast: a little coil of sand
         g.strokeStyle = 'rgba(160,126,110,0.55)'; g.lineWidth = Math.max(0.6, 1.2 * s);
         g.beginPath(); for (let k = 0; k < 14; k++) { const a = k * 0.9, rr = (0.6 + k * 0.28) * s; const px = x + Math.cos(a) * rr * 1.4, py = y + Math.sin(a) * rr * fl * 2.4 - k * 0.1 * s; k ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke();
         g.strokeStyle = 'rgba(248,224,196,0.55)'; g.lineWidth = Math.max(0.4, 0.6 * s); g.stroke();

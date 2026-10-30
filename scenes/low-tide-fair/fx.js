@@ -66,11 +66,11 @@ layer({
     const v = st.view;
     g.save();
     g.globalCompositeOperation = 'soft-light';
-    g.fillStyle = radial(g, -200, 200, 0, 1900, [[0, 'rgba(255,184,110,0.45)'], [0.45, 'rgba(255,196,140,0.12)'], [1, 'rgba(90,90,170,0.3)']]);
+    g.fillStyle = radial(g, -200, 200, 0, 1900, [[0, 'rgba(255,184,110,0.45)'], [0.5, 'rgba(255,196,140,0.1)'], [1, 'rgba(255,196,140,0)']]);
     g.fillRect(v.x0, v.y0, v.x1 - v.x0, v.y1 - v.y0);
     g.restore();
     const cx = F.W * 0.42, cy = F.H * 0.5, R = Math.hypot(F.W, F.H) * 0.55;
-    g.fillStyle = radial(g, cx, cy, R * 0.5, R * 1.1, [[0, 'rgba(50,30,60,0)'], [1, 'rgba(46,28,62,0.38)']]);
+    g.fillStyle = radial(g, cx, cy, R * 0.55, R * 1.15, [[0, 'rgba(60,34,50,0)'], [1, 'rgba(60,34,50,0.3)']]);
     g.fillRect(v.x0, v.y0, v.x1 - v.x0, v.y1 - v.y0);
   },
 });

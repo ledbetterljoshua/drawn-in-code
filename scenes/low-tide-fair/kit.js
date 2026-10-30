@@ -183,7 +183,7 @@ F.folk = (g, x, y, o) => {
   const sc = o.sc, dir = o.dir || 1, px = 30 * sc; // px: height on screen
   const tiny = px < 16, small = px < 26;
   const line = o.line || F.inkAt(hz);
-  const lw = clamp(1.6 / sc * (small ? 0.75 : 1), 0.4 / sc, 2.4 / sc) * (o.lwk || 1);
+  const lw = (clamp(0.8 + sc * 0.75, 0.7, 2.4) / sc) * (o.lwk || 1);
   const coat = hz ? F.mix(o.coat || '#d65a4a', F.HAZE, hz) : (o.coat || '#d65a4a');
   const coatSh = F.mix(coat, '#4a3a6a', 0.38);
   const acc = o.acc ? (hz ? F.mix(o.acc, F.HAZE, hz) : o.acc) : null;
@@ -192,7 +192,7 @@ F.folk = (g, x, y, o) => {
 
   g.save();
   g.translate(x, y);
-  g.scale(sc * dir, sc);
+  g.scale(sc * dir * (o.wide || 1), sc * (o.tall || 1));
   // legs (walking or standing) under the body
   const hipY = -7 + crouch * 2.5;
   const legs = step == null ? [[-3, 0], [3, 0]] : [[-3 + Math.sin(step * TAU) * 3.5, -Math.max(0, Math.cos(step * TAU)) * 2], [3 - Math.sin(step * TAU) * 3.5, -Math.max(0, -Math.cos(step * TAU)) * 2]];
