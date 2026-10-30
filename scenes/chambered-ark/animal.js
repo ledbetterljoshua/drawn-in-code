@@ -25,15 +25,20 @@ const EYE = { ring: '#cbb8ae', dark: '#24182a' };
 
 // the cirri: rooted in a fan under the eye
 const r = rng(808);
-const cirri = [];
-for (let i = 0; i < 48; i++) {
-  const f = r();
-  const layer = i % 3; // 0 back, 1 middle, 2 front
-  cirri.push({
-    root: layer === 0 ? [lerp(120, 156, r()), lerp(200, 280, f)] : [lerp(70, 158, r()), lerp(196, 288, f)],
-    a: lerp(0.05, 0.95, f) + (r() - 0.5) * 0.25, len: lerp(110, 230, Math.sin(f * Math.PI * 0.9 + 0.2)) * (0.7 + r() * 0.4),
-    curl: (r() - 0.35) * 2.2, ph: r() * TAU, w: layer === 2 ? 5.4 + r() * 1.6 : 4.2 + r() * 1.4, layer, back: layer === 0,
-  });
+// the cirri grow in bunches, each from a soft sheath on the face; back bunches darker, front lighter
+const cirri = [], sheaths = [];
+const BUNCH = [[146, 200, -0.05, 0], [124, 214, 0.15, 1], [140, 226, 0.25, 2], [100, 234, 0.4, 0], [120, 244, 0.45, 1], [136, 258, 0.6, 2], [86, 262, 0.7, 0], [108, 270, 0.75, 2], [74, 284, 0.95, 1], [96, 292, 1.05, 2]];
+for (const [bu, bv, ba, layer] of BUNCH) {
+  const sl = 16 + r() * 8;
+  sheaths.push({ u: bu, v: bv, a: ba, len: sl, layer });
+  const n = 4 + Math.floor(r() * 3);
+  for (let i = 0; i < n; i++) {
+    cirri.push({
+      root: [bu + Math.cos(ba) * sl + (r() - 0.5) * 4, bv + Math.sin(ba) * sl + (r() - 0.5) * 6],
+      a: ba + (i / (n - 1) - 0.5) * 0.5 + (r() - 0.5) * 0.1, len: (120 + r() * 90) * (layer === 2 ? 1 : 0.85),
+      curl: (r() - 0.4) * 2, ph: r() * TAU + layer, w: layer === 2 ? 4.6 + r() : 3.8 + r(), layer, back: layer === 0,
+    });
+  }
 }
 cirri.sort((p, q) => p.layer - q.layer);
 const S = { look: [0, 0], blink: Drawn.blinker(3, 6), slow: 0, puff: 0, puffT: 9, breathe: 0, reach: 0, curlOn: 0 };
@@ -47,7 +52,7 @@ function cirrusPts(c, t, hov, tx, ty) {
     pts.push([x, y]);
     const u = i / n;
     // stream in the current and wave; when hovered, bend toward the pointer and curl at the tip
-    let da = (c.curl * 0.07 * u * u * 3 + Math.sin(t * 1.1 + c.ph + u * 3.2) * 0.08) * (0.4 + u);
+    let da = (c.curl * 0.09 * u * u * 3 + Math.sin(t * 1.1 + c.ph + u * 4.2) * 0.12) * (0.4 + u);
     if (hov > 0.01) {
       const want = Math.atan2(ty - y, tx - x);
       let d = want - a; while (d > Math.PI) d -= TAU; while (d < -Math.PI) d += TAU;
@@ -64,10 +69,8 @@ function drawCirri(g, t, L, back) {
   for (const c of cirri) {
     if (c.back !== back) continue;
     const pts = cirrusPts(c, t, L.hover * (c.back ? 0.6 : 1), tx, ty);
-    const col = c.layer === 0 ? '#c99a8e' : c.layer === 1 ? '#e2b9a8' : CIRRI.base;
-    C.limb(g, pts, c.w, 1.3, col, 1.3, CIRRI.shade);
-    // each cirrus leaves its sheath with a pale collar
-    if (c.layer) { const [x, y] = pts[1]; g.fillStyle = CIRRI.lit; g.globalAlpha = 0.7; g.fill(ell(x, y, c.w * 0.5, c.w * 0.35)); g.globalAlpha = 1; }
+    const col = c.layer === 0 ? '#b98a84' : c.layer === 1 ? '#dcb0a0' : CIRRI.base;
+    C.limb(g, pts, c.w, 1.1, col, c.layer === 2 ? 1.3 : 1, CIRRI.shade);
     if (!back) {
       // the ridged grip along each cirrus
       g.save(); g.globalAlpha = 0.5;
@@ -113,7 +116,7 @@ layer({
       g.save(); g.transform(M.a, M.b, M.c, M.d, M.e, M.f);
       const br = S.breathe;
       // the dark inside of the aperture, behind everything
-      const mouth = curve([[-4, 100], [20, 160], [24, 260], [12, ap - 16], [-4, ap - 4]]);
+      const mouth = curve([[-4, 120], [14, 180], [16, 280], [6, ap - 30], [-4, ap - 24]]);
       ink(g, mouth, '#5a3a48', 1.6);
       drawCirri(g, t, L, true);
       // the funnel under the head, a soft curled tube that breathes
@@ -124,35 +127,34 @@ layer({
       ink(g, ell(106 * fp, 314 + 2 * fp, 4 + S.puff * 3, 8, undefined, 0.2), '#6d3f4a', 1.4);
       // the head: one soft mass from the hood down to the root of the cirri
       const hb = br * 1.6;
-      const headPts = [[-56, 44], [-44, -4 - hb], [6, -32 - hb], [80, -40 - hb], [146, -24 - hb], [184, 16], [192, 70], [176, 118], [164, 160], [160, 214], [148, 262], [112, 292], [50, 296], [6, 280], [-4, 200], [-30, 110]];
+      const headPts = [[-96, 58], [-76, 10 - hb], [-20, -18 - hb], [70, -28 - hb], [146, -16 - hb], [186, 20], [192, 72], [176, 118], [164, 160], [160, 214], [148, 262], [112, 292], [50, 300], [6, 290], [-4, 200], [-40, 120]];
       const head = curve(headPts);
-      ink(g, head, '#e0b29c', 2.8);
+      ink(g, head, '#d8a690', 2.8);
       g.save(); g.clip(head);
       g.fillStyle = '#c18a80'; g.fill(ell(30, 240, 90, 90));
       g.fillStyle = '#f2cdb8'; g.fill(ell(150, 190, 26, 60));
-      // the sheaths along the front of the face, each a little ringed cup a cirrus leaves from
-      const sr = rng(23);
-      for (let i = 0; i < 26; i++) {
-        const u = 70 + sr() * 92, v = 196 + sr() * 92;
-        g.fillStyle = sr() < 0.5 ? '#d39c8a' : '#ebc3ae'; g.fill(ell(u, v, 7, 5, undefined, 0.4));
-        g.lineWidth = 0.9; g.strokeStyle = 'rgba(120,60,60,0.6)'; g.stroke(ell(u, v, 7, 5, undefined, 0.4));
-      }
       // the hood: the upper half of the head, leathery tan, mottled and rough
-      const hoodEdge = [[-60, 96], [10, 118], [80, 132], [140, 128], [200, 108]];
-      const hood = curve([[-80, -80], [220, -80], ...hoodEdge.slice().reverse()]);
+      const hoodEdge = [[-100, 90], [-20, 112], [60, 130], [140, 128], [200, 108]];
+      const hood = curve([[-120, -80], [220, -80], ...hoodEdge.slice().reverse()]);
       g.save(); g.clip(hood);
-      g.fillStyle = '#c47d52'; g.fill(hood);
+      g.fillStyle = '#eed9bf'; g.fill(hood);
       const hm = rng(4);
-      // darker patches
-      for (let i = 0; i < 26; i++) { const x = -50 + hm() * 240, y = -40 + hm() * 160, s = 8 + hm() * 16; g.fillStyle = hm() < 0.5 ? 'rgba(120, 56, 40, 0.45)' : 'rgba(150, 76, 48, 0.5)'; g.fill(ell(x, y, s, s * 0.6, undefined, hm() * 3)); }
+      // the hood wears the shell's own pattern: rust flames running back over it, broken into blotches
+      for (let i = 0; i < 11; i++) {
+        const cu = -110 + i * 28 + hm() * 10;
+        const pts = []; for (let j = 0; j < 6; j++) pts.push([cu + j * 9 + Math.sin(j * 1.3 + i) * 7, -34 + j * 28 + hm() * 6]);
+        g.globalAlpha = 0.8; A.stroke(g, pts, 9 + hm() * 8, i % 3 ? '#b8603a' : '#9a4a2e');
+        g.globalAlpha = 1;
+        for (let j = 0; j < 3; j++) { const [x, y] = pts[1 + Math.floor(hm() * 4)]; g.fillStyle = '#eed9bf'; g.fill(ell(x + (hm() - 0.5) * 8, y, 3 + hm() * 3, 2 + hm() * 2)); }
+      }
       // form: sunlit along the top, falling into shade toward the brim
       g.fillStyle = grad(g, 0, -40, 0, 130, [[0, 'rgba(255, 236, 200, 0.5)'], [0.45, 'rgba(255, 236, 200, 0)'], [0.8, 'rgba(70, 30, 40, 0.15)'], [1, 'rgba(70, 30, 40, 0.45)']]);
       g.fillRect(-80, -80, 300, 220);
       // tubercles: small raised bumps, cream on top
       for (let i = 0; i < 80; i++) {
-        const x = -46 + hm() * 230, y = -34 + hm() * 150, s = 1.4 + hm() * 2.6;
+        const x = -90 + hm() * 270, y = -24 + hm() * 140, s = 1.2 + hm() * 2.2;
         g.fillStyle = 'rgba(90, 40, 40, 0.4)'; g.fill(circ(x + s * 0.3, y + s * 0.4, s));
-        g.fillStyle = '#f3dcc0'; g.fill(circ(x - s * 0.15, y - s * 0.2, s * 0.75));
+        g.fillStyle = '#f8ead6'; g.fill(circ(x - s * 0.15, y - s * 0.2, s * 0.75));
       }
       g.restore();
       // the brim: the hood's edge overhangs, casting a shadow on the face
@@ -179,6 +181,12 @@ layer({
         g.fillStyle = 'rgba(60, 30, 40, 0.3)'; g.fill(ell(ex, ey - er * 0.95, er * 1.2, er * 0.4));
         if (bl < 1) { g.fillStyle = '#c99a86'; g.fillRect(ex - er - 4, ey - er - 6, er * 2 + 8, (er * 2 + 8) * (1 - bl)); }
         g.restore();
+      }
+      for (const sh of sheaths) {
+        const [x0, y0] = [sh.u, sh.v], x1 = x0 + Math.cos(sh.a) * sh.len, y1 = y0 + Math.sin(sh.a) * sh.len;
+        C.limb(g, [[x0, y0], [lerp(x0, x1, 0.5), lerp(y0, y1, 0.5) + 2], [x1, y1]], 20, 13, sh.layer === 2 ? '#e8bca6' : sh.layer === 1 ? '#d6a490' : '#c08e84', 1.3, '#a87470');
+        g.lineWidth = 0.9; g.strokeStyle = 'rgba(120,60,60,0.5)';
+        for (const f of [0.35, 0.65]) { const cx = lerp(x0, x1, f), cy = lerp(y0, y1, f); g.beginPath(); g.ellipse(cx, cy, 2.5, 6.5, sh.a, 0, TAU); g.stroke(); }
       }
       drawCirri(g, t, L, false);
       g.restore();

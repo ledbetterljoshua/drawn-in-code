@@ -65,3 +65,26 @@ Worst five now:
 3. Rooms are pale lilac and evenly lit; the jelly-light doesn't pool; interiors don't feel warm vs sea.
 4. The body crescent is a big blank cream fan; its stripes are thin rays like a paper fan.
 5. Rocks in the phone foreground are dull grey mounds with tiny coral on top.
+
+## Round 3 — after the first critic
+The critic (screenshots only) named ten: the head as a bread roll on a pink plane with a broom of
+straight cirri; the cutaway with no depth (flat lavender rooms, lanterns that light nothing, thin cut
+rim); no focal room, the inner whorls a procedural pinwheel; the ark not grounded; generated-looking
+kelp as bookends; a stamped phone crop; one line weight everywhere; flat shell and candy-coloured reef;
+a story that contradicts itself (moored, yet a captain at the wheel); a lazy scribble caustic.
+
+Did:
+- Light: each room's jelly-light is now an additive pool drawn over the furniture *and* the crew,
+  breathing with the jellies; hollows darker and cooler, with deeper corner falloff; small inner
+  chambers sink toward dark so the wheelhouse and galley carry the picture (hero rooms get a stronger
+  pool). Septa are thick pearly slices with a lit side and a shaded side. Contact shadows under the crew.
+- Head: the hood wears the shell's own rust flames, lies back over the coil, tubercles; cirri grow in
+  bunches from ringed sheaths, back bunches darker; the fang under the funnel is gone.
+- Story: committed to under way. Anchor and mooring line removed.
+- Kelp: blades stream downstream off mostly one side, irregular spacing and lengths, strands of
+  different heights, fogged line colour with distance, one short strand in front on the left.
+- Phone: slack 0.7 so a portrait screen crops the sides and the ark is half again as big; one big
+  near outcrop instead of three clones; surface brought down into view.
+- Caustics: a warped Voronoi net built once as pixels, finer and flatter with distance.
+- Reef: distant forms fogged harder, no table "mushrooms" in the haze. Eels have burrow mounds.
+- A sea turtle, a fusilier school that scatters from the pointer, two moon jellies.

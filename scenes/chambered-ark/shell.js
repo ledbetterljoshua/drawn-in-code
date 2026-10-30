@@ -41,7 +41,7 @@ function chamberHollow(g, ch, r) {
   g.save(); g.clip(ch.path);
   // the far wall: nacre in shadow (it's recessed), cooler toward the inner whorl
   const [ix, iy] = A.pt(ch.thm, ch.rIn), [ox, oy] = A.pt(ch.thm, ch.rOut);
-  g.fillStyle = grad(g, ix, iy, ox, oy, ['#8c86a6', '#a69bb4', '#b8a6b4']);
+  g.fillStyle = grad(g, ix, iy, ox, oy, ['#6f6c92', '#8b84a6', '#a093aa']);
   g.fill(ch.path);
   // the sheen of nacre: soft bands following the curve of the whorl
   for (let i = 0; i < 3; i++) {
@@ -59,8 +59,10 @@ function chamberHollow(g, ch, r) {
   // even-odd: everything but the lit (shifted) chamber
   const both = new Path2D(); both.addPath(sh); both.addPath(lit);
   g.fill(both, 'evenodd'); g.restore();
-  // ambient occlusion along every edge
-  for (const [w, a] of [[s * 0.34, 0.08], [s * 0.18, 0.1], [s * 0.08, 0.12], [s * 0.03, 0.14]]) {
+  // the inner whorls sink into the dark: quieter, so the big rooms read first
+  g.fillStyle = `rgba(36, 30, 70, ${0.42 * (1 - clamp(s / 190, 0, 1))})`; g.fill(ch.path);
+  // and every room falls off into its corners
+  for (const [w, a] of [[s * 0.5, 0.1], [s * 0.34, 0.1], [s * 0.18, 0.12], [s * 0.08, 0.14], [s * 0.03, 0.16]]) {
     g.lineWidth = w; g.strokeStyle = `rgba(56, 44, 84, ${a})`; g.stroke(ch.path);
   }
   g.restore();
@@ -99,10 +101,12 @@ function paintFace(g) {
   g.lineWidth = 0.9; g.strokeStyle = 'rgba(120, 92, 96, 0.55)'; g.stroke(skin);
   // septa: the nacre walls, each cut edge inked, lit on the sun side
   for (const s of A.septa) {
-    const w = Math.max(1.6, A.R(s.th) * 0.024);
-    A.stroke(g, s.pts, w + 2.2, LINE);
-    A.stroke(g, s.pts, w, '#f6eee9');
-    A.stroke(g, s.pts.map(([x, y]) => [x - w * 0.18, y - w * 0.22]), w * 0.35, '#ffffff');
+    // a thick pearly slice: lit along its sun side, the nacre's layers showing on the far side
+    const w = Math.max(1.6, A.R(s.th) * 0.034);
+    A.stroke(g, s.pts, w + 2.4, LINE);
+    A.stroke(g, s.pts, w, '#efe4e6');
+    A.stroke(g, s.pts.map(([x, y]) => [x + w * 0.2, y + w * 0.22]), w * 0.35, '#cbbfd2');
+    A.stroke(g, s.pts.map(([x, y]) => [x - w * 0.2, y - w * 0.24]), w * 0.3, '#ffffff');
   }
   g.lineWidth = 1.4; g.strokeStyle = 'rgba(51, 33, 58, 0.75)';
   for (const ch of A.chambers) g.stroke(ch.path);
@@ -168,13 +172,9 @@ function paintBody(g, r) {
     g.save(); g.clip(S); g.globalAlpha = 0.55 * fade; g.fillStyle = SH.stripeDk; g.translate(4, 5); g.fill(S); g.restore();
     g.globalAlpha = 1;
   }
-  // growth lines: fine arcs parallel to the aperture
-  g.lineWidth = 0.9;
-  for (let th = th0 + 0.04; th < A.thE - 0.02; th += 0.035 + r() * 0.03) {
-    g.strokeStyle = `rgba(150, 120, 104, ${0.05 + r() * 0.06})`;
-    const a = A.pt(th, A.ri(th)), b = A.pt(th + 0.05, (A.ri(th) + A.R(th)) / 2), c = A.pt(th - 0.02, A.R(th));
-    g.beginPath(); g.moveTo(...a); g.quadraticCurveTo(...b, ...c); g.stroke();
-  }
+  // the whorl's roundness: the sun on the upper left, the keel turning away into shade
+  g.fillStyle = grad(g, A.C[0] - 200, A.C[1] + 100, A.C[0] + 250, A.C[1] + 560, [[0, 'rgba(255, 250, 235, 0.3)'], [0.5, 'rgba(255, 250, 235, 0)'], [1, 'rgba(70, 90, 120, 0.35)']]);
+  g.fill(W);
   // a glossy highlight where the sun hits the shoulder of the whorl
   const hi = A.toPath([...arc(th0 + 0.2, A.thE - 0.15, (th) => lerp(A.ri(th), A.R(th), 0.3), 30), ...arc(A.thE - 0.15, th0 + 0.2, (th) => lerp(A.ri(th), A.R(th), 0.4), 30)]);
   g.fillStyle = 'rgba(255, 252, 240, 0.35)'; g.fill(hi);

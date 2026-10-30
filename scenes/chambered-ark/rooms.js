@@ -61,11 +61,14 @@ K.deck = (g, ch, y, o = {}) => {
 };
 // warm jelly-light pooled in a room
 K.glow = (g, ch, x, y, rad, a = 0.55) => {
+  a = Math.min(1, a * 1.35); rad *= 1.15;
   g.save(); g.clip(ch.path); g.globalCompositeOperation = 'screen';
   g.fillStyle = radial(g, x, y, 0, rad, [[0, `rgba(255, 214, 140, ${a})`], [0.45, `rgba(255, 180, 110, ${a * 0.45})`], [1, 'rgba(255, 170, 100, 0)']]);
   g.fillRect(x - rad, y - rad, rad * 2, rad * 2);
   g.restore();
 };
+// a soft contact shadow on a floor
+K.shadow = (g, x, y, w, a = 0.35) => { g.fillStyle = `rgba(40, 24, 40, ${a})`; g.fill(ell(x, y, w, Math.max(1.2, w * 0.18))); };
 // a porthole drilled through the far wall: the sea outside, a brass rim
 K.porthole = (g, x, y, rad) => {
   const O = circ(x, y, rad);
@@ -112,7 +115,6 @@ A.room = (def) => {
   const R = Object.assign({ ch, k: def.k }, def.state ? def.state() : {});
   A.furnish((g) => {
     g.save(); g.clip(ch.path);
-    if (def.glow) for (const [x, y, rad, a] of def.glow) K.glow(g, ch, x, y, rad, a);
     if (def.floor != null) { const [x0, x1] = K.deck(g, ch, def.floor, { near: def.near }); R.fx0 = x0; R.fx1 = x1; }
     if (def.furnish) def.furnish(g, R);
     g.restore();
@@ -129,6 +131,18 @@ A.room = (def) => {
       A.inShell(g, () => {
         g.save(); g.clip(ch.path);
         def.draw(g, t, L, R);
+        // the jelly-light pools warm over the room and everyone in it, breathing with the jellies
+        if (def.glow) {
+          const hero = clamp(ch.size / 200, 0.35, 1.15);
+          const f = 0.85 + 0.1 * Math.sin(t * 2.3 + def.k) + 0.05 * Math.sin(t * 5.1 + def.k * 3) + L.hover * 0.2 + (A.flare ? A.flare(def.k) * 0.8 : 0);
+          g.globalCompositeOperation = 'lighter';
+          for (const [x, y, rad, a] of def.glow) {
+            const al = a * 0.42 * f * hero, rr = rad * 1.2;
+            g.fillStyle = radial(g, x, y, 0, rr, [[0, `rgba(255, 190, 110, ${al})`], [0.4, `rgba(240, 140, 70, ${al * 0.45})`], [1, 'rgba(200, 100, 60, 0)']]);
+            g.fillRect(x - rr, y - rr, rr * 2, rr * 2);
+          }
+          g.globalCompositeOperation = 'source-over';
+        }
         g.restore();
         if (def.over) def.over(g, t, L, R);
       });
@@ -146,7 +160,7 @@ A.look = look;
 // ================================================================== 0 · the wheelhouse
 A.room({
   k: 0, id: 'wheelhouse', floor: 512,
-  glow: [[1170, 420, 170, 0.6]],
+  glow: [[1172, 410, 190, 0.95], [1130, 500, 90, 0.5]],
   state: () => ({ act: A.actor(11, [['look', 2.4], ['hat', 1.6], ['peer', 3]], [3, 7]), wheel: 0, wv: 0, blink: Drawn.blinker(), tube: A.beat(2.6), lean: 0 }),
   furnish(g, R) {
     // a chart of the reef pinned to the wall
@@ -200,6 +214,7 @@ A.room({
     // the captain: at the wheel, or leaning to the tube when he calls down it
     const toTube = tb >= 0 ? A.env(tb, 0.15, 0.8) : 0;
     const x = lerp(1132, 1112, toTube), y = 497;
+    K.shadow(g, 1127, 497, 18, 0.3); K.shadow(g, 1169, 512, 16, 0.3);
     const lk = peer >= 0 ? [1, -0.2] : lw >= 0 ? [-1 + 2 * A.smooth(lw), -0.4] : look(x, y - 40);
     C.hermit(g, x, y, 1.15, {
       hat: true, hatTip: hat >= 0 ? -0.3 * A.bump(hat) : 0, blink: R.blink(t), look: toTube > 0.5 ? [-1, 0.3] : lk, flip: toTube > 0.5,
@@ -213,7 +228,7 @@ A.room({
 // ================================================================== 1 · the galley
 A.room({
   k: 1, id: 'galley', floor: 371, near: 1150,
-  glow: [[1190, 330, 140, 0.55], [1205, 355, 60, 0.4]],
+  glow: [[1160, 310, 150, 0.8], [1205, 348, 60, 0.9]],
   state: () => ({ act: A.actor(21, [['taste', 2], ['look', 2.2], ['shake', 1.6]], [2.5, 6]), blink: Drawn.blinker(), jug: 0, flip: A.beat(1.6) }),
   furnish(g, R) {
     // the vent stove: a squat stone chimney with a hot mouth
@@ -260,6 +275,7 @@ A.room({
     const taste = R.act.is('taste'), shake = R.act.is('shake');
     const jug = R.jug, fl = R.flip.live ? R.flip.u : -1;
     const ox = 1150, oy = 371;
+    K.shadow(g, ox, oy, 22, 0.35);
     const items = [];
     C.octopus(g, ox, oy, 0.95, {
       hat: true, t, blink: R.blink(t), look: taste >= 0 ? [0.6, 0.5] : look(ox, oy - 40),
@@ -481,6 +497,7 @@ A.room({
     // the librarian
     const nod = R.act.is('nod'), adj = R.act.is('adjust');
     const looking = L.hovered && R.page.u >= 1;
+    K.shadow(g, 768, 345, 22);
     C.snail(g, 768, 345, 0.85, { t, specs: true, blink: nod >= 0 ? 1 - A.bump(nod) * 0.9 : R.blink(t), look: looking ? look(790, 300) : [0.7, 0.6], reach: nod >= 0 ? -0.2 * A.bump(nod) : adj >= 0 ? 0.3 * A.bump(adj) : 0.15, rock: Math.sin(t * 0.8) * 0.03 });
     // the bookworm on the top shelf
     if (R.worm.live) {
@@ -539,6 +556,7 @@ A.room({
     }
     // the gardener with her watering can
     const w = R.water;
+    K.shadow(g, 752, 424, 22);
     C.nudi(g, 752, 424, 0.85, { t, blink: R.blink(t), look: w > 0.5 ? [-0.5, 0.4] : look(760, 400), rear: w * 0.8, ripple: R.open, flip: true });
     g.save(); g.translate(744, 388 - w * 6); g.rotate(-0.3 - w * 0.5);
     ink(g, A.rr(-7, -6, 14, 12, 3), '#6aa3c8', 1.1);
@@ -609,6 +627,7 @@ A.room({
     const p = R.play, tap = R.act.is('tap');
     // the pufferfish with a conch horn
     const pf = R.puff * (0.7 + 0.3 * Math.sin(t * 2));
+    K.shadow(g, 750, 572, 14);
     C.puffer(g, 750, 572, 0.85, { t, puff: pf, blink: R.blink(t), look: p > 0.3 ? [1, 0] : look(750, 555), blow: p * (0.5 + 0.5 * Math.sin(t * 7)) });
     const hx = 750 + (15 + pf * 6) * 0.85, hy = 572 - (11 + pf * 10) * 0.85 - 2;
     g.save(); g.translate(hx + 2, hy + 1); g.rotate(-0.2 + Math.sin(t * 3) * 0.05 * p);
