@@ -292,7 +292,7 @@
     g.lineWidth = 1.4; g.strokeStyle = 'rgba(30,16,20,0.85)'; g.stroke(circ(x, y, R)); g.stroke(circ(x + 1, y + 1, R * 0.7));
   }
   function saggar(g, x, y, w, h, r) {
-    const broken = r() < 0.12;
+    const broken = r() < 0.06;
     const p = K.rrect(x, y, w, h, 6);
     const col = K.mix(K.mix(M.slip, '#7a6458', 0.35), r() < 0.3 ? '#c08068' : '#b8a890', r() * 0.6);
     g.fillStyle = K.css(col); g.fill(p);
@@ -301,8 +301,8 @@
     g.fillStyle = 'rgba(60,40,40,0.25)'; g.fillRect(x + 2, y + 3, w - 4, 3);
     g.fillStyle = 'rgba(30,20,24,0.35)'; g.fillRect(x + 2, y + h - 5, w - 4, 4);
     if (broken) {
-      g.fillStyle = '#1c1214';
-      g.fill(poly([[x + w * 0.3, y + h], [x + w * 0.4, y + h * 0.3], [x + w * 0.6, y + h * 0.5], [x + w * 0.75, y + h]]));
+      g.fillStyle = 'rgba(40,24,24,0.6)';
+      g.fill(poly([[x + w * 0.35, y + h - 2], [x + w * 0.42, y + h * 0.55], [x + w * 0.58, y + h * 0.62], [x + w * 0.66, y + h - 2]]));
     } else if (r() < 0.3) {
       g.beginPath(); g.moveTo(x + w * r(), y); g.lineTo(x + w * 0.5, y + h * 0.5); g.lineTo(x + w * r(), y + h);
       g.lineWidth = 0.9; g.strokeStyle = 'rgba(40,24,28,0.6)'; g.stroke();
@@ -446,6 +446,12 @@
       // the near ground's lip: a soft shadowed crest rather than an inked line
       g.save(); g.clip(p); g.lineWidth = 10; g.strokeStyle = 'rgba(20,10,14,0.35)'; g.stroke(curve(frontEdge.map(([x, y]) => [x, y + 6]), false)); g.restore();
       K.applyLight(g, p);
+      // the near ground falls into shadow toward the viewer so the kiln's forecourt is the
+      // brightest band and the foreground reads as a dark, simple plane
+      g.save(); g.clip(p);
+      g.fillStyle = grad(g, 0, 1040, 0, Math.max(1500, v.y1), [[0, 'rgba(8,6,16,0)'], [0.25, 'rgba(8,6,16,0.3)'], [0.6, 'rgba(8,6,16,0.6)'], [1, 'rgba(6,5,12,0.8)']]);
+      g.fillRect(-800, 1040, 3200, Math.max(500, v.y1 - 1000));
+      g.restore();
       tufts(g, [[592, 1060], [610, 1110], [590, 1180], [556, 1260], [552, 1380], [600, 1460]], 66, { n: 7, h: 10 });
       tufts(g, [[690, 1052], [718, 1110], [706, 1180], [690, 1260], [736, 1380], [790, 1460]], 67, { n: 7, h: 10 });
       tufts(g, frontEdge, 64, { n: 3, h: 14 });

@@ -1,6 +1,6 @@
 /* sky.js — the dark above Kilnhill: no moon, no stars, only the kiln's smoke, lit from underneath.
    z 0   sky: near-black, warming faintly toward the horizon haze where far kiln towns burn
-   z 2   canopy (still): the smoke the kiln has been making for three nights, a ceiling lit by the town
+   z 2   canopy (still): the plume, one designed ribbon twisting off the lip, lit underneath
    z 4   far hills: the other kiln towns on the horizon. Hover: they flash back, like answering a signal
    z 59  bats: flit through the lit smoke. Hover: the nearest swerves away and the others follow
    z 60  plume (live, drawn over the kiln top): new smoke rolling off the chimney, sparks rising. */
@@ -28,27 +28,7 @@
   });
 
   // ------------------------------------------------------------------ smoke canopy
-  // Smoke is shaded as one mass (never circle by circle, which reads as scales): a dark top, a
-  // middle band, and an underside that catches the fire. Colours come from radial gradients
-  // centred on the chimney, so the plume warms smoothly toward its source.
   const CH = [560, 214];
-  function smokeMass(g, circles, o = {}) {
-    const warm = o.warm == null ? 1 : o.warm, reach = o.reach || 760;
-    const U = new Path2D(), Mid = new Path2D(), Low = new Path2D();
-    for (const [x, y, r] of circles) { circ(x, y, r, U); circ(x + r * 0.04, y + r * 0.26, r * 0.9, Mid); circ(x + r * 0.06, y + r * 0.52, r * 0.62, Low); }
-    const rg = (list) => radial(g, CH[0], CH[1], 0, reach, list);
-    g.fillStyle = rg([[0, K.mixc('#141218', '#3a1a16', 0.7 * warm)], [0.45, '#0e0e1c'], [1, '#0a0b18']]); g.fill(U);
-    g.save(); g.clip(U);
-    g.fillStyle = rg([[0, K.mixc('#1a1418', '#6a2c18', 0.8 * warm)], [0.3, K.mixc('#14131e', '#3a1c1a', 0.5 * warm)], [0.7, '#10101e'], [1, '#0d0e1a']]); g.fill(Mid);
-    g.fillStyle = rg([[0, K.mixc('#2a1a1a', '#b04c1e', 0.85 * warm, 0.95)], [0.22, K.mixc('#1a1418', '#5a2618', 0.7 * warm, 0.7)], [0.55, 'rgba(26,24,40,0.35)'], [1, 'rgba(26,24,40,0.15)']]); g.fill(Low);
-    // rolling volume: a few curling lit edges inside the mass
-    if (o.curls) for (const [x, y, r] of o.curls) {
-      const d = Math.hypot(x - CH[0], y - CH[1]), k = clamp(1 - d / reach, 0, 1);
-      g.lineWidth = 1.6 + r * 0.02; g.strokeStyle = K.mixc('#1a1a2a', '#c0582a', k * k * warm, 0.18 + 0.4 * k);
-      g.beginPath(); g.arc(x, y, r, Math.PI * 0.15, Math.PI * 0.85); g.stroke();
-    }
-    g.restore();
-  }
   // The plume, as one designed shape: a ribbon that leaves the lip tight, twists up, shears off
   // to the right with the breeze and thins out to wisps. The leading (upper) edge billows crisp;
   // the trailing underside is smoother and takes the fire's light near the chimney.

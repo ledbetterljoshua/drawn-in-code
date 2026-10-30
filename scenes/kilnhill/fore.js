@@ -113,7 +113,7 @@
   const BX0 = 1150, BX1 = 1470, BY = 1086;
   const cooling = [
     { x: 1182, w: 18, h: 34, glaze: M.glazeTeal, shape: 'vase' }, { x: 1232, w: 26, h: 22, glaze: M.glazeHoney, shape: 'bowl' },
-    { x: 1290, w: 22, h: 40, glaze: M.glazeOx, shape: 'jar' }, { x: 1346, w: 16, h: 30, glaze: M.glazeBlue, shape: 'vase' },
+    { x: 1290, w: 22, h: 40, glaze: '#4a3a3a', shape: 'jar' }, { x: 1346, w: 16, h: 30, glaze: M.glazeBlue, shape: 'vase' },
     { x: 1400, w: 24, h: 26, glaze: M.glazeCream, shape: 'jar' }, { x: 1444, w: 14, h: 18, glaze: M.glazeTeal, shape: 'cup' },
   ];
   function coolPath(p) {
@@ -227,8 +227,9 @@
       g.lineWidth = 0.8; g.beginPath(); g.moveTo(1500, 1124); g.lineTo(1496, 1144); g.moveTo(1514, 1124); g.lineTo(1516, 1144); g.stroke();
       for (const z of zs) {
         const a = Math.min(1, z.age * 2) * (1 - z.age / 3);
-        g.font = `italic ${10 * z.s + z.age * 3}px Georgia, serif`;
-        g.fillStyle = `rgba(255,220,180,${0.7 * a})`; g.fillText('z', z.x, z.y);
+        // slow sleeping breaths: little curls drifting up off the snout
+        g.lineWidth = 1.1; g.strokeStyle = `rgba(220,200,190,${0.45 * a})`;
+        g.beginPath(); g.arc(z.x, z.y, 2.5 * z.s + z.age * 1.5, Math.PI * 0.2, Math.PI * 1.6); g.stroke();
       }
     },
   });
@@ -413,6 +414,38 @@
         g.fill(ell(m.x - 2.6 * s * f, m.y, 2.8 * s * f + 0.4, 1.9 * s, undefined, -0.4));
         g.fill(ell(m.x + 2.6 * s * f, m.y, 2.8 * s * f + 0.4, 1.9 * s, undefined, 0.4));
         g.fillStyle = 'rgba(30,20,20,0.8)'; g.fillRect(m.x - 0.5, m.y - 1.2, 1, 2.6);
+      }
+    },
+  });
+})();
+
+// ------------------------------------------------------------------ the nearest grass
+// big, simple, nearly black blades at the bottom corners: the near plane that frames the picture,
+// rim-lit only on the edges that face the kiln. They lean in the shared wind
+(function () {
+  const { rng, noise, wind, st, layer } = Drawn;
+  const K = window.Kiln;
+  const clumps = [[-120, 1214, 1.3], [40, 1222, 1], [1480, 1216, 1.2], [1640, 1210, 1.4], [260, 1560, 1.6], [1180, 1600, 1.5]];
+  const blades = [];
+  for (const [cx, cy, s] of clumps) {
+    const r = rng(cx * 7 + 3);
+    for (let i = 0; i < 9; i++) blades.push({ x: cx + (r() - 0.5) * 60 * s, y: cy + r() * 8, h: (50 + r() * 70) * s, w: (5 + r() * 4) * s, lean: (r() - 0.5) * 0.8, ph: r() * 9 });
+  }
+  layer({
+    id: 'nearGrass', z: 66,
+    draw(g, t) {
+      for (const b of blades) {
+        const sway = (wind(t, b.x) - 0.6) * 0.18 + noise(t * 0.7 + b.ph) * 0.05;
+        const a = b.lean + sway, tx = b.x + Math.sin(a) * b.h, ty = b.y - Math.cos(a) * b.h;
+        const p = new Path2D();
+        p.moveTo(b.x - b.w, b.y);
+        p.quadraticCurveTo(b.x + Math.sin(a) * b.h * 0.4 - b.w * 0.6, b.y - b.h * 0.55, tx, ty);
+        p.quadraticCurveTo(b.x + Math.sin(a) * b.h * 0.4 + b.w * 0.6, b.y - b.h * 0.5, b.x + b.w, b.y);
+        g.fillStyle = '#0a080c'; g.fill(p);
+        // the kiln is up and to the side: a thin warm edge on the blade's kiln side
+        const side = b.x < 560 ? 1 : -1, I = Math.min(1, K.glowAt(b.x, b.y - b.h * 0.5) * 2.5 + 0.15);
+        g.lineWidth = 1; g.strokeStyle = `rgba(255,140,70,${0.45 * I})`;
+        g.beginPath(); g.moveTo(b.x + side * b.w, b.y); g.quadraticCurveTo(b.x + Math.sin(a) * b.h * 0.4 + side * b.w * 0.6, b.y - b.h * 0.5, tx, ty); g.stroke();
       }
     },
   });

@@ -229,7 +229,9 @@
       // silhouette ink, heavier than anything else in the picture
       g.lineWidth = 3.2; g.strokeStyle = K.LINE; g.stroke(body);
       // a ladder up the flank for the chimney sweep
-      K.ladder(g, cx + 196, base - 4, cx + 140, 520, 23);
+      g.fillStyle = 'rgba(8,4,10,0.5)'; g.fill(ell(cx + 196, base - 3, 18, 3));
+      K.ladder(g, cx + 196, base - 4, cx + 128, 522, 23);
+      g.fillStyle = 'rgba(8,4,10,0.45)'; g.fill(ell(cx + 128, 516, 12, 4));
     },
   });
   function band(g, by, r) {
@@ -331,7 +333,7 @@
       // the wicket seams glow where the clay has cracked
       const r = rng(5);
       g.globalCompositeOperation = 'lighter';
-      for (let k = 0; k < 9; k++) {
+      for (let k = 0; k < 4; k++) {
         const u = (r() - 0.5) * wicket.w * 0.8, y = wicket.y0 - 80 - r() * (wicket.h - 30), len = 6 + r() * 14;
         const a = onK(wicket.th, u, y), b = onK(wicket.th, u + len, y + (r() - 0.5) * 3);
         const pulse = 0.4 + 0.35 * (0.5 + 0.5 * Math.sin(t * (0.6 + r()) + k * 3)) * K.fire.level;

@@ -169,3 +169,23 @@ the clip-art flames and depth. What changed:
    layers sat between stills. Regrouped z so stills merge into 5 buckets (moved the front burrow
    out from behind the rack to under the bench). With the CPU throttled 4× in headless Chromium:
    desktop 17 → 26 fps, phone frame 21 → 31 fps. Unthrottled: 60 fps on both.
+
+## Round 8 — third fresh-eyes critique
+1. **"The foreground is a dead zone, the same value as the middle ground."** The near ground now
+   falls into shadow toward the viewer, so the kiln's forecourt is the brightest band and the
+   near plane reads as one dark, simple shape. Big nearly black grass blades frame the bottom
+   corners, rim-lit only on the edge that faces the kiln, swaying in the shared wind.
+2. **"The fire doesn't light its neighbours."** Every thrown pot now catches a warm rim on the
+   flank that faces the kiln, fading with distance (the teapot's left side, the workshop jar, the
+   bowl house). The hill door's light is shorter so the strata don't glow to the frame edge. The
+   red jar on the cooling bench read as a lamp; it's a dark iron glaze now.
+3. **"The kiln ladder floats."** Its top now rests on the shoulder, with contact shadows at both
+   ends.
+4. **"Line weight is the same everywhere."** Pot outlines are lighter (2.2), the far jar stack
+   lighter still behind its haze.
+5. **"Black triangles in the wall read as glitches; typed z's."** Broken saggars are rarer and
+   show a dim recess instead of black; the sleeper breathes out little curls instead of text Zs.
+   Fewer glowing seams on the wicket so it reads as a bricked-up door, not a window.
+Rejected again: moon, stars, horizon glow (the lane is light from within only).
+Not fixed: a portrait-specific composition (needs per-aspect framing the shared engine doesn't
+have); bricks staying one size up the taper is correct for a real bottle kiln.

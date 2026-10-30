@@ -78,11 +78,18 @@
       for (let i = 0; i <= 160; i++) { const th = (i / 160) * Math.PI, yy = edgeAt(th), w = F.halfW(yy), ry = K.rimRy(yy, w); const x = F.cx + w * Math.cos(th), y = yy + ry * Math.sin(th); i ? g.lineTo(x, y) : g.moveTo(x, y); }
       g.lineWidth = 1.6; g.strokeStyle = K.css(K.mul(K.lit(o.glaze.col, F.cx, o.glaze.edge), 0.6), 0.8); g.stroke();
     }
+    // the kiln's glare catches the flank that faces it
+    { const kx = 560, ky = 846, d = Math.hypot(kx - F.cx, ky - (y0 + y1) / 2), k = clamp(1 - d / 760, 0, 1);
+      if (k > 0.02) {
+        const dx = (kx - F.cx) / d, dy = (ky - (y0 + y1) / 2) / d, R = F.bot[0] * 1.4, cy = (y0 + y1) / 2;
+        g.lineWidth = 9; g.strokeStyle = grad(g, F.cx - dx * R, cy - dy * R, F.cx + dx * R, cy + dy * R, [[0, 'rgba(255,140,60,0)'], [0.62, 'rgba(255,140,60,0)'], [1, `rgba(255,150,70,${0.55 * k})`]]);
+        g.stroke(F.path);
+      } }
     // turn the edges away into shadow
     g.fillStyle = grad(g, F.cx - F.bot[0] * 1.6, 0, F.cx + F.bot[0] * 1.6, 0, [[0, 'rgba(6,4,12,0.55)'], [0.2, 'rgba(6,4,12,0.12)'], [0.5, 'rgba(6,4,12,0)'], [0.8, 'rgba(6,4,12,0.12)'], [1, 'rgba(6,4,12,0.55)']]);
     g.fillRect(F.cx - 400, y0 - 10, 800, y1 - y0 + 20);
     g.restore();
-    g.lineWidth = o.lw || 2.6; g.strokeStyle = K.inkAt(F.cx, (y0 + y1) / 2, 0.5); g.stroke(F.path);
+    g.lineWidth = o.lw || 2.2; g.strokeStyle = K.inkAt(F.cx, (y0 + y1) / 2, 0.5); g.stroke(F.path);
     // contact shadow
     g.fillStyle = 'rgba(8,4,10,0.5)'; g.fill(ell(F.cx, y1 + 1, F.bot[0] * 1.08, Math.max(3, K.rimRy(y1, F.bot[0]) + 3)));
   }
