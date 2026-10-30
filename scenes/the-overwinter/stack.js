@@ -138,8 +138,19 @@ function drawRock(g) {
     g.fill(poly([[x - 4, y], [x + 4, y], [x + 1, y + 40 + R() * 90], [x - 2, y + 30]]));
   }
   g.globalAlpha = 1;
-  // lichen: mustard and sage crusts, mostly high on the sides where the spray doesn't reach
-  for (let i = 0; i < 140; i++) {
+  // lichen: mustard and sage crusts in a few colonies, along the seams where water runs
+  for (let c = 0; c < 9; c++) {
+    const cu = [-0.25, -0.15, 1.12, 1.2, -0.3, 1.05, 0.5, 0.2, 0.8][c], cv = [0.95, 0.7, 0.8, 1.02, 0.5, 0.55, 0.9, 1.0, 0.98][c];
+    const [cx, cy] = drum(cu, cv);
+    for (let k = 0; k < 26; k++) {
+      const x = cx + (R() - 0.5) * 30 * (1 + R()), y = cy + (R() - 0.5) * 8 + R() * 22;
+      g.globalAlpha = 0.3 + R() * 0.4;
+      g.fillStyle = R() < 0.65 ? '#9a7e52' : '#76806a';
+      g.fill(ell(x, y, 1 + R() * 2.6, 0.8 + R() * 1.4));
+    }
+  }
+  g.globalAlpha = 1;
+  for (let i = 0; i < 0; i++) {
     const side = R() < 0.5 ? -1 : 1;
     const y = 220 + R() ** 1.4 * 720;
     const xs = side < 0 ? lerp(470, 440, (y - 200) / 900) + R() * 70 : lerp(920, 1000, (y - 200) / 900) - R() * 80;

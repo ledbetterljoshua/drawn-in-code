@@ -42,7 +42,7 @@ const TAGS = {
 // fixed casting first
 D.forEach((d) => { d.guest = null; d.rest = 0; });
 const free = () => D.filter((d) => !d.guest);
-const bear = D.find((d) => d.bear); bear.guest = 'bear'; bear.rest = 1;
+const bear = D.find((d) => d.bear); bear.guest = 'bear'; bear.rest = 2.4; // it won't shut: pulled right out
 focal.guest = 'dormouse'; focal.rest = 0.45; focal.cap = true;
 const big = free().filter((d) => d.w > 95 && d.cy > 900).sort((a, b) => b.w - a.w);
 big[0].guest = 'tortoise'; big[0].rest = 0.4;
@@ -374,7 +374,7 @@ function bearCub(g, s, a, d) {
   // a patchwork quilt, tucked in
   const quilt = curve([[-46 * s, 4 * s], [-36 * s, -6 * s], [-10 * s, -8 * s], [20 * s, -5 * s], [44 * s, -9 * s], [48 * s, 4 * s]]);
   // the back: a big brown hill
-  const by = -18 * s - rise * 14 * s;
+  const by = -13 * s - rise * 14 * s;
   const back = ell(8 * s, by + 6 * s, 30 * s, (18 + a.br * 1.6 + rise * 8) * s);
   ink(g, back, base, lw);
   g.save(); g.clip(back); g.fillStyle = shade; g.fill(ell(0, by + 22 * s, 32 * s, 14 * s)); g.fillStyle = lit; g.fill(ell(18 * s, by - 6 * s, 14 * s, 6 * s)); g.restore();
@@ -497,7 +497,7 @@ function drawOpen(g, d, o, a) {
   }
   // the guest, behind the front so the front hides its lower half
   const lipL = f[0], lipR = f[1], lx = (lipL[0] + lipR[0]) / 2, ly = (lipL[1] + lipR[1]) / 2;
-  const s = clamp((lipR[0] - lipL[0]) / 66, 0.45, 1.6) * (d.guest === 'bear' ? 0.8 : 1);
+  const s = clamp((lipR[0] - lipL[0]) / 66, 0.45, 1.6) * (d.guest === 'bear' ? 0.95 : 1);
   if (d.guest && RIGS[d.guest] && (o > 0.08 || d.guest === 'bear')) {
     g.save();
     // only what rises above the lip (or, below eye level, what's in the open drawer) is visible
@@ -506,6 +506,14 @@ function drawOpen(g, d, o, a) {
     if (d.flip < 0) g.scale(-1, 1);
     RIGS[d.guest](g, s, a, d);
     g.restore();
+  }
+  // below eye level we look down onto the drawer's side boards running back into the cabinet;
+  // drawn over the guest, they make it sit in the drawer rather than on it
+  if (below && o > 0.3) {
+    for (const [a0, b0] of [[f[0], slot[0]], [f[1], slot[1]]]) {
+      const th = 4 * s;
+      ink(g, poly([a0, b0, [b0[0], b0[1] + th * 0.6], [a0[0], a0[1] + th]]), mix(T.shade, T.lit, 0.4), 1.2);
+    }
   }
   OW.drawerFront(g, d, f, rng(d.seed));
   return { f, s };

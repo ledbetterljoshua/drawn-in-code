@@ -342,7 +342,7 @@ layer({
 
 // ------------------------------------------------------------ the kettle on its rope
 const K = { x: 0, y: 0, drop: 0, sv: 0, sw: 0 };
-const DAVIT = [930, 208];
+const DAVIT = [872, 186];
 layer({
   id: 'kettle', z: 26,
   hit(x, y) { return Math.hypot(x - K.x, y - K.y) < 26; },
@@ -357,13 +357,13 @@ layer({
     // the davit: a little timber crane at the top, its pulley wheel turning when the rope moves
     const [dx, dy] = DAVIT;
     ink(g, poly([[dx - 4, dy + 10], [dx - 1, dy - 26], [dx + 3, dy - 26], [dx + 4, dy + 10]]), '#5a4034', 1.4);
-    ink(g, poly([[dx - 2, dy - 26], [dx + 46, dy - 34], [dx + 46, dy - 29], [dx, dy - 21]]), '#6a4a3a', 1.4);
-    const wx = dx + 44, wy = dy - 28;
+    ink(g, poly([[dx - 2, dy - 26], [dx + 34, dy - 32], [dx + 34, dy - 27], [dx, dy - 21]]), '#6a4a3a', 1.4);
+    const wx = dx + 32, wy = dy - 26;
     ink(g, circ(wx, wy, 5), '#8a7a6a', 1.2);
     g.save(); g.translate(wx, wy); g.rotate(K.drop * 6); g.strokeStyle = LINE; g.lineWidth = 0.8; g.beginPath(); g.moveTo(-4, 0); g.lineTo(4, 0); g.moveTo(0, -4); g.lineTo(0, 4); g.stroke(); g.restore();
     // the rope down the face (it hangs clear of the drawers, past the right-hand chimney)
-    const len = 560 + K.drop * 40;
-    K.x = wx + 5 + Math.sin(K.sw) * len * 0.3; K.y = wy + Math.cos(K.sw) * len;
+    const len = 590 + K.drop * 40;
+    K.x = wx + 5 + Math.sin(K.sw) * len * 0.12; K.y = wy + Math.cos(K.sw) * len;
     g.lineWidth = 1.3; g.strokeStyle = '#a89070';
     g.beginPath(); g.moveTo(wx + 5, wy); g.quadraticCurveTo(wx + 6 + Math.sin(K.sw) * len * 0.1, wy + len * 0.5, K.x, K.y - 16); g.stroke();
     // a copper kettle, blackened on the bottom, steaming

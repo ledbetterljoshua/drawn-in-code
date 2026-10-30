@@ -32,24 +32,47 @@ layer({
     g.fillRect(-3000, -3000, 6000, 3000);
     g.restore();
 
-    // long stratus, lit from below by the sun under the horizon: thin tapering streaks, rose on
-    // their undersides near the glow, going violet and ragged higher up
+    // the snow cloud: a deck moving in over the top of the picture. Its ragged underside hangs in
+    // lumps and catches the afterglow — rose and apricot near the sunset, violet away from it —
+    // above a clear band of sky on the horizon. (It's what's dropping the snow.)
     const R = rng(77);
-    const bands = [[HZ - 40, 1, 4], [HZ - 96, 0.85, 5], [HZ - 170, 0.6, 4], [HZ - 330, 0.35, 3], [HZ - 560, 0.18, 3]];
-    for (const [y0, warm, n] of bands) {
-      for (let i = 0; i < n; i++) {
-        const cx = X0 + (X1 - X0) * (i + R() * 0.8) / n, len = 260 + R() * 700, yy = y0 + (R() - 0.5) * 50;
-        const near = clamp(1 - Math.abs(cx - SUNX) / 1300, 0, 1);
-        const body = mix('#2e2a54', '#6c5078', warm * 0.7);
-        const lit = mix('#8c6890', near > 0.4 ? '#ffd0aa' : '#f0a0a0', warm * (0.4 + near * 0.6));
-        // a streak is a stack of thin ellipses, each a little offset: soft and fibrous
-        for (let k = 0; k < 7; k++) {
-          const ox = (R() - 0.5) * len * 0.5, w = len * (0.25 + R() * 0.35), h = 1.2 + R() * (3 + warm * 3);
-          g.globalAlpha = 0.18 + R() * 0.28;
-          g.fillStyle = body; g.fill(ell(cx + ox, yy + (R() - 0.5) * 8, w, h));
-          g.globalAlpha *= 0.9;
-          g.fillStyle = lit; g.fill(ell(cx + ox + 6, yy + h * 0.7 + (R() - 0.5) * 6, w * 0.8, Math.max(0.8, h * 0.45)));
-        }
+    const deckY = (x) => 380 + 120 * noise(x * 0.0022 + 4) + 70 * noise(x * 0.006 + 9) + (x - SUNX) * 0.05;
+    const top = Math.min(Y0, -600);
+    // the body of the deck: a soft lower edge, no hard line (columns, each with its own fade)
+    for (let x = X0; x < X1; x += 6) {
+      const y = deckY(x);
+      g.fillStyle = grad(g, 0, y - 260, 0, y + 30, [[0, '#1a1834'], [0.7, 'rgba(36,32,64,0.96)'], [0.9, 'rgba(46,40,74,0.6)'], [1, 'rgba(46,40,74,0)']]);
+      g.fillRect(x, y - 260, 7, 290);
+    }
+    g.fillStyle = grad(g, 0, top, 0, 200, [[0, '#12112a'], [1, '#1a1834']]);
+    g.fillRect(X0, top, X1 - X0, 200 - top + 1);
+    for (let x = X0; x < X1; x += 6) { const y = deckY(x); if (y - 260 > 200) { g.fillStyle = '#1a1834'; g.fillRect(x, 200, 7, y - 260 - 200 + 1); } }
+    // rolls along the underside (stratocumulus): long soft lozenges, lit from below near the sunset
+    for (let i = 0; i < 260; i++) {
+      const lx = X0 + R() * (X1 - X0), y = deckY(lx) - R() ** 1.5 * 70;
+      const near = clamp(1 - Math.abs(lx - SUNX) / 1200, 0, 1) ** 1.4;
+      const rx = 24 + R() * 80, ry = 4 + R() * 10;
+      g.globalAlpha = 0.18 + R() * 0.22;
+      g.fillStyle = mix('#231f40', '#3a2a4c', near); g.fill(ell(lx, y, rx, ry));
+      g.globalAlpha = (0.12 + R() * 0.3) * (0.3 + near);
+      g.fillStyle = mix('#6c5888', '#ffb894', near); g.fill(ell(lx + 4, y + ry * 0.6, rx * 0.8, ry * 0.45));
+    }
+    g.globalAlpha = 1;
+    // soft folds inside the deck, so it isn't a flat lid
+    for (let i = 0; i < 40; i++) {
+      const x = X0 + R() * (X1 - X0), y = deckY(x) - 60 - R() * 380;
+      g.globalAlpha = 0.18; g.fillStyle = R() < 0.5 ? '#2e2a4e' : '#100f24';
+      g.fill(ell(x, y, 80 + R() * 220, 6 + R() * 16));
+    }
+    g.globalAlpha = 1;
+    // a few streaks low in the clear band, lit hot near the sunset
+    for (let i = 0; i < 9; i++) {
+      const cx = SUNX + (R() - 0.45) * 1800, yy = HZ - 30 - R() * 150, len = 120 + R() * 380;
+      const near = clamp(1 - Math.abs(cx - SUNX) / 900, 0, 1);
+      for (let k = 0; k < 4; k++) {
+        const w = len * (0.3 + R() * 0.4), h = 1.4 + R() * 3.2, ox = (R() - 0.5) * len * 0.5;
+        g.globalAlpha = 0.25 + R() * 0.3; g.fillStyle = mix('#5a4470', '#3a2c52', R()); g.fill(ell(cx + ox, yy, w, h));
+        g.globalAlpha *= 1.2; g.fillStyle = mix('#c88aa0', '#ffd2a8', near); g.fill(ell(cx + ox + 4, yy + h * 0.6, w * 0.8, Math.max(0.7, h * 0.4)));
       }
     }
     g.globalAlpha = 1;
@@ -128,8 +151,8 @@ const lighthouse = layer({
 const stars = [];
 {
   const R = rng(404);
-  for (let i = 0; i < 70; i++) stars.push({ x: -700 + R() * 2600, y: -500 + R() * 950, r: 0.5 + R() ** 3 * 1.4, ph: R() * TAU, sp: 0.6 + R() * 2 });
-  stars.push({ x: 1180, y: 430, r: 2.6, ph: 0, sp: 0.4, venus: true });
+  for (let i = 0; i < 14; i++) stars.push({ x: 1000 + R() * 900, y: 560 + R() * 260, r: 0.5 + R() ** 3 * 1.1, ph: R() * TAU, sp: 0.6 + R() * 2 });
+  stars.push({ x: 1150, y: 640, r: 2.4, ph: 0, sp: 0.4, venus: true });
 }
 layer({
   id: 'stars', z: 1,
@@ -137,7 +160,7 @@ layer({
   draw(g, t, L) {
     for (const s of stars) {
       // fade toward the horizon: stars only show where the sky is dark enough
-      const vis = clamp((HZ - 420 - s.y) / 500, 0, 1) + (s.venus ? 0.9 : 0);
+      const vis = clamp((HZ - 300 - s.y) / 200, 0, 0.7) + (s.venus ? 0.9 : 0);
       if (vis <= 0) continue;
       const tw = 0.65 + 0.35 * Math.sin(t * s.sp + s.ph) * Math.sin(t * s.sp * 1.7 + s.ph * 2);
       const boost = L.cur === s ? L.hover : 0;
@@ -170,14 +193,14 @@ layer({
     g.restore();
     // swell lines: short, broken, thinner and closer toward the horizon
     const R = rng(55);
-    for (let i = 0; i < 260; i++) {
+    for (let i = 0; i < 120; i++) {
       const k = R() ** 1.6, y = HZ + 2 + k * (SHORE + 30 - HZ);
       const x = X0 + R() * (X1 - X0), len = 6 + k * 60 * (0.5 + R());
       const near = clamp(1 - Math.abs(x - SUNX) / (500 + k * 600), 0, 1);
-      g.globalAlpha = 0.25 + near * 0.55;
+      g.globalAlpha = 0.12 + near * 0.45;
       g.fillStyle = near > 0.2 ? OW.mix('#9d7ba0', '#ffd0b0', near) : '#5c5084';
       g.fillRect(x, y, len, 0.8 + k * 1.4);
-      g.globalAlpha = 0.35; g.fillStyle = '#1c1934';
+      g.globalAlpha = 0.18; g.fillStyle = '#1c1934';
       g.fillRect(x + len * 0.2, y + 1 + k * 1.6, len * 0.7, 0.8 + k);
     }
     g.globalAlpha = 1;

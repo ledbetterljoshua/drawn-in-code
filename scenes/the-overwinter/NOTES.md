@@ -99,3 +99,18 @@ foreground. Reflection half strength and fading fast. Foreground slabs at the bo
 high face is now a scatter of dark half-buried slots instead of ghost wallpaper. Snow on every
 cabinet top, drifted to one end; rock lips creep over cabinet corners. Cap snow drifted, uneven.
 Sleepers sunk into their drawers with heads on the lips; tags on far fewer drawers.
+
+## Round 3
+
+Five worst:
+1. **Sky: pinstripe streaks over a flat field — and it's snowing out of a clear sky.** → a snow-cloud
+   deck over the top of the picture, its soft underside in rolls lit rose/apricot near the sunset,
+   above a clear band on the horizon. First try had a scalloped edge (doily), second dangling blobs;
+   third — a per-column soft fade plus 260 soft lit rolls — reads as weather.
+2. **The bear cub sleeps *on* its drawer.** → drawer pulled right out (it won't shut), cub sunk into it
+   with only its back, head and paw over the lip; side boards drawn over the guest below eye level.
+3. **The kettle dangles in empty sky past the stack's edge.** → davit moved in; the rope now hangs
+   down across the face to the bottle porter.
+4. **Sea dashes ruled like a ledger.** → half as many, fainter.
+5. **Lichen as even noise.** → nine colonies along the seams.
+Perf: 60 fps desktop.
