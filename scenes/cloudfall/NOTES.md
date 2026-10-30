@@ -229,3 +229,10 @@ It still rated eight items visible, so not done. The ones that held up:
    the household's size, basket half as big again.
 Marginal by its own rating, left alone: tangents at the frame edge, "perspective is mixed" (it
 isn't).
+
+## Round 13
+Looked at both frames at full size and at thumbnail size. Candidates I considered and rejected:
+the big pale lavender bank on the left (it is the side away from the sun and the picture needs
+the rest there); more texture on the rock (would put detail back where the eye shouldn't go);
+more sky content on the phone (the stars, islets and varied clouds already carry it). Nothing I
+could name would visibly change the full frame.
