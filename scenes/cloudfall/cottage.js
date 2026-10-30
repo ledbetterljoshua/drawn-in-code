@@ -609,15 +609,17 @@ layer({
     for (const a of [0.5, 1.2, 1.9, 2.6]) { const [x0, y0] = pr(X + Math.cos(a) * TR, BAL_Y - 22, Z + Math.sin(a) * TR), [x1, y1] = pr(X + Math.cos(a) * BAL_R, BAL_Y - 1, Z + Math.sin(a) * BAL_R); tube(g, seg(x0, y0, x1, y1 + 4), tone(M.timber, 0.4), 2.4, 1.1); }
     const [gx, gy] = pr(...gazerPos());
     // the telescope on its tripod
-    const px = gx + 18, py = gy - 22;
+    const px = gx + 18, py = gy - 28;
     for (const fx_ of [px - 8, px, px + 8]) tube(g, seg(px, py, fx_, gy + 1), '#5a3a3a', 1.4, 0.9);
     g.save(); g.translate(px, py); g.rotate(gazer.a);
     ink(g, poly([[-12, -3.5], [22, -5], [22, 5], [-12, 3.5]]), grad(g, 0, -5, 0, 5, ['#f6d27a', '#c98f3e']), 1.5);
     ink(g, rect(20, -6.5, 5, 13), '#8a5a3c', 1.4); ink(g, rect(-15, -2.5, 4, 5), '#8a5a3c', 1.2);
     g.restore();
     const ex = px + Math.cos(gazer.a) * -13, ey = py + Math.sin(gazer.a) * -13;
-    frog(g, gx, gy + gazer.hop, 0.6, { wide: 0.86, tall: 1.08, c: CF.FROG_TINTS.teal, open: gazer.blink(t), look: [Math.cos(gazer.a), Math.sin(gazer.a)], smile: 2 + L.hover * 2.5, squash: gazer.hop < -1 ? 1.06 : 1,
-      arms: gazer.hop < -2 ? [[-20, -30], [20, -30]] : [[(ex - gx) / 0.72, (ey - gy) / 0.72]],
+    // she stands on a crate to see over the rail
+    ink(g, rect(gx - 9, gy - 8, 18, 8), tone(M.timber, 0.6), 1.2, M.timber.line);
+    frog(g, gx, gy - 8 + gazer.hop, 0.68, { wide: 0.88, tall: 1.06, c: CF.FROG_TINTS.teal, open: gazer.blink(t), look: [Math.cos(gazer.a), Math.sin(gazer.a)], smile: 2 + L.hover * 2.5, squash: gazer.hop < -1 ? 1.06 : 1,
+      arms: gazer.hop < -2 ? [[-20, -30], [20, -30]] : [[(ex - gx) / 0.68, (ey - gy + 8) / 0.68]],
       hat: (g, lw) => { ink(g, poly([[-9, -32], [9, -32], [2, -52], [-1, -52]]), '#4a4a8a', lw); g.fillStyle = '#f2d35a'; g.fill(circ(-1, -40, 1.6)); g.fill(circ(3, -45, 1.2)); } });
     // the near railing, in front of her
     const rail = outer.map(([x, y]) => [x, y - 17]);

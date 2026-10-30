@@ -217,6 +217,11 @@ layer({
     g.save();
     const sil = new Path2D(); for (const c of ISLE.cells) if (c.facing > -0.05) sil.addPath(c.path);
     g.clip(sil);
+    // aerial haze: the belly goes back toward the colour of the cloud below as it descends, so
+    // the rock is darkest just under the lip and the eye stays up on the top
+    const [, yLip] = pr(0, -20, RZ), [, yTip] = pr(40, -450, 30);
+    g.fillStyle = grad(g, 0, yLip + 60, 0, yTip, [[0, 'rgba(232,196,214,0)'], [0.6, 'rgba(232,196,214,0.22)'], [1, 'rgba(240,206,214,0.5)']]);
+    g.fillRect(CF.CAM.cx - 440, yLip, 880, yTip - yLip + 40);
     g.save(); g.globalCompositeOperation = 'multiply';
     g.fillStyle = grad(g, CF.CAM.cx - 420, 0, CF.CAM.cx + 420, 0, ['rgba(70,56,140,0.72)', 'rgba(140,120,190,0.3)', 'rgba(255,255,255,0)']); g.fillRect(CF.CAM.cx - 430, 630, 870, 460);
     g.fillStyle = grad(g, 0, 660, 0, 1090, ['rgba(255,255,255,0)', 'rgba(120,90,150,0.3)']); g.fillRect(CF.CAM.cx - 430, 630, 870, 460);
@@ -263,8 +268,9 @@ layer({
       g.fillStyle = rgba(r() < 0.5 ? '#3f7a52' : '#d8e48a', 0.12 + r() * 0.1);
       g.fill(ell(x, y, w, w * 0.28, undefined, (r() - 0.5) * 0.3));
     }
-    // a lighter edge where the grass turns down toward us and catches the sky
+    // a lighter edge where the grass turns down toward us and catches the sky, warmest sunward
     g.lineWidth = 16; g.strokeStyle = rgba('#e9f0a0', 0.18); g.stroke(top);
+    g.lineWidth = 10; g.strokeStyle = grad(g, CF.CAM.cx, 0, CF.CAM.cx + 420, 0, ['rgba(255,214,140,0)', 'rgba(255,214,140,0.5)']); g.stroke(top);
     g.restore();
     // the edge isn't combed: bites where the turf has crumbled to bare soil, clumps that slump over
     const bites = [0.6, 1.05, 1.9, 2.3, 2.8], clumps = [0.25, 0.9, 1.4, 2.05, 2.65, 3.0];
@@ -733,7 +739,7 @@ layer({
     tube(g, rod, '#b07a4c', 2.2, 1.2);
     frog(g, fx_, fy - 2, 0.85, { wide: 1.08, open: fisher.blink(t), look: [-0.8, 0.6 - c], smile: 2 + c * 3, c: CF.FROG_TINTS.olive,
       arms: [[-17, -12 - c * 6, -12, -11]],
-      hat: (g, lw) => { ink(g, D.ell(0, -32, 17, 4.5), '#e8c56a', lw); ink(g, D.ell(0, -36, 9, 6), '#e8c56a', lw); g.lineWidth = 2.4; g.strokeStyle = '#c9503f'; g.beginPath(); g.ellipse(0, -33.5, 8.6, 2.2, 0, 0, Math.PI); g.stroke(); } });
+      hat: (g, lw) => { ink(g, D.ell(0, -37, 17, 4), '#e8c56a', lw); ink(g, D.ell(0, -41, 9, 5.5), '#e8c56a', lw); g.lineWidth = 2.4; g.strokeStyle = '#c9503f'; g.beginPath(); g.ellipse(0, -38.5, 8.6, 2, 0, 0, Math.PI); g.stroke(); } });
     // a bucket beside the fisher, with one already in it
     const [kx, ky] = pr(SAT.X - 34, SAT.Y, SAT.Z + 22);
     CF.contact(g, kx, ky, 11, 3.5);

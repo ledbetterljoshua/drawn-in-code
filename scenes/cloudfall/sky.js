@@ -46,11 +46,11 @@ layer({
     }
     // long thin streaks of high cloud, lit underneath by the low sun
     const r = rng(8);
-    for (let i = 0; i < 16; i++) {
+    for (let i = 0; i < 9; i++) {
       const y = lerp(v.y0 + 80, HZ - 60, r() ** 0.7), x = v.x0 + r() * (v.x1 - v.x0), len = 120 + r() * 340, th = 2 + r() * 5;
       const warm = clamp((y - (HZ - 500)) / 500, 0, 1) * clamp((x + 200) / 2000, 0.2, 1);
       g.fillStyle = rgba(mix('#d9d6f2', '#ffd3b0', warm), 0.32 + r() * 0.3);
-      const p = new Path2D(); p.moveTo(x - len / 2, y); p.quadraticCurveTo(x, y - th * 1.6, x + len / 2, y + 2); p.quadraticCurveTo(x, y + th, x - len / 2, y); g.fill(p);
+      const bend = (r() - 0.5) * 18, p = new Path2D(); p.moveTo(x - len / 2, y + bend * 0.3); p.bezierCurveTo(x - len * 0.2, y - th * 1.4 + bend, x + len * 0.15, y - th * 0.6 - bend * 0.5, x + len / 2, y - bend * 0.2); p.bezierCurveTo(x + len * 0.2, y + th * 0.2 - bend * 0.4, x - len * 0.25, y + th * 0.5 + bend, x - len / 2, y + bend * 0.3); g.fill(p);
     }
   },
 });
@@ -81,7 +81,7 @@ function cloudRow(g, d, seed, v) {
     const tall = 0.4 + R() ** 1.5 * 1.6;
     for (let i = 0; i < n; i++) {
       const u = i / (n - 1), env = Math.sin(Math.PI * (0.08 + u * 0.84)) ** 0.7;
-      const rr = r * (0.45 + 0.75 * env * tall) * (0.85 + R() * 0.3);
+      const rr = r * (0.45 + 0.75 * env * tall) * (0.6 + R() * 0.8);
       cs.push([x + u * len, y - rr * 0.55 * env * tall + noise(x * 0.01 + i) * r * 0.15, rr]);
     }
     for (let i = 0; i < n * 0.5; i++) { const u = 0.2 + R() * 0.6, env = Math.sin(Math.PI * u); cs.push([x + u * len, y - r * tall * env * (0.9 + R() * 0.4), r * (0.35 + 0.4 * env * tall)]); }
@@ -89,7 +89,7 @@ function cloudRow(g, d, seed, v) {
     for (let xx = x; xx < x + len; xx += r * 0.9) cs.push([xx, y + r * 0.7, r * 0.95]);
     const w = warmAt(x + len / 2);
     lumps(g, cs, {
-      union: true, lw: 1.2, line: r > 22 && r < 48 ? rgba('#9a6a8c', 0.22 * (1 - far)) : null,
+      union: true, lw: 1.2, line: null,
       shade: mix(mix('#b9a0cc', '#d2a6bc', w), '#e4c6d0', far),
       base: mix(mix('#f1d8da', '#fbd8c4', w), '#f3d8d0', far * 0.6),
       lit: mix(mix('#fff2e8', '#fff0cc', w), '#fbe6d8', far * 0.6),
@@ -142,7 +142,7 @@ function farIsle(g, x, y, w, haze, seed) {
   g.fillStyle = grad(g, x - w / 2, 0, x + w / 2, 0, [sh, mix(sh, lt, 0.45), lt]); g.fill(rock);
   g.fillStyle = mix('#5d5a8a', '#bba9c0', haze);
   g.save(); g.clip(rock); g.globalAlpha = 0.4;
-  for (let i = 0; i < 4; i++) { g.fillRect(x - w / 2, y + w * (0.12 + i * 0.13), w, w * 0.025); }
+  g.globalAlpha = 0.18; for (let i = 0; i < 2; i++) { g.fill(ell(x - w * 0.05, y + w * (0.2 + i * 0.2), w * (0.38 - i * 0.12), w * 0.02)); }
   g.restore(); g.globalAlpha = 1;
   // its waterfall, a thread of light
   g.strokeStyle = grad(g, 0, y, 0, y + w * 1.1, [rgba('#fff6ea', 0.7 - haze * 0.3), rgba('#fff6ea', 0)]); g.lineWidth = Math.max(1, w * 0.02);
@@ -183,11 +183,18 @@ layer({
       at(3.2, () => bank(g, 100, rowY(3.2) + 10, 760, 210, 31, 0.1)),
       at(2.4, () => bank(g, 1640, rowY(2.4) + 10, 820, 260, 33, 1)),
       at(1.3, () => bank(g, -200, rowY(1.3) + 30, 900, 300, 35, 0.2)),
+      at(0.26, () => bank(g, 1100, rowY(0.26) + 60, 1300, 420, 37, 0.7)),
     ];
     for (const d of ds) {
       for (const th of things) if (!th.done && th.d >= d) { th.fn(); th.done = true; }
       cloudRow(g, d, seed++, v);
     }
+    // the island's own shadow, far below on the cloud floor, thrown back and to the left
+    g.save(); g.globalCompositeOperation = 'multiply';
+    const [shx, shy] = [CF.CAM.cx - 330, HZ + 300 / 0.9];
+    g.fillStyle = radial(g, shx, shy, 0, 330, [[0, 'rgba(150,130,190,0.45)'], [0.7, 'rgba(170,150,200,0.25)'], [1, 'rgba(200,180,220,0)']]);
+    g.save(); g.translate(shx, shy); g.scale(1, 0.18); g.fill(circ(0, 0, 330)); g.restore();
+    g.restore();
     // the sun's warmth laid across the cloud tops on its side
     g.save(); g.globalCompositeOperation = 'soft-light';
     g.fillStyle = radial(g, 1900, HZ + 40, 0, 1300, [[0, 'rgba(255,190,110,0.55)'], [1, 'rgba(255,190,110,0)']]);

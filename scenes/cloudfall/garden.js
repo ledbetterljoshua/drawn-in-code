@@ -47,26 +47,29 @@ layer({
 // ------------------------------------------------------------------ cast shadows across the grass
 layer({
   id: 'shadows', z: 18, still: true,
-  draw(g) {
-    g.save(); g.clip(CF.topPath);
-    for (const f of CF.casters) CF.multiply(g, CF.castPath(f()), CF.SHADOW, 0.85);
-    // the tree's canopy throws a soft dappled patch
-    const [sx, sz] = CF.shadowOf(TREE.X, TREE.cy, TREE.Z);
-    const [x, y] = pr(sx, 0, sz);
-    CF.multiply(g, ell(x, y, 150, 150 * S * 1.2), CF.SHADOW, 0.7);
-    const r = rng(2);
-    for (let i = 0; i < 14; i++) CF.multiply(g, ell(x + (r() - 0.5) * 260, y + (r() - 0.5) * 70, 30 + r() * 30, 10 + r() * 8), CF.SHADOW, 0.35);
+  draw(g0) {
+    // every shadow is painted flat into one mask first, so where two overlap they don't stack
+    // into a hole; then the mask is laid over the grass once
+    const off = document.createElement('canvas'); off.width = g0.canvas.width; off.height = g0.canvas.height;
+    const g = off.getContext('2d'); g.setTransform(g0.getTransform()); g.lineCap = 'round';
+    g.clip(CF.topPath);
+    g.fillStyle = g.strokeStyle = CF.SHADOW;
+    for (const f of CF.casters) g.fill(CF.castPath(f()));
+    // the tree's canopy throws a dappled patch
+    const [sx, sz] = CF.shadowOf(TREE.X, TREE.cy, TREE.Z), [x, y] = pr(sx, 0, sz), r = rng(2);
+    g.fill(ell(x, y, 140, 140 * S * 1.1));
+    g.globalCompositeOperation = 'destination-out';
+    for (let i = 0; i < 12; i++) g.fill(ell(x + (r() - 0.5) * 240, y + (r() - 0.5) * 50, 8 + r() * 12, 3 + r() * 3));
+    g.globalCompositeOperation = 'source-over';
     // little things cast long thin shadows too: flowers, poles, the hive, the barrel, the post
-    const streak = (X, Z, h, w, a = 0.75) => { const [x0, y0] = pr(X, 0, Z), [sx, sz] = CF.shadowOf(X, h, Z), [x1, y1] = pr(sx, 0, sz); g.save(); g.globalCompositeOperation = 'multiply'; g.globalAlpha = a; g.strokeStyle = CF.SHADOW; g.lineCap = 'round'; g.lineWidth = w; g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke(); g.fillStyle = CF.SHADOW; g.fill(ell(x1, y1, w * 2.2, w * 0.9)); g.restore(); };
+    const streak = (X, Z, h, w) => { const [x0, y0] = pr(X, 0, Z), [sx, sz] = CF.shadowOf(X, h, Z), [x1, y1] = pr(sx, 0, sz); g.lineWidth = w; g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke(); g.fill(ell(x1, y1, w * 2.2, w * 0.9)); };
     for (const f of flowers) streak(f.X, f.Z, f.h, 2.5);
     streak(HIVE[0], HIVE[2], 40, 14); streak(-150, 168, 78, 6); streak(HB[0], HB[2], 62, 4);
     const [bX, bZ] = CF.cottage.at(-84, 76); streak(bX, bZ, 30, 18);
-    streak(-104, 150, 30, 12, 0.6);
-    for (let a = 1.75; a <= 2.75; a += 0.07) { const [X, Z] = CF.rim(a); streak(X * 0.93, Z * 0.93, 18, 2.2, 0.5); }
-    // the trunk's shadow, a long thin streak back to the left
-    const [tx, ty] = pr(TREE.X, 0, TREE.Z), [sx2, sz2] = CF.shadowOf(TREE.X, 130, TREE.Z), [ex, ey] = pr(sx2, 0, sz2);
-    g.lineCap = 'round'; g.lineWidth = 20; g.save(); g.globalCompositeOperation = 'multiply'; g.strokeStyle = CF.SHADOW; g.globalAlpha = 0.85; g.beginPath(); g.moveTo(tx, ty); g.lineTo(ex, ey); g.stroke(); g.restore();
-    g.restore();
+    streak(-104, 150, 30, 12);
+    for (let a = 1.75; a <= 2.75; a += 0.07) { const [X, Z] = CF.rim(a); streak(X * 0.93, Z * 0.93, 18, 2.2); }
+    streak(TREE.X, TREE.Z, 130, 20);
+    g0.save(); g0.setTransform(1, 0, 0, 1, 0, 0); g0.globalCompositeOperation = 'multiply'; g0.globalAlpha = 0.8; g0.drawImage(off, 0, 0); g0.restore();
   },
 });
 
@@ -484,7 +487,7 @@ layer({
   update(dt, t, L) { fall.flow = ease(fall.flow, L.hover, 2, dt); },
   draw(g, t) {
     const f = fall.flow, gust = (wind(t, 1100) - 0.7) * 6;
-    const T1 = 4.3, TS = 2.1, N = 30;
+    const T1 = 5.2, TS = 2.1, N = 34;
     const edge = (side, t0, t1, w0, off = 0) => { const pts = []; for (let i = 0; i <= N; i++) { const tt = lerp(t0, t1, i / N), sp = clamp((tt - TS + 0.5) / (T1 - TS + 0.5), 0, 1), [x, y] = fallAt(tt, side, w0 + f * 2 + (1 - sp) * (13 - w0) * (off ? 1 : 0)); pts.push([x + off * sp + gust * tt * tt * 0.6 + Math.sin(tt * 3 + t * 2 + off) * tt * 2, y]); } return pts; };
     const sheet = (t0, t1, w0, off, a0, a1) => {
       const L = edge(-1, t0, t1, w0, off), R = edge(1, t0, t1, w0, off);
@@ -518,8 +521,13 @@ layer({
     for (let i = 0; i < 6; i++) { const ph = (t * 1.5 + i * 0.17) % 1, [fx_, fy] = fallAt(0.05, -1 + i * 0.4); g.fillStyle = `rgba(255,255,255,${0.7 * (1 - ph)})`; g.fill(circ(fx_, fy - ph * 6, 1.8 + ph * 2.5)); }
     // spray: drops blown off the edges, and the veil of mist where it all comes apart
     for (let i = 0; i < 18; i++) { const ph = (t * 0.5 + i / 18) % 1, tt = 0.4 + ph * (T1 - 0.4), [x, y] = fallAt(tt, i % 2 ? 1.4 : -1.3); g.fillStyle = `rgba(255,255,255,${0.45 * (1 - ph)})`; g.fill(circ(x + gust * tt * tt + ph * 16 + Math.sin(i * 3) * 5, y, 1.2 + ph * 2)); }
+    // where what's left of it reaches the cloud floor, a warm plume of mist
+    const [ex, ey] = fallAt(T1, 0);
     g.save(); g.globalCompositeOperation = 'lighter';
-    for (let i = 0; i < 6; i++) { const ph = (t * 0.25 + i / 6) % 1, [x, y] = fallAt(T1 - 0.3 + ph * 0.3, (i - 2.5) * 0.5); const mx = x + gust * 4 + ph * 20, my = y - ph * 30, mr = 22 + ph * 30; g.fillStyle = radial(g, mx, my, 0, mr, [[0, `rgba(255,246,236,${0.22 * Math.sin(ph * Math.PI)})`], [1, 'rgba(255,246,236,0)']]); g.fill(circ(mx, my, mr)); }
+    for (let i = 0; i < 5; i++) { const ph = (t * 0.2 + i / 5) % 1, mr = 30 + ph * 50; g.fillStyle = radial(g, ex + gust * 6 + (i - 2) * 18, ey - ph * 60, 0, mr, [[0, `rgba(255,236,214,${0.2 * Math.sin(ph * Math.PI)})`], [1, 'rgba(255,236,214,0)']]); g.fill(circ(ex + gust * 6 + (i - 2) * 18, ey - ph * 60, mr)); }
+    g.restore();
+    g.save(); g.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < 6; i++) { const ph = (t * 0.25 + i / 6) % 1, [x, y] = fallAt(TS + 0.4 + ph * 0.6, (i - 2.5) * 0.5); const mx = x + gust * 4 + ph * 20, my = y - ph * 30, mr = 22 + ph * 30; g.fillStyle = radial(g, mx, my, 0, mr, [[0, `rgba(255,246,236,${0.12 * Math.sin(ph * Math.PI)})`], [1, 'rgba(255,246,236,0)']]); g.fill(circ(mx, my, mr)); }
     g.restore();
   },
 });

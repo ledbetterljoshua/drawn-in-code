@@ -50,7 +50,7 @@ layer({
 });
 
 // ------------------------------------------------------------------ near clouds, drifting past below
-const front = [{ x: 1010, y: 1118, w: 760, h: 170, seed: 41, sp: 1.2 }, { x: 330, y: 1200, w: 560, h: 150, seed: 42, sp: 1.4 }, { x: 1640, y: 1190, w: 520, h: 150, seed: 43, sp: 1.8 }, { x: 760, y: 1290, w: 620, h: 160, seed: 44, sp: 1.1 }, { x: -120, y: 1290, w: 520, h: 150, seed: 45, sp: 1.6 }];
+const front = [{ x: 260, y: 1170, w: 620, h: 160, seed: 42, sp: 1.4 }, { x: 1560, y: 1150, w: 640, h: 170, seed: 43, sp: 1.8 }, { x: 900, y: 1340, w: 900, h: 170, seed: 44, sp: 1.1 }, { x: -160, y: 1270, w: 520, h: 150, seed: 45, sp: 1.6 }];
 const FRONT = { union: true, line: 'rgba(140,84,120,0.6)', lw: 1.9, shade: '#c891b4', base: '#f9d2c6', lit: '#fff1de' };
 onLayout(() => { for (const c of front) { c.cs = CF.cumulusCircles(c.seed, c.w, c.h); c.sp_ = sprite(-c.w * 0.6 - 10, -c.h * 1.7, c.w * 1.2 + 20, c.h * 2.4, (g) => lumps(g, c.cs, FRONT)); c.billow = 0; } });
 layer({

@@ -179,3 +179,26 @@ Fixed:
 4. The flour-sack labels were clipped by the sacks in front; only the front one is lettered.
 5. (Checked, not changed: the left cloud bank is paler and flatter than the right one. That's the
    side away from the sun, so it should be.)
+
+## Round 10 (third fresh-eyes critic)
+Asked this critic, besides the usual ten, which of its points would visibly improve the picture
+at full-frame size. It named six: (1) the rock's belly was the largest, darkest mass and pulled
+the eye off the story; (2) the foreground bank swallowed the tip so the island seemed to sit in
+the clouds (the opposite of round 8's critic, who asked for the bank; I sided with the idea of
+the picture: it floats); (3) the floor's rows still stamped, with one lavender rim; (4) the
+phone's sky wisps looked like scanlines and the high islets like striped icons; (6) a
+near-black hole under the tree where shadows stacked; (10) the waterfall dissolved with nowhere
+to land. Its claim that the roof is twisted off the walls is wrong: ridge, eave and window
+lines are parallel by construction in this camera.
+
+Fixed:
+- The belly hazes back toward the cloud colour as it descends; the grass lip got a warm rim on
+  the sun side. The rock is now darkest just under the lip.
+- The bank moved to frame the corners; the whole tip and its chunks hang in clear air.
+- No ink at all on the floor rows; heads vary from 0.6 to 1.4 of the row's size. A big designed
+  bank in the phone's lower third.
+- Wisps are tapered, curved, and fewer; the high islets lost their stripes.
+- Shadows are painted flat into one mask and laid over the grass once, so overlaps can't stack.
+- The waterfall runs on down and ends in a warm plume of mist where it reaches the floor.
+- (Also: the fisher's and gardener's hats sat on their eyes; the stargazer was hidden behind
+  her rail, so she stands on a crate.)
